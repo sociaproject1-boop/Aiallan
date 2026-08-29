@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -390,4 +389,269 @@
       <a href="#" class="product-card" id="prod4">
         <div class="product-thumb" id="thumb4">📢</div>
         <div class="product-info"><div class="product-name" id="name4">Campaign Tools</div></div>
-      
+      </a>
+      <a href="#" class="product-card" id="prod5">
+        <div class="product-thumb" id="thumb5">🍜</div>
+        <div class="product-info"><div class="product-name" id="name5">Foods & Groceries</div></div>
+      </a>
+      <a href="#" class="product-card" id="prod6">
+        <div class="product-thumb" id="thumb6">🔧</div>
+        <div class="product-info"><div class="product-name" id="name6">Heavy Duty Tools</div></div>
+      </a>
+      <a href="#" class="product-card" id="prod7">
+        <div class="product-thumb" id="thumb7">🏍️</div>
+        <div class="product-info"><div class="product-name" id="name7">Motor & Vehicle Parts</div></div>
+      </a>
+      <a href="#" class="product-card" id="prod8">
+        <div class="product-thumb" id="thumb8">📚</div>
+        <div class="product-info"><div class="product-name" id="name8">Books & Learning</div></div>
+      </a>
+    </div>
+  </div>
+
+<script>
+  // state variables
+  let PASSWORD = "allan123";
+  let otpCode = "";
+  let musicUrl = "";
+  let isPlaying = false;
+  const catImgData = {}; // store data URLs for category thumbs
+  let avatarData = "";
+
+  // Modal controls
+  function openLogin() {
+    const m = document.getElementById('loginModal');
+    m.classList.add('on');
+    m.setAttribute('aria-hidden', 'false');
+  }
+  function closeLogin() {
+    const m = document.getElementById('loginModal');
+    m.classList.remove('on');
+    m.setAttribute('aria-hidden', 'true');
+    const pi = document.getElementById('passInput');
+    if (pi) pi.value = '';
+  }
+  function openAdminModal() {
+    const m = document.getElementById('adminModal');
+    m.classList.add('on');
+    m.setAttribute('aria-hidden', 'false');
+  }
+  function closeAdminModal() {
+    const m = document.getElementById('adminModal');
+    m.classList.remove('on');
+    m.setAttribute('aria-hidden', 'true');
+  }
+
+  // Login check
+  function checkPass() {
+    const p = document.getElementById('passInput').value || "";
+    if (p === PASSWORD) {
+      closeLogin();
+      openAdminModal();
+      switchTab('profile');
+    } else {
+      alert("❌ Wrong password!");
+    }
+  }
+
+  // Forgot password flow
+  function showForgotPass() {
+    closeLogin();
+    const m = document.getElementById('forgotModal');
+    m.classList.add('on');
+    m.setAttribute('aria-hidden', 'false');
+    // reset steps
+    document.getElementById('forgotStep1').classList.remove('hidden');
+    document.getElementById('forgotStep2').classList.add('hidden');
+    document.getElementById('forgotStep3').classList.add('hidden');
+  }
+  function closeForgotModal() {
+    const m = document.getElementById('forgotModal');
+    m.classList.remove('on');
+    m.setAttribute('aria-hidden', 'true');
+  }
+  function sendOTP() {
+    // generate demo OTP and show step 2
+    otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // In real app, send OTP to user's email or phone.
+    alert(`✅ OTP Sent! Demo OTP: ${otpCode}`);
+    document.getElementById('forgotStep1').classList.add('hidden');
+    document.getElementById('forgotStep2').classList.remove('hidden');
+  }
+  function verifyOTP() {
+    const entered = (document.getElementById('otpInput').value || "").trim();
+    if (entered === otpCode) {
+      // proceed to change password
+      document.getElementById('forgotStep2').classList.add('hidden');
+      document.getElementById('forgotStep3').classList.remove('hidden');
+    } else {
+      alert("❌ Incorrect OTP code.");
+    }
+  }
+  function saveNewPass() {
+    const p1 = document.getElementById('newPass1').value || "";
+    const p2 = document.getElementById('newPass2').value || "";
+    if (!p1 || !p2) {
+      alert("❌ Please fill both password fields.");
+      return;
+    }
+    if (p1 !== p2) {
+      alert("❌ Passwords don't match!");
+      return;
+    }
+    PASSWORD = p1;
+    alert("✅ Password updated. You can login with your new password.");
+    // close forgot modal and open login
+    closeForgotModal();
+    openLogin();
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    switchTab(t.dataset.tab);
+  }));
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === name);
+      t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    const el = document.getElementById('tab-' + name);
+    if (el) el.classList.remove('hidden');
+  }
+
+  // Avatar preview
+  function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const r = new FileReader();
+      r.onload = e => {
+        avatarData = e.target.result;
+        const preview = document.getElementById('avatarPreview');
+        if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
+      };
+      r.readAsDataURL(file);
+    }
+  }
+  function saveProfile() {
+    const n = document.getElementById('adminName').value;
+    const b = document.getElementById('adminBio').value;
+    if (n) document.getElementById('dispName').innerText = n;
+    if (b) document.getElementById('dispBio').innerText = b;
+    if (avatarData) {
+      const disp = document.getElementById('dispAvatar');
+      if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
+    }
+    alert("✅ Profile Saved!");
+  }
+
+  // Social links
+  function saveSocial() {
+    document.getElementById('socLinkFb').href = document.getElementById('socFb').value || '#';
+    document.getElementById('socLinkIg').href = document.getElementById('socIg').value || '#';
+    document.getElementById('socLinkTt').href = document.getElementById('socTt').value || '#';
+    document.getElementById('socLinkShopee').href = document.getElementById('socShopee').value || '#';
+    document.getElementById('socLinkYt').href = document.getElementById('socYt').value || '#';
+    document.getElementById('socLinkTw').href = document.getElementById('socTw').value || '#';
+    alert("✅ Social Links Saved!");
+  }
+
+  // Category thumb preview
+  function previewCatThumb(num, input) {
+    if (!num || !input) return;
+    if (input.files && input.files[0]) {
+      const r = new FileReader();
+      r.onload = e => {
+        catImgData[num] = e.target.result;
+        const prev = document.getElementById('cat' + num + 'Prev');
+        if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">';
+      };
+      r.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Add link input field
+  function addLinkField(catNum) {
+    const c = document.getElementById('cat' + catNum + 'Links');
+    if (!c) return;
+    const f = document.createElement('div');
+    f.className = 'link-item';
+    f.innerHTML = '<input type="url" placeholder="New Link"><button onclick="this.parentElement.remove()">✕</button>';
+    c.appendChild(f);
+  }
+
+  // Save categories (update tiles and first link hrefs)
+  function saveAllProducts() {
+    for (let i = 1; i <= 8; i++) {
+      const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+      if (nameEl && nameEl.value) {
+        const nameTarget = document.getElementById('name' + i);
+        if (nameTarget) nameTarget.innerText = nameEl.value;
+      }
+      if (catImgData[i]) {
+        const thumb = document.getElementById('thumb' + i);
+        if (thumb) thumb.innerHTML = '<img src="' + catImgData[i] + '" alt="thumb">';
+      }
+      const firstLink = document.querySelector(`#cat${i}Links .link-item input`);
+      if (firstLink && firstLink.value) {
+        const prod = document.getElementById('prod' + i);
+        if (prod) prod.href = firstLink.value;
+      }
+    }
+    alert("✅ All Categories Saved!");
+  }
+
+  // Music preview / playback
+  function previewMusic(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      musicUrl = URL.createObjectURL(file);
+      const audio = document.getElementById('bgMusic');
+      audio.src = musicUrl;
+      audio.load();
+      const player = document.getElementById('musicPlayer');
+      if (player) player.classList.remove('hidden');
+      const musicTitle = document.getElementById('musicTitle');
+      if (musicTitle) musicTitle.innerText = file.name;
+      // Auto-play short preview?
+      // No autoplay forced here; user controls play/pause
+    }
+  }
+  function playMusic() {
+    const audio = document.getElementById('bgMusic');
+    if (!audio.src) return;
+    audio.play().then(() => {
+      isPlaying = true;
+      const btn = document.getElementById('musicBtn');
+      if (btn) btn.innerText = '⏸️';
+    }).catch(err => {
+      // autoplay might be blocked by browser; user must interact
+      console.warn('Play prevented:', err);
+    });
+  }
+  function pauseMusic() {
+    const audio = document.getElementById('bgMusic');
+    audio.pause();
+    isPlaying = false;
+    const btn = document.getElementById('musicBtn');
+    if (btn) btn.innerText = '▶️';
+  }
+  function toggleMusic() {
+    isPlaying ? pauseMusic() : playMusic();
+  }
+
+  // Accessibility: close modals when clicking outside modal-box
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('on');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
+  });
+
+  // Initialize default tab
+  switchTab('profile');
+</script>
+</body>
+</html>

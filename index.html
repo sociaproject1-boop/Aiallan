@@ -20,6 +20,7 @@
     --shopee: #f4512c;
     --yt: #ff0000;
     --tw: #1da1f2;
+    --muted: #101010;
   }
   body {
     background: var(--bg);
@@ -45,108 +46,134 @@
     inset: 0;
     background: rgba(0,0,0,0.9);
     display: none;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     z-index: 100;
     overflow-y: auto;
-    padding: 20px 0;
+    padding: 20px 12px;
   }
   .modal.on { display: flex; }
   .modal-box {
     background: var(--card);
-    padding: 24px;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 720px;
+    padding: 18px;
+    border-radius: 12px;
+    width: 92%;
+    max-width: 760px;
     border: 1px solid var(--border);
     margin: auto;
     color: var(--text);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.6);
   }
-  .modal-box h2 { text-align: center; margin-bottom: 18px; font-size: 18px; }
-  .modal-box h3 { font-size: 15px; margin: 16px 0 10px; color: var(--text2); }
+  /* Admin modal slightly more compact when it's admin */
+  .modal-box.compact { padding: 14px; max-height: 80vh; overflow:auto; }
+
+  .modal-box h2 { text-align: center; margin-bottom: 12px; font-size: 18px; }
+  .modal-box h3 { font-size: 14px; margin: 12px 0 8px; color: var(--text2); }
   .modal-box input,
   .modal-box textarea,
   .modal-box select {
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: #2c2c2e;
+    background: #171717;
     color: var(--text);
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 13px;
+    margin-bottom: 8px;
   }
-  .modal-box textarea { resize: vertical; min-height: 80px; }
+  .modal-box textarea { resize: vertical; min-height: 72px; }
 
-  .btn { padding: 12px; border-radius: 10px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .btn { padding: 10px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
   .btn-red { background: var(--accent); color: white; }
   .btn-gray { background: var(--border); color: var(--text); }
-  .btn-row { display:flex; gap: 10px; margin-top: 12px; }
+  .btn-row { display:flex; gap: 8px; margin-top: 8px; }
   .btn-row .btn { flex: 1; }
 
   .link-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-  .link-item input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: var(--text); }
-  .link-item button { width: 36px; height: 36px; padding: 0; border-radius: 8px; border: none; background: #ff4444; color: white; cursor: pointer; }
-
+  .link-item input[type="url"], .link-item input[type="text"] { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #171717; color: var(--text); }
+  .link-item .thumb-preview { width: 56px; height: 56px; border-radius: 8px; background: #121212; display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden; border:1px solid #222; }
+  .link-item .thumb-preview img { width:100%; height:100%; object-fit:cover; }
+  .link-item .remove-btn { width:36px; height:36px; padding:0; border-radius:8px; border:none; background:#ff4444; color:white; cursor:pointer; }
+  .small-file { display:none; }
   .add-link-btn {
-    width: 100%;
-    padding: 10px;
+    padding: 8px 10px;
     border-radius: 8px;
     border: 1px dashed var(--text2);
     background: transparent;
     color: var(--text2);
     cursor: pointer;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+    font-size:13px;
   }
 
-  .category-block { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
-  .category-block h4 { font-size: 15px; margin-bottom: 10px; color: var(--accent); }
-  .upload-preview { width: 60px; height: 60px; border-radius: 8px; background: #2c2c2e; display:flex; align-items:center; justify-content:center; font-size:24px; margin-top:8px; overflow:hidden; }
-  .upload-preview img { width:100%; height:100%; object-fit:cover; }
+  .category-block { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .category-block h4 { font-size: 14px; margin-bottom: 8px; color: var(--accent); }
 
-  .avatar-upload { text-align:center; margin-bottom:16px; }
-  .avatar-upload .preview { width:100px; height:100px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto 10px; overflow:hidden; }
-  .avatar-upload .preview img { width:100%; height:100%; object-fit:cover; }
-
-  .tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-  .tab { padding:8px 14px; border-radius:8px; background:var(--border); color:var(--text2); font-size:14px; cursor:pointer; }
+  .tabs { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .tab { padding:8px 12px; border-radius:8px; background:var(--border); color:var(--text2); font-size:13px; cursor:pointer; }
   .tab.active { background:var(--accent); color:white; }
   .hidden { display: none !important; }
 
-  .home { max-width:480px; margin: 0 auto; padding: 60px 16px 40px; }
-  .profile { text-align:center; margin-bottom:20px; }
-  .avatar { width:90px; height:90px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:40px; overflow:hidden; }
+  .home { max-width:480px; margin: 0 auto; padding: 40px 16px 36px; }
+  .profile { text-align:center; margin-bottom:14px; }
+  .avatar { width:82px; height:82px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
   .avatar img { width:100%; height:100%; object-fit:cover; }
-  .name { font-size:22px; font-weight:700; margin-bottom:6px; }
-  .bio { color:var(--text2); font-size:14px; margin-bottom:16px; }
+  .name { font-size:20px; font-weight:700; margin-bottom:6px; }
+  .bio { color:var(--text2); font-size:13px; margin-bottom:12px; }
 
-  .music-player { display:flex; align-items:center; gap:10px; background:var(--card); padding:10px; border-radius:12px; margin-bottom:20px; border:1px solid var(--border); }
-  .music-player button { width:40px; height:40px; border-radius:50%; border:none; background:var(--accent); color:white; font-size:16px; cursor:pointer; }
-  .music-player span { font-size:13px; color:var(--text2); flex:1; }
+  /* Slim music player */
+  .music-player { display:flex; align-items:center; gap:10px; background:var(--card); padding:6px 8px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border); height:44px; }
+  .music-player button { width:36px; height:36px; border-radius:8px; border:none; background:var(--accent); color:white; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .music-player .icon { font-size:16px; }
+  .music-player span { font-size:13px; color:var(--text2); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-  .social-row { display:flex; justify-content:center; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
-  .social-link { width:50px; height:50px; border-radius:12px; color:white; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:22px; transition:.2s; }
+  .social-row { display:flex; justify-content:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .social-link { width:46px; height:46px; border-radius:10px; color:white; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:20px; transition:.12s; }
   .social-link.fb { background:var(--fb); }
   .social-link.ig { background:var(--ig); }
   .social-link.tt { background:var(--tt); border:1px solid #333; }
   .social-link.shopee { background:var(--shopee); }
   .social-link.yt { background:var(--yt); }
   .social-link.tw { background:var(--tw); }
-  .social-link:hover { transform: scale(1.1); }
+  .social-link:hover { transform: scale(1.06); }
 
-  .section-title { font-size:15px; font-weight:600; margin-bottom:16px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
-  .products-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
-  .product-card { background:var(--card); border-radius:14px; overflow:hidden; border:1px solid var(--border); text-decoration:none; color:var(--text); transition:.2s; cursor:pointer; display:block; }
+  .section-title { font-size:13px; font-weight:600; margin-bottom:12px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px; }
+  .products-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+  .product-card { background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); text-decoration:none; color:var(--text); transition:.12s; cursor:pointer; display:block; }
   .product-card:hover { transform: translateY(-3px); border-color:var(--accent); }
-  .product-thumb { width:100%; aspect-ratio:1; background:#2c2c2e; display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
+  .product-thumb { width:100%; aspect-ratio:1; background:#171717; display:flex; align-items:center; justify-content:center; font-size:28px; overflow:hidden; }
   .product-thumb img { width:100%; height:100%; object-fit:cover; }
-  .product-info { padding:12px; }
-  .product-name { font-size:14px; font-weight:600; line-height:1.3; }
+  .product-info { padding:8px; }
+  .product-name { font-size:13px; font-weight:600; line-height:1.2; }
 
-  /* small screens */
+  /* Category modal custom */
+  .category-modal .modal-box { max-width: 640px; width: 92%; border-radius: 12px; padding: 12px; }
+  .category-modal .modal-box h2 { text-align:left; font-size:16px; margin-bottom:10px; }
+  .product-list { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+  .product-card-modal { background: #121212; border: 1px solid var(--border); border-radius:10px; padding:8px; display:flex; gap:8px; align-items:center; height:76px; }
+  .product-card-modal .img { width:64px; height:64px; border-radius:8px; overflow:hidden; background:#111; flex:0 0 64px; }
+  .product-card-modal .img img { width:100%; height:100%; object-fit:cover; }
+  .product-card-modal .meta { flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px; }
+  .product-card-modal .meta .title { font-size:13px; font-weight:600; color:var(--text); }
+  .product-card-modal .meta .domain { font-size:12px; color:var(--text2); }
+  .product-card-modal .cta { flex:0 0 auto; }
+  .btn-shopee { background:var(--shopee); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-default { background:#2b2b2b; color:var(--text); border:1px solid #2f2f2f; padding:8px 12px; border-radius:8px; }
+
+  /* compact admin product row */
+  .prod-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .prod-row .prod-thumb { width:56px; height:56px; border-radius:8px; overflow:hidden; background:#121212; border:1px solid #222; flex:0 0 56px; }
+  .prod-row .prod-thumb img { width:100%; height:100%; object-fit:cover; }
+  .prod-row .prod-inputs { display:flex; gap:8px; align-items:center; flex:1; }
+  .prod-row .prod-inputs input[type="text"], .prod-row .prod-inputs input[type="url"] { padding:8px; border-radius:8px; border:1px solid var(--border); background:#171717; color:var(--text); font-size:13px; }
+
+  /* small screens adjustments */
   @media (max-width: 420px) {
-    .modal-box { padding: 18px; border-radius: 12px; }
-    .home { padding: 48px 12px 40px; }
+    .modal-box { padding: 12px; border-radius: 12px; }
+    .home { padding: 34px 12px 36px; }
+    .product-list { grid-template-columns: 1fr; }
+    .prod-row { flex-direction:column; align-items:stretch; }
+    .prod-row .prod-inputs { flex-direction:column; }
   }
 </style>
 </head>
@@ -172,7 +199,7 @@
 
   <!-- Admin Modal -->
   <div class="modal" id="adminModal" aria-hidden="true">
-    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="modal-box compact" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
       <h2 id="adminTitle">🛠️ Admin Panel</h2>
 
       <div class="tabs" role="tablist" aria-label="Admin tabs">
@@ -183,9 +210,9 @@
       </div>
 
       <div id="tab-profile" class="tab-content">
-        <div class="avatar-upload">
-          <div class="preview" id="avatarPreview">👤</div>
-          <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)">
+        <div class="avatar-upload" style="text-align:left;margin-bottom:10px;">
+          <div class="preview" id="avatarPreview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--card);display:inline-block;vertical-align:middle;margin-right:8px;">👤</div>
+          <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)" style="display:inline-block;vertical-align:middle;">
         </div>
         <input type="text" id="adminName" placeholder="Your Name">
         <input type="text" id="adminBio" placeholder="Short Bio">
@@ -209,15 +236,12 @@
         </div>
       </div>
 
-      <div id="tab-products" class="tab-content">
-        <h3>8 Categories — Editable Links</h3>
+      <div id="tab-products" class="tab-content hidden">
+        <h3 style="margin-bottom:8px;">8 Categories — Editable Products</h3>
 
-        <!-- Generate 8 category blocks -->
-        <div id="categoriesContainer">
-          <!-- Static markup for categories; JS will manage link lists -->
-        </div>
+        <div id="categoriesContainer"></div>
 
-        <div style="display:flex;gap:10px;margin-top:10px;">
+        <div style="display:flex;gap:8px;margin-top:8px;">
           <button class="btn btn-red" style="flex:1;" onclick="saveAllProducts()">💾 Save All Categories</button>
           <button class="btn btn-gray" style="flex:1;" onclick="clearAllData()">Clear All Data</button>
         </div>
@@ -226,14 +250,14 @@
       <div id="tab-music" class="tab-content hidden">
         <h3>Background Music</h3>
         <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file (will be saved locally)</p>
-        <div style="display:flex;gap:10px;margin-top:10px;">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file (will be saved locally)</p>
+        <div style="display:flex;gap:8px;margin-top:8px;">
           <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
           <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
         </div>
       </div>
 
-      <div style="display:flex;gap:10px;margin-top:16px;">
+      <div style="display:flex;gap:8px;margin-top:10px;">
         <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importStateFromFile(event)">
         <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
       </div>
@@ -241,12 +265,12 @@
     </div>
   </div>
 
-  <!-- Category Links Modal (shows all links for a clicked category) -->
-  <div class="modal" id="categoryModal" aria-hidden="true">
+  <!-- Category Links Modal (shows all products for a clicked category) -->
+  <div class="modal category-modal" id="categoryModal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="categoryTitle">
       <h2 id="categoryTitle">Category Links</h2>
-      <div id="categoryLinksList" style="margin-top:12px;"></div>
-      <div class="btn-row" style="margin-top:12px;">
+      <div id="categoryLinksList" style="margin-top:8px;"></div>
+      <div class="btn-row" style="margin-top:10px;">
         <button class="btn btn-gray" onclick="closeCategoryModal()">Close</button>
       </div>
     </div>
@@ -261,7 +285,7 @@
     </div>
 
     <div class="music-player hidden" id="musicPlayer">
-      <button onclick="toggleMusic()" id="musicBtn">▶️</button>
+      <button onclick="toggleMusic()" id="musicBtn" aria-label="Play/Pause"><i class="fa fa-music icon"></i></button>
       <span id="musicTitle">Background Music</span>
     </div>
 
@@ -370,8 +394,6 @@
   // state variables
   let musicDataUrl = ""; // stored data URL for bg music
   let isPlaying = false;
-  const catImgData = {}; // store data URLs for category thumbs
-  let avatarData = "";
   const STATE_KEY = 'settings';
   const AUTH_KEY = 'auth';
   const BG_STORAGE_KEY = 'aiallan_bg_state_v1';
@@ -389,33 +411,26 @@
     {name: 'Books & Learning', icon: '📚'}
   ];
 
+  // local in-memory mapping for product thumbnails while editing: {catIndex: {prodIndex: dataURL}}
+  const prodThumbs = {};
+
   // Build products UI and categories editor
-  function buildCategoriesUI() {
+  function buildCategoriesUI(savedState) {
     const container = document.getElementById('categoriesContainer');
     const productsGrid = document.getElementById('productsGrid');
     container.innerHTML = '';
     productsGrid.innerHTML = '';
     for (let i = 1; i <= 8; i++) {
-      const cat = defaultCats[i-1] || {name: 'Category ' + i, icon: '🔖'};
+      const catDefaults = defaultCats[i-1] || {name: 'Category ' + i, icon: '🔖'};
+      const catName = (savedState && savedState.categories && savedState.categories[i-1] && savedState.categories[i-1].name) || catDefaults.name;
       // admin category block
       const block = document.createElement('div');
       block.className = 'category-block';
       block.innerHTML = `
-        <h4>${i}. ${cat.name} ${cat.icon}</h4>
-        <input type="text" class="cat-name" data-cat="${i}" value="${cat.name}" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(${i},this)">
-        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
-          <div class="upload-preview" id="cat${i}Prev">${cat.icon}</div>
-          <div style="flex:1;">
-            <div id="cat${i}Links" class="links-container">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <button class="add-link-btn" onclick="addLinkField(${i})">+ Add Link</button>
-              <button class="btn btn-gray" onclick="clearCategoryLinks(${i})">Clear Links</button>
-            </div>
-          </div>
-        </div>
+        <h4>${i}. ${catName} ${catDefaults.icon}</h4>
+        <input type="text" class="cat-name" data-cat="${i}" value="${catName}" placeholder="Category Name">
+        <div id="cat${i}Products"></div>
+        <button class="add-link-btn" onclick="addProductField(${i})">+ Add Product</button>
       `;
       container.appendChild(block);
 
@@ -426,16 +441,71 @@
       a.id = 'prod' + i;
       a.setAttribute('data-cat', i);
       a.innerHTML = `
-        <div class="product-thumb" id="thumb${i}">${cat.icon}</div>
-        <div class="product-info"><div class="product-name" id="name${i}">${cat.name}</div></div>
+        <div class="product-thumb" id="thumb${i}">${catDefaults.icon}</div>
+        <div class="product-info"><div class="product-name" id="name${i}">${catName}</div></div>
       `;
       productsGrid.appendChild(a);
+
+      // If saved state has products, render them in admin area
+      if (savedState && Array.isArray(savedState.categories) && savedState.categories[i-1]) {
+        const cat = savedState.categories[i-1];
+        if (Array.isArray(cat.products)) {
+          cat.products.forEach((p, idx) => addProductField(i, p));
+        }
+        // update thumbnail for category if provided
+        if (cat.thumb) {
+          const thumb = document.getElementById('thumb' + i);
+          if (thumb) thumb.innerHTML = `<img src="${cat.thumb}" alt="thumb">`;
+        }
+        // update product tile name
+        const nameTarget = document.getElementById('name' + i);
+        if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
+      } else {
+        // add a single empty product field by default for convenience
+        addProductField(i);
+      }
     }
   }
 
-  function clearCategoryLinks(i) {
-    const c = document.getElementById('cat' + i + 'Links');
-    if (c) c.innerHTML = '';
+  function addProductField(catNum, product) {
+    const container = document.getElementById('cat' + catNum + 'Products');
+    if (!container) return;
+    const idx = container.children.length; // 0-based index
+    const row = document.createElement('div');
+    row.className = 'prod-row';
+    row.dataset.index = idx;
+    row.innerHTML = `
+      <div class="prod-thumb" id="prodThumb-${catNum}-${idx}">${product && product.thumb ? '<img src="'+product.thumb+'" alt="p">' : ''}</div>
+      <div class="prod-inputs">
+        <input type="text" class="prod-name" placeholder="Product name" value="${product && product.name ? escapeHtml(product.name) : ''}">
+        <input type="url" class="prod-url" placeholder="https://..." value="${product && product.url ? escapeHtml(product.url) : ''}">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <input type="file" accept="image/*" class="small-file" id="prodFile-${catNum}-${idx}" onchange="previewProductThumb(${catNum}, ${idx}, this)">
+        <button class="remove-btn" onclick="this.closest('.prod-row').remove()">✕</button>
+      </div>
+    `;
+    container.appendChild(row);
+    // if product had a thumb keep it in prodThumbs map
+    if (product && product.thumb) {
+      prodThumbs[catNum] = prodThumbs[catNum] || {};
+      prodThumbs[catNum][idx] = product.thumb;
+    }
+  }
+
+  function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
+  function previewProductThumb(catNum, prodIndex, input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const r = new FileReader();
+    r.onload = e => {
+      prodThumbs[catNum] = prodThumbs[catNum] || {};
+      prodThumbs[catNum][prodIndex] = e.target.result;
+      const preview = document.getElementById(`prodThumb-${catNum}-${prodIndex}`);
+      if (preview) preview.innerHTML = `<img src="${e.target.result}" alt="p">`;
+    };
+    r.readAsDataURL(file);
   }
 
   // Modal controls
@@ -517,7 +587,7 @@
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const r = new FileReader();
-      r.onload = e => { avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; };
+      r.onload = e => { const avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; document.getElementById('dispAvatar').innerHTML = '<img src="' + avatarData + '" alt="avatar">'; };
       r.readAsDataURL(file);
     }
   }
@@ -526,7 +596,6 @@
     const b = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText;
     if (n) document.getElementById('dispName').innerText = n;
     if (b) document.getElementById('dispBio').innerText = b;
-    if (avatarData) { const disp = document.getElementById('dispAvatar'); if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; }
     saveStateToDB();
     alert('✅ Profile Saved!');
   }
@@ -543,31 +612,16 @@
     alert('✅ Social Links Saved!');
   }
 
-  // Category thumb preview
-  function previewCatThumb(num, input) {
-    if (!num || !input) return;
-    if (input.files && input.files[0]) {
-      const r = new FileReader();
-      r.onload = e => { catImgData[num] = e.target.result; const prev = document.getElementById('cat' + num + 'Prev'); if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; const thumb = document.getElementById('thumb' + num); if (thumb) thumb.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; };
-      r.readAsDataURL(input.files[0]);
-    }
-  }
-
-  // Add link input field
-  function addLinkField(catNum) {
-    const c = document.getElementById('cat' + catNum + 'Links'); if (!c) return; const f = document.createElement('div'); f.className = 'link-item'; f.innerHTML = '<input type="url" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>'; c.appendChild(f);
-  }
-
-  // Save categories (update tiles and first link hrefs)
+  // Save categories (update tiles and keep products)
   function saveAllProducts() {
     for (let i = 1; i <= 8; i++) {
       const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
       if (nameEl && nameEl.value) { const nameTarget = document.getElementById('name' + i); if (nameTarget) nameTarget.innerText = nameEl.value; }
-      if (catImgData[i]) { const thumb = document.getElementById('thumb' + i); if (thumb) thumb.innerHTML = '<img src="' + catImgData[i] + '" alt="thumb">'; }
-      // DO NOT set product tile href to a single link anymore — product click should open modal showing ALL links.
-      // Keep previous behavior of setting default first link as href optional (commented out).
-      // const firstLink = document.querySelector(`#cat${i}Links .link-item input`);
-      // if (firstLink && firstLink.value) { const prod = document.getElementById('prod' + i); if (prod) prod.href = firstLink.value; }
+      // update thumb if category-level thumb was set (not used currently)
+      const thumb = document.getElementById('thumb' + i);
+      if (thumb && thumb.querySelector('img')) {
+        // keep as-is
+      }
     }
     saveStateToDB();
     alert('✅ All Categories Saved!');
@@ -584,7 +638,6 @@
         const audio = document.getElementById('bgMusic');
         audio.src = musicDataUrl;
         audio.load();
-        // start playing
         audio.play().then(()=>{ isPlaying = true; updateMusicUI(); }).catch(err => { console.warn('Autoplay prevented', err); updateMusicUI(); });
         const player = document.getElementById('musicPlayer'); if (player) player.classList.remove('hidden');
         const musicTitle = document.getElementById('musicTitle'); if (musicTitle) musicTitle.innerText = file.name;
@@ -592,10 +645,10 @@
       r.readAsDataURL(file);
     }
   }
-  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Play failed',err); }); }
+  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Play failed',err); updateMusicUI(); }); }
   function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; updateMusicUI(); }
   function toggleMusic() { isPlaying ? pauseMusic() : playMusic(); }
-  function updateMusicUI(){ const btn=document.getElementById('musicBtn'); if(btn) btn.innerText = isPlaying ? '⏸️' : '▶️'; const player=document.getElementById('musicPlayer'); if(player) player.classList.remove('hidden'); }
+  function updateMusicUI(){ const btn=document.getElementById('musicBtn'); if(btn) btn.innerHTML = isPlaying ? '<i class="fa fa-pause icon"></i>' : '<i class="fa fa-play icon"></i>'; const player=document.getElementById('musicPlayer'); if(player) { if(document.getElementById('bgMusic').src) player.classList.remove('hidden'); else player.classList.add('hidden'); } }
 
   // Build and persist state to IndexedDB
   async function saveStateToDB() {
@@ -603,7 +656,9 @@
       const state = { profile: {}, social: {}, categories: [], music: null };
       state.profile.name = document.getElementById('adminName').value || document.getElementById('dispName').innerText || '';
       state.profile.bio = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '';
-      state.profile.avatar = avatarData || null;
+      // avatar: if dispAvatar contains img, store its src
+      const dispAvatarImg = document.querySelector('#dispAvatar img');
+      state.profile.avatar = dispAvatarImg ? dispAvatarImg.src : null;
       state.social = {
         fb: document.getElementById('socFb').value || '',
         ig: document.getElementById('socIg').value || '',
@@ -615,13 +670,17 @@
 
       for (let i=1;i<=8;i++){
         const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
-        const links = [];
-        const linkInputs = document.querySelectorAll(`#cat${i}Links .link-item input`);
-        linkInputs.forEach(li => { if (li.value) links.push(li.value); });
-        state.categories.push({ name: nameEl ? (nameEl.value || '') : '', thumb: catImgData[i] || null, links });
+        const products = [];
+        const rows = document.querySelectorAll(`#cat${i}Products .prod-row`);
+        rows.forEach((r, idx) => {
+          const name = r.querySelector('.prod-name') ? r.querySelector('.prod-name').value : '';
+          const url = r.querySelector('.prod-url') ? r.querySelector('.prod-url').value : '';
+          const thumb = (prodThumbs[i] && prodThumbs[i][r.dataset.index]) ? prodThumbs[i][r.dataset.index] : (r.querySelector(`#prodThumb-${i}-${r.dataset.index} img`) ? r.querySelector(`#prodThumb-${i}-${r.dataset.index} img`).src : null);
+          if (name || url || thumb) products.push({ name: name || '', url: url || '', thumb: thumb || null });
+        });
+        state.categories.push({ name: nameEl ? (nameEl.value || '') : '', thumb: null, products });
       }
 
-      // save music data url if available to state so import/export works
       try { state.music = musicDataUrl || localStorage.getItem(BG_SRC_KEY) || null; } catch(e) { state.music = null; }
 
       await idbSet(STATE_KEY, state);
@@ -632,11 +691,12 @@
   async function loadStateFromDB() {
     try {
       const state = await idbGet(STATE_KEY);
+      buildCategoriesUI(state);
       if (!state) return;
       if (state.profile) {
         if (state.profile.name) { document.getElementById('dispName').innerText = state.profile.name; document.getElementById('adminName').value = state.profile.name; }
         if (state.profile.bio) { document.getElementById('dispBio').innerText = state.profile.bio; document.getElementById('adminBio').value = state.profile.bio; }
-        if (state.profile.avatar) { avatarData = state.profile.avatar; const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+avatarData+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp)disp.innerHTML='<img src="'+avatarData+'" alt="avatar">'; }
+        if (state.profile.avatar) { const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp)disp.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; }
       }
       if (state.social) {
         document.getElementById('socFb').value = state.social.fb || '';
@@ -659,14 +719,24 @@
           if (nameEl) nameEl.value = cat.name || '';
           const nameTarget = document.getElementById('name' + i);
           if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
-          if (cat.thumb) { catImgData[i] = cat.thumb; const thumb = document.getElementById('thumb' + i); const prev = document.getElementById('cat' + i + 'Prev'); if (thumb) thumb.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; if (prev) prev.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; }
-          const linksContainer = document.getElementById('cat' + i + 'Links');
-          if (linksContainer && Array.isArray(cat.links)) { linksContainer.innerHTML = ''; cat.links.forEach(link => { const div=document.createElement('div'); div.className='link-item'; div.innerHTML = '<input type="url" value="'+link+'"><button onclick="this.parentElement.remove()">✕</button>'; linksContainer.appendChild(div); });
-            const prod = document.getElementById('prod' + i); if (prod && cat.links && cat.links[0]) { /* do not set prod.href; clicking opens modal with all links */ }
+          // render products in admin area
+          const container = document.getElementById('cat' + i + 'Products');
+          if (container && Array.isArray(cat.products)) {
+            container.innerHTML = '';
+            cat.products.forEach((p, pid) => {
+              addProductField(i, p);
+            });
+            // store thumbs
+            prodThumbs[i] = prodThumbs[i] || {};
+            cat.products.forEach((p, pid) => { if (p.thumb) prodThumbs[i][pid] = p.thumb; });
+          }
+          // update product tile thumbnail if first product has thumb
+          const thumb = document.getElementById('thumb' + i);
+          if (thumb && cat.products && cat.products[0] && cat.products[0].thumb) {
+            thumb.innerHTML = `<img src="${cat.products[0].thumb}" alt="thumb">`;
           }
         });
       }
-      // restore music if present in state
       if (state.music) {
         try { musicDataUrl = state.music; localStorage.setItem(BG_SRC_KEY, musicDataUrl); } catch(e){}
       }
@@ -695,31 +765,36 @@
     try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ location.reload(); }; } catch(e){ console.warn(e); }
   }
 
-  // Category modal handling: clicking a product tile shows ALL links for that category
-  function openCategoryModal(title, links) {
+  // Category modal handling: clicking a product tile shows ALL links for that category as neat cards
+  function openCategoryModal(title, products) {
     const mdl = document.getElementById('categoryModal');
     const list = document.getElementById('categoryLinksList');
     const titleEl = document.getElementById('categoryTitle');
     titleEl.textContent = title || 'Category Links';
     list.innerHTML = '';
-    if (!links || links.length === 0) {
-      const p = document.createElement('div'); p.style.color = 'var(--text2)'; p.textContent = 'No links available for this category.'; list.appendChild(p);
+    if (!products || products.length === 0) {
+      const p = document.createElement('div'); p.style.color = 'var(--text2)'; p.textContent = 'No products available for this category.'; list.appendChild(p);
     } else {
-      links.forEach((l, idx) => {
-        const a = document.createElement('a');
-        a.href = l;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.style.display = 'block';
-        a.style.padding = '10px';
-        a.style.background = '#111';
-        a.style.border = '1px solid var(--border)';
-        a.style.borderRadius = '8px';
-        a.style.marginBottom = '8px';
-        a.style.color = 'var(--text)';
-        a.textContent = 'Product ' + (idx+1) + ' — ' + l.replace(/^https?:\/\//,'');
-        list.appendChild(a);
+      const grid = document.createElement('div'); grid.className = 'product-list';
+      products.forEach((p, idx) => {
+        const card = document.createElement('div'); card.className = 'product-card-modal';
+        const imgWrap = document.createElement('div'); imgWrap.className = 'img'; imgWrap.innerHTML = p.thumb ? `<img src="${p.thumb}" alt="p${idx}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text2);">📦</div>`;
+        const meta = document.createElement('div'); meta.className = 'meta'; meta.innerHTML = `<div class="title">${p.name || ('Product ' + (idx+1))}</div><div class="domain">${(p.url||'').replace(/^https?:\/\//,'')}</div>`;
+        const ctaWrap = document.createElement('div'); ctaWrap.className = 'cta';
+        const btn = document.createElement('button');
+        const isShopee = p.url && /shopee\./i.test(p.url);
+        btn.className = isShopee ? 'btn-shopee' : 'btn-default';
+        btn.textContent = isShopee ? 'Open on Shopee' : 'Open';
+        btn.onclick = (ev)=>{ ev.stopPropagation(); if(p.url) window.open(p.url, '_blank', 'noopener'); };
+        ctaWrap.appendChild(btn);
+        card.appendChild(imgWrap);
+        card.appendChild(meta);
+        card.appendChild(ctaWrap);
+        // Clicking whole card should open link as well
+        card.onclick = ()=>{ if(p.url) window.open(p.url, '_blank', 'noopener'); };
+        grid.appendChild(card);
       });
+      list.appendChild(grid);
     }
     mdl.classList.add('on'); mdl.setAttribute('aria-hidden','false');
   }
@@ -731,17 +806,22 @@
     if (!card) return;
     const catIndex = parseInt(card.getAttribute('data-cat'), 10);
     if (!catIndex) return;
-    // gather links from admin fields
-    const linkInputs = document.querySelectorAll(`#cat${catIndex}Links .link-item input`);
-    const links = [];
-    linkInputs.forEach(li => { if (li.value) links.push(li.value); });
+    // gather products from admin fields
+    const rows = document.querySelectorAll(`#cat${catIndex}Products .prod-row`);
+    const products = [];
+    rows.forEach(r => {
+      const name = r.querySelector('.prod-name') ? r.querySelector('.prod-name').value : '';
+      const url = r.querySelector('.prod-url') ? r.querySelector('.prod-url').value : '';
+      const thumb = (prodThumbs[catIndex] && prodThumbs[catIndex][r.dataset.index]) ? prodThumbs[catIndex][r.dataset.index] : (r.querySelector(`#prodThumb-${catIndex}-${r.dataset.index} img`) ? r.querySelector(`#prodThumb-${catIndex}-${r.dataset.index} img`).src : null);
+      if (name || url || thumb) products.push({ name: name || '', url: url || '', thumb: thumb || null });
+    });
     const title = document.getElementById('name' + catIndex).innerText || ('Category ' + catIndex);
-    openCategoryModal(title, links);
+    openCategoryModal(title, products);
   });
 
   // Initialize
   window.addEventListener('DOMContentLoaded', async () => {
-    buildCategoriesUI();
+    // build UI will be called inside loadStateFromDB
     await loadStateFromDB();
     switchTab('profile');
 
@@ -770,7 +850,6 @@
         if (audio.readyState > 0) setTime(); else audio.addEventListener('loadedmetadata', setTime, {once:true});
       }
 
-      // attempt to autoplay if saved playing is true or default to play
       const shouldPlay = savedState ? !!savedState.playing : true;
       if (shouldPlay) {
         const p = audio.play();
@@ -779,19 +858,15 @@
         } else { isPlaying = true; updateMusicUI(); }
       }
 
-      // show music player if we have a source
       if (audio.src) { document.getElementById('musicPlayer').classList.remove('hidden'); }
 
-      // update saved time & playing state frequently
       const saveNow = ()=>{
         try{
           const nowState = { time: audio.currentTime || 0, playing: !audio.paused };
           localStorage.setItem(BG_STORAGE_KEY, JSON.stringify(nowState));
         }catch(e){}
       };
-      audio.addEventListener('timeupdate', function(){
-        try{ localStorage.setItem(BG_STORAGE_KEY, JSON.stringify({ time: audio.currentTime || 0, playing: !audio.paused })); }catch(e){}
-      });
+      audio.addEventListener('timeupdate', function(){ try{ localStorage.setItem(BG_STORAGE_KEY, JSON.stringify({ time: audio.currentTime || 0, playing: !audio.paused })); }catch(e){} });
       audio.addEventListener('play', ()=>{ isPlaying=true; updateMusicUI(); saveNow(); });
       audio.addEventListener('pause', ()=>{ isPlaying=false; updateMusicUI(); saveNow(); });
       window.addEventListener('beforeunload', saveNow);
@@ -799,12 +874,12 @@
     } catch (e) { console.warn('bgMusic init failed', e); }
 
     // close modals by clicking outside
-    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','true'); } }); });
+    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','false'); } }); });
 
   });
 
   // Close admin/login modals with esc
-  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' || e.key === 'Esc') { document.querySelectorAll('.modal.on').forEach(m=>{ m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }); }});
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' || e.key === 'Esc') { document.querySelectorAll('.modal.on').forEach(m=>{ m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }); } });
 
 </script>
 </body>

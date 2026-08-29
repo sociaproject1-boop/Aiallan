@@ -417,6 +417,7 @@
   let isPlaying = false;
   const catImgData = {}; // store data URLs for category thumbs
   let avatarData = "";
+  const STORAGE_KEY = 'aiallan_state_v1';
 
   // Modal controls
   function openLogin() {
@@ -542,6 +543,7 @@
       const disp = document.getElementById('dispAvatar');
       if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
     }
+    saveState();
     alert("✅ Profile Saved!");
   }
 
@@ -553,6 +555,7 @@
     document.getElementById('socLinkShopee').href = document.getElementById('socShopee').value || '#';
     document.getElementById('socLinkYt').href = document.getElementById('socYt').value || '#';
     document.getElementById('socLinkTw').href = document.getElementById('socTw').value || '#';
+    saveState();
     alert("✅ Social Links Saved!");
   }
 
@@ -598,6 +601,7 @@
         if (prod) prod.href = firstLink.value;
       }
     }
+    saveState();
     alert("✅ All Categories Saved!");
   }
 
@@ -640,6 +644,126 @@
     isPlaying ? pauseMusic() : playMusic();
   }
 
+  // Persist/load state to localStorage
+  function saveState() {
+    try {
+      const state = {
+        profile: {
+          name: document.getElementById('adminName').value || document.getElementById('dispName').innerText || '',
+          bio: document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '',
+          avatar: avatarData || null
+        },
+        social: {
+          fb: document.getElementById('socFb').value || '',
+          ig: document.getElementById('socIg').value || '',
+          tt: document.getElementById('socTt').value || '',
+          shopee: document.getElementById('socShopee').value || '',
+          yt: document.getElementById('socYt').value || '',
+          tw: document.getElementById('socTw').value || ''
+        },
+        categories: []
+      };
+
+      for (let i = 1; i <= 8; i++) {
+        const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+        const links = [];
+        const linkInputs = document.querySelectorAll(`#cat${i}Links .link-item input`);
+        linkInputs.forEach(li => { if (li.value) links.push(li.value); });
+        state.categories.push({
+          name: nameEl ? (nameEl.value || '') : '',
+          thumb: catImgData[i] || null,
+          links: links
+        });
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.warn('Saving state failed', e);
+    }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      if (!state) return;
+
+      // profile
+      if (state.profile) {
+        if (state.profile.name) {
+          document.getElementById('dispName').innerText = state.profile.name;
+          document.getElementById('adminName').value = state.profile.name;
+        }
+        if (state.profile.bio) {
+          document.getElementById('dispBio').innerText = state.profile.bio;
+          document.getElementById('adminBio').value = state.profile.bio;
+        }
+        if (state.profile.avatar) {
+          avatarData = state.profile.avatar;
+          const prev = document.getElementById('avatarPreview');
+          if (prev) prev.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
+          const disp = document.getElementById('dispAvatar');
+          if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
+        }
+      }
+
+      // social
+      if (state.social) {
+        document.getElementById('socFb').value = state.social.fb || '';
+        document.getElementById('socIg').value = state.social.ig || '';
+        document.getElementById('socTt').value = state.social.tt || '';
+        document.getElementById('socShopee').value = state.social.shopee || '';
+        document.getElementById('socYt').value = state.social.yt || '';
+        document.getElementById('socTw').value = state.social.tw || '';
+
+        document.getElementById('socLinkFb').href = state.social.fb || '#';
+        document.getElementById('socLinkIg').href = state.social.ig || '#';
+        document.getElementById('socLinkTt').href = state.social.tt || '#';
+        document.getElementById('socLinkShopee').href = state.social.shopee || '#';
+        document.getElementById('socLinkYt').href = state.social.yt || '#';
+        document.getElementById('socLinkTw').href = state.social.tw || '#';
+      }
+
+      // categories
+      if (Array.isArray(state.categories)) {
+        state.categories.forEach((cat, idx) => {
+          const i = idx + 1;
+          const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+          if (nameEl) nameEl.value = cat.name || '';
+          const nameTarget = document.getElementById('name' + i);
+          if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
+
+          if (cat.thumb) {
+            catImgData[i] = cat.thumb;
+            const thumb = document.getElementById('thumb' + i);
+            const prev = document.getElementById('cat' + i + 'Prev');
+            if (thumb) thumb.innerHTML = '<img src="' + cat.thumb + '" alt="thumb">';
+            if (prev) prev.innerHTML = '<img src="' + cat.thumb + '" alt="thumb">';
+          }
+
+          // restore links
+          const linksContainer = document.getElementById('cat' + i + 'Links');
+          if (linksContainer && Array.isArray(cat.links)) {
+            linksContainer.innerHTML = ''; // clear
+            cat.links.forEach(link => {
+              const div = document.createElement('div');
+              div.className = 'link-item';
+              div.innerHTML = `<input type="url" value="${link}" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>`;
+              linksContainer.appendChild(div);
+            });
+            // set product href to first link
+            const prod = document.getElementById('prod' + i);
+            if (prod && cat.links[0]) prod.href = cat.links[0];
+          }
+        });
+      }
+
+    } catch (e) {
+      console.warn('Loading state failed', e);
+    }
+  }
+
   // Accessibility: close modals when clicking outside modal-box
   document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener('click', (e) => {
@@ -650,8 +774,11 @@
     });
   });
 
-  // Initialize default tab
-  switchTab('profile');
+  // Initialize on DOM ready
+  window.addEventListener('DOMContentLoaded', () => {
+    loadState();
+    switchTab('profile');
+  });
 </script>
 </body>
 </html>

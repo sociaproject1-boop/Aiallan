@@ -1,381 +1,393 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Allan — aiallan.shop</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-:root{--bg:#000;--card:#1c1c1e;--accent:#ff2d55;--text:#fff;--text2:#8e8e93;--border:#38383a;--fb:#1877f2;--ig:#e1306c;--tt:#000;--shopee:#f4512c;--yt:#ff0000;--tw:#1da1f2;}
-body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
-.admin-btn{position:fixed;top:12px;right:12px;background:transparent;color:var(--text2);border:none;font-size:18px;cursor:pointer;z-index:10;}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;align-items:flex-start;justify-content:center;z-index:100;overflow-y:auto;padding:20px 0;}
-.modal.on{display:flex;}
-.modal-box{background:var(--card);padding:24px;border-radius:16px;width:90%;max-width:440px;border:1px solid var(--border);margin:auto;}
-.modal-box h2{text-align:center;margin-bottom:18px;font-size:18px;}
-.modal-box h3{font-size:15px;margin:16px 0 10px;color:var(--text2);}
-.modal-box input,.modal-box textarea,.modal-box select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#2c2c2e;color:var(--text);font-size:14px;margin-bottom:10px;}
-.modal-box textarea{resize:vertical;min-height:80px;}
-.btn{padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;}
-.btn-red{background:var(--accent);color:white;}
-.btn-gray{background:var(--border);color:var(--text);}
-.btn-row{display:flex;gap:10px;margin-top:12px;}
-.btn-row .btn{flex:1;}
-.link-item{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
-.link-item input{flex:1;margin:0;}
-.link-item button{width:36px;height:36px;padding:0;border-radius:8px;border:none;background:#ff4444;color:white;cursor:pointer;}
-.add-link-btn{width:100%;padding:10px;border-radius:8px;border:1px dashed var(--text2);background:transparent;color:var(--text2);cursor:pointer;margin-bottom:12px;}
-.category-block{border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;}
-.category-block h4{font-size:15px;margin-bottom:10px;color:var(--accent);}
-.upload-preview{width:60px;height:60px;border-radius:8px;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:24px;margin-top:8px;overflow:hidden;}
-.upload-preview img{width:100%;height:100%;object-fit:cover;}
-.avatar-upload{text-align:center;margin-bottom:16px;}
-.avatar-upload .preview{width:100px;height:100px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 10px;overflow:hidden;}
-.avatar-upload .preview img{width:100%;height:100%;object-fit:cover;}
-.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
-.tab{padding:8px 14px;border-radius:8px;background:var(--border);color:var(--text2);font-size:14px;cursor:pointer;}
-.tab.active{background:var(--accent);color:white;}
-.hidden{display:none !important;}
-.home{max-width:480px;margin:0 auto;padding:60px 16px 40px;}
-.profile{text-align:center;margin-bottom:20px;}
-.avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff9500);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:38px;overflow:hidden;}
-.avatar img{width:100%;height:100%;object-fit:cover;}
-.name{font-size:22px;font-weight:700;margin-bottom:6px;}
-.bio{color:var(--text2);font-size:14px;margin-bottom:16px;}
-.music-player{display:flex;align-items:center;gap:10px;background:var(--card);padding:10px;border-radius:12px;margin-bottom:20px;border:1px solid var(--border);}
-.music-player button{width:40px;height:40px;border-radius:50%;border:none;background:var(--accent);color:white;font-size:16px;cursor:pointer;}
-.music-player span{font-size:13px;color:var(--text2);flex:1;}
-.social-row{display:flex;justify-content:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
-.social-link{width:50px;height:50px;border-radius:12px;color:white;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:22px;transition:.2s;}
-.social-link.fb{background:var(--fb);}
-.social-link.ig{background:var(--ig);}
-.social-link.tt{background:var(--tt);border:1px solid #333;}
-.social-link.shopee{background:var(--shopee);}
-.social-link.yt{background:var(--yt);}
-.social-link.tw{background:var(--tw);}
-.social-link:hover{transform:scale(1.1);}
-.section-title{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;}
-.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.product-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:.2s;cursor:pointer;}
-.product-card:hover{transform:translateY(-3px);border-color:var(--accent);}
-.product-thumb{width:100%;aspect-ratio:1;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;}
-.product-thumb img{width:100%;height:100%;object-fit:cover;}
-.product-info{padding:12px;}
-.product-name{font-size:14px;font-weight:600;line-height:1.3;}
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  :root {
+    --bg: #000;
+    --card: #1c1c1e;
+    --accent: #ff2d55;
+    --text: #fff;
+    --text2: #8e8e93;
+    --border: #38383a;
+    --fb: #1877f2;
+    --ig: #e1306c;
+    --tt: #000;
+    --shopee: #f4512c;
+    --yt: #ff0000;
+    --tw: #1da1f2;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  .admin-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    color: var(--text2);
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 20;
+  }
+
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    overflow-y: auto;
+    padding: 20px 0;
+  }
+  .modal.on { display: flex; }
+  .modal-box {
+    background: var(--card);
+    padding: 24px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 520px;
+    border: 1px solid var(--border);
+    margin: auto;
+    color: var(--text);
+  }
+  .modal-box h2 { text-align: center; margin-bottom: 18px; font-size: 18px; }
+  .modal-box h3 { font-size: 15px; margin: 16px 0 10px; color: var(--text2); }
+  .modal-box input,
+  .modal-box textarea,
+  .modal-box select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #2c2c2e;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .modal-box textarea { resize: vertical; min-height: 80px; }
+
+  .btn { padding: 12px; border-radius: 10px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .btn-red { background: var(--accent); color: white; }
+  .btn-gray { background: var(--border); color: var(--text); }
+  .btn-row { display:flex; gap: 10px; margin-top: 12px; }
+  .btn-row .btn { flex: 1; }
+
+  .link-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .link-item input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: var(--text); }
+  .link-item button { width: 36px; height: 36px; padding: 0; border-radius: 8px; border: none; background: #ff4444; color: white; cursor: pointer; }
+
+  .add-link-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px dashed var(--text2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+
+  .category-block { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+  .category-block h4 { font-size: 15px; margin-bottom: 10px; color: var(--accent); }
+  .upload-preview { width: 60px; height: 60px; border-radius: 8px; background: #2c2c2e; display:flex; align-items:center; justify-content:center; font-size:24px; margin-top:8px; overflow:hidden; }
+  .upload-preview img { width:100%; height:100%; object-fit:cover; }
+
+  .avatar-upload { text-align:center; margin-bottom:16px; }
+  .avatar-upload .preview { width:100px; height:100px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto 10px; overflow:hidden; }
+  .avatar-upload .preview img { width:100%; height:100%; object-fit:cover; }
+
+  .tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .tab { padding:8px 14px; border-radius:8px; background:var(--border); color:var(--text2); font-size:14px; cursor:pointer; }
+  .tab.active { background:var(--accent); color:white; }
+  .hidden { display: none !important; }
+
+  .home { max-width:480px; margin: 0 auto; padding: 60px 16px 40px; }
+  .profile { text-align:center; margin-bottom:20px; }
+  .avatar { width:90px; height:90px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:38px; overflow:hidden; }
+  .avatar img { width:100%; height:100%; object-fit:cover; }
+  .name { font-size:22px; font-weight:700; margin-bottom:6px; }
+  .bio { color:var(--text2); font-size:14px; margin-bottom:16px; }
+
+  .music-player { display:flex; align-items:center; gap:10px; background:var(--card); padding:10px; border-radius:12px; margin-bottom:20px; border:1px solid var(--border); }
+  .music-player button { width:40px; height:40px; border-radius:50%; border:none; background:var(--accent); color:white; font-size:16px; cursor:pointer; }
+  .music-player span { font-size:13px; color:var(--text2); flex:1; }
+
+  .social-row { display:flex; justify-content:center; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+  .social-link { width:50px; height:50px; border-radius:12px; color:white; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:22px; transition:.2s; }
+  .social-link.fb { background:var(--fb); }
+  .social-link.ig { background:var(--ig); }
+  .social-link.tt { background:var(--tt); border:1px solid #333; }
+  .social-link.shopee { background:var(--shopee); }
+  .social-link.yt { background:var(--yt); }
+  .social-link.tw { background:var(--tw); }
+  .social-link:hover { transform: scale(1.1); }
+
+  .section-title { font-size:15px; font-weight:600; margin-bottom:16px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
+  .products-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
+  .product-card { background:var(--card); border-radius:14px; overflow:hidden; border:1px solid var(--border); text-decoration:none; color:var(--text); transition:.2s; cursor:pointer; display:block; }
+  .product-card:hover { transform: translateY(-3px); border-color:var(--accent); }
+  .product-thumb { width:100%; aspect-ratio:1; background:#2c2c2e; display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
+  .product-thumb img { width:100%; height:100%; object-fit:cover; }
+  .product-info { padding:12px; }
+  .product-name { font-size:14px; font-weight:600; line-height:1.3; }
+
+  /* small screens */
+  @media (max-width: 420px) {
+    .modal-box { padding: 18px; border-radius: 12px; }
+    .home { padding: 48px 12px 40px; }
+  }
 </style>
 </head>
 <body>
-<audio id="bgMusic" loop><source src="" type="audio/mpeg">
-<button class="admin-btn" onclick="openLogin()">⚙️</button>
-<div class="modal" id="loginModal">
-  <div class="modal-box">
-    <h2>🔐 Admin Login</h2>
-    <input type="password" id="passInput" placeholder="Enter Password">
-    <div class="btn-row">
-      <button class="btn btn-gray" onclick="closeLogin()">Cancel</button>
-      <button class="btn btn-red" onclick="checkPass()">Login</button>
-    </div>
-    <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2);">
-      <a href="#" onclick="showForgotPass();return false;" style="color:var(--accent);text-decoration:none;">Forgot Password?</a>
-    </p>
-  </div>
-</div>
+  <!-- Background audio element (closed properly) -->
+  <audio id="bgMusic" loop></audio>
 
-<div class="modal" id="forgotModal">
-  <div class="modal-box">
-    <h2>🔑 Recover Password</h2>
-    <div id="forgotStep1">
-      <h3>Send OTP via</h3>
-      <input type="email" id="recoveryEmail" placeholder="Email Address">
-      <input type="tel" id="recoveryPhone" placeholder="Phone Number" style="margin-top:8px;">
-      <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="sendOTP()">Send OTP Code</button>
-    </div>
-    <div id="forgotStep2" class="hidden">
-      <h3>Enter OTP Code</h3>
-      <input type="text" id="otpInput" placeholder="6-digit OTP Code" maxlength="6">
-      <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="verifyOTP()">Verify OTP</button>
-    </div>
-    <div id="forgotStep3" class="hidden">
-      <h3>Set New Password</h3>
-      <input type="password" id="newPass1" placeholder="New Password">
-      <input type="password" id="newPass2" placeholder="Confirm Password" style="margin-top:8px;">
-      <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveNewPass()">Save Password</button>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gray" style="flex:1;" onclick="closeForgotModal()">Back</button>
+  <!-- Admin button -->
+  <button class="admin-btn" onclick="openLogin()" aria-label="Open admin">⚙️</button>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <h2 id="loginTitle">🔐 Admin Login</h2>
+      <input type="password" id="passInput" placeholder="Enter Password" autocomplete="current-password">
+      <div class="btn-row">
+        <button class="btn btn-gray" onclick="closeLogin()">Cancel</button>
+        <button class="btn btn-red" onclick="checkPass()">Login</button>
+      </div>
+      <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2);">
+        <a href="#" onclick="showForgotPass();return false;" style="color:var(--accent);text-decoration:none;">Forgot Password?</a>
+      </p>
     </div>
   </div>
-</div>
 
-<div class="modal" id="adminModal">
-  <div class="modal-box" style="max-width:460px;max-height:90vh;overflow-y:auto;">
-    <h2>🛠️ Admin Panel</h2>
-    <div class="tabs">
-      <span class="tab active" data-tab="profile">👤 Profile</span>
-      <span class="tab" data-tab="social">🔗 Social</span>
-      <span class="tab" data-tab="products">🛍️ Products</span>
-      <span class="tab" data-tab="music">🎵 Music</span>
-    </div>
+  <!-- Forgot / Recover Modal -->
+  <div class="modal" id="forgotModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="forgotTitle">
+      <h2 id="forgotTitle">🔑 Recover Password</h2>
 
-    <div id="tab-profile" class="tab-content">
-      <div class="avatar-upload">
-        <div class="preview" id="avatarPreview">👤</div>
-        <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)">
+      <div id="forgotStep1">
+        <h3>Send OTP via</h3>
+        <input type="email" id="recoveryEmail" placeholder="Email Address">
+        <input type="tel" id="recoveryPhone" placeholder="Phone Number" style="margin-top:8px;">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="sendOTP()">Send OTP Code</button>
       </div>
-      <input type="text" id="adminName" placeholder="Your Name">
-      <input type="text" id="adminBio" placeholder="Short Bio">
-      <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveProfile()">Save Profile</button>
-    </div>
 
-    <div id="tab-social" class="tab-content hidden">
-      <h3>Social Links (brand colors)</h3>
-      <input type="url" id="socFb" placeholder="Facebook URL" style="border-left:4px solid var(--fb);">
-      <input type="url" id="socIg" placeholder="Instagram URL" style="border-left:4px solid var(--ig);">
-      <input type="url" id="socTt" placeholder="TikTok URL" style="border-left:4px solid #555;">
-      <input type="url" id="socShopee" placeholder="Shopee URL" style="border-left:4px solid var(--shopee);">
-      <input type="url" id="socYt" placeholder="YouTube URL" style="border-left:4px solid var(--yt);">
-      <input type="url" id="socTw" placeholder="Twitter/X URL" style="border-left:4px solid var(--tw);">
-      <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveSocial()">Save Social Links</button>
-    </div>
+      <div id="forgotStep2" class="hidden">
+        <h3>Enter OTP Code</h3>
+        <input type="text" id="otpInput" placeholder="6-digit OTP Code" maxlength="6" inputmode="numeric">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="verifyOTP()">Verify OTP</button>
+      </div>
 
-    <div id="tab-products" class="tab-content">
-      <h3>8 Categories — Unlimited Links Each</h3>
-      
-      <div class="category-block">
-        <h4>1. Health & Beauty 💄</h4>
-        <input type="text" class="cat-name" data-cat="1" value="Health & Beauty" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(1,this)">
-        <div class="upload-preview" id="cat1Prev">💄</div>
-        <div class="links-container" id="cat1Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(1)">+ Add Another Link</button>
+      <div id="forgotStep3" class="hidden">
+        <h3>Set New Password</h3>
+        <input type="password" id="newPass1" placeholder="New Password" autocomplete="new-password">
+        <input type="password" id="newPass2" placeholder="Confirm Password" style="margin-top:8px;" autocomplete="new-password">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveNewPass()">Save Password</button>
       </div>
-      
-      <div class="category-block">
-        <h4>2. Clothes & Fashion 👕</h4>
-        <input type="text" class="cat-name" data-cat="2" value="Clothes & Fashion" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(2,this)">
-        <div class="upload-preview" id="cat2Prev">👕</div>
-        <div class="links-container" id="cat2Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(2)">+ Add Another Link</button>
-      </div>
-      
-      <div class="category-block">
-        <h4>3. Gadgets & Accessories 📱</h4>
-        <input type="text" class="cat-name" data-cat="3" value="Gadgets & Accessories" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(3,this)">
-        <div class="upload-preview" id="cat3Prev">📱</div>
-        <div class="links-container" id="cat3Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(3)">+ Add Another Link</button>
-      </div>
-      
-      <div class="category-block">
-        <h4>4. Campaign Tools 📢</h4>
-        <input type="text" class="cat-name" data-cat="4" value="Campaign Tools" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(4,this)">
-        <div class="upload-preview" id="cat4Prev">📢</div>
-        <div class="links-container" id="cat4Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(4)">+ Add Another Link</button>
-      </div>
-      
-      <div class="category-block">
-        <h4>5. Foods & Groceries 🍜</h4>
-        <input type="text" class="cat-name" data-cat="5" value="Foods & Groceries" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(5,this)">
-        <div class="upload-preview" id="cat5Prev">🍜</div>
-        <div class="links-container" id="cat5Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(5)">+ Add Another Link</button>
-      </div>
-      
-      <div class="category-block">
-        <h4>6. Heavy Duty Tools 🔧</h4>
-        <input type="text" class="cat-name" data-cat="6" value="Heavy Duty Tools" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(6,this)">
-        <div class="upload-preview" id="cat6Prev">🔧</div>
-        <div class="links-container" id="cat6Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(6)">+ Add Another Link</button>
-      </div>
-      
-      <div class="category-block">
-        <h4>7. Motor & Vehicle Parts 🏍️</h4>
-        <input type="text" class="cat-name" data-cat="7" value="Motor & Vehicle Parts" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(7,this)">
-        <div class="upload-preview" id="cat7Prev">🏍️</div>
-        <div class="links-container" id="cat7Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(7)">+ Add Another Link</button>
-      </div>
-      
-      <div class="category-block">
-        <h4>8. Books & Learning 📚</h4>
-        <input type="text" class="cat-name" data-cat="8" value="Books & Learning" placeholder="Category Name">
-        <input type="file" accept="image/*" onchange="previewCatThumb(8,this)">
-        <div class="upload-preview" id="cat8Prev">📚</div>
-        <div class="links-container" id="cat8Links">
-          <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-        </div>
-        <button class="add-link-btn" onclick="addLinkField(8)">+ Add Another Link</button>
-      </div>
-      
-      <button class="btn btn-red" style="width:100%;margin-top:20px;" onclick="saveAllProducts()">💾 Save All Categories</button>
-    </div>
 
-    <div id="tab-music" class="tab-content hidden">
-      <h3>Background Music</h3>
-      <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file</p>
-      <div style="display:flex;gap:10px;margin-top:10px;">
-        <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
-        <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
+      <div class="btn-row">
+        <button class="btn btn-gray" style="flex:1;" onclick="closeForgotModal()">Back</button>
       </div>
-    </div>
-
-    <div class="btn-row" style="margin-top:20px;">
-      <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
     </div>
   </div>
-                                   </div>
-                                   <div class="home" id="homePage">
-  <div class="profile">
-    <div class="avatar" id="dispAvatar">👤</div>
-    <h1 class="name" id="dispName">Allan</h1>
-    <p class="bio" id="dispBio">Affiliate & Creator</p>
+
+  <!-- Admin Modal -->
+  <div class="modal" id="adminModal" aria-hidden="true">
+    <div class="modal-box" style="max-width:680px; max-height:90vh; overflow-y:auto;" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <h2 id="adminTitle">🛠️ Admin Panel</h2>
+
+      <div class="tabs" role="tablist" aria-label="Admin tabs">
+        <span class="tab active" data-tab="profile" role="tab" aria-selected="true">👤 Profile</span>
+        <span class="tab" data-tab="social" role="tab" aria-selected="false">🔗 Social</span>
+        <span class="tab" data-tab="products" role="tab" aria-selected="false">🛍️ Products</span>
+        <span class="tab" data-tab="music" role="tab" aria-selected="false">🎵 Music</span>
+      </div>
+
+      <div id="tab-profile" class="tab-content">
+        <div class="avatar-upload">
+          <div class="preview" id="avatarPreview">👤</div>
+          <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)">
+        </div>
+        <input type="text" id="adminName" placeholder="Your Name">
+        <input type="text" id="adminBio" placeholder="Short Bio">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveProfile()">Save Profile</button>
+      </div>
+
+      <div id="tab-social" class="tab-content hidden">
+        <h3>Social Links (brand colors)</h3>
+        <input type="url" id="socFb" placeholder="Facebook URL" style="border-left:4px solid var(--fb);">
+        <input type="url" id="socIg" placeholder="Instagram URL" style="border-left:4px solid var(--ig);">
+        <input type="url" id="socTt" placeholder="TikTok URL" style="border-left:4px solid #555;">
+        <input type="url" id="socShopee" placeholder="Shopee URL" style="border-left:4px solid var(--shopee);">
+        <input type="url" id="socYt" placeholder="YouTube URL" style="border-left:4px solid var(--yt);">
+        <input type="url" id="socTw" placeholder="Twitter/X URL" style="border-left:4px solid var(--tw);">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveSocial()">Save Social Links</button>
+      </div>
+
+      <div id="tab-products" class="tab-content">
+        <h3>8 Categories — Unlimited Links Each</h3>
+
+        <!-- Generate 8 category blocks -->
+        <div id="categoriesContainer">
+          <!-- We'll output category blocks using static markup similar to original -->
+          <div class="category-block">
+            <h4>1. Health & Beauty 💄</h4>
+            <input type="text" class="cat-name" data-cat="1" value="Health & Beauty" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(1,this)">
+            <div class="upload-preview" id="cat1Prev">💄</div>
+            <div class="links-container" id="cat1Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(1)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>2. Clothes & Fashion 👕</h4>
+            <input type="text" class="cat-name" data-cat="2" value="Clothes & Fashion" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(2,this)">
+            <div class="upload-preview" id="cat2Prev">👕</div>
+            <div class="links-container" id="cat2Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(2)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>3. Gadgets & Accessories 📱</h4>
+            <input type="text" class="cat-name" data-cat="3" value="Gadgets & Accessories" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(3,this)">
+            <div class="upload-preview" id="cat3Prev">📱</div>
+            <div class="links-container" id="cat3Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(3)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>4. Campaign Tools 📢</h4>
+            <input type="text" class="cat-name" data-cat="4" value="Campaign Tools" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(4,this)">
+            <div class="upload-preview" id="cat4Prev">📢</div>
+            <div class="links-container" id="cat4Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(4)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>5. Foods & Groceries 🍜</h4>
+            <input type="text" class="cat-name" data-cat="5" value="Foods & Groceries" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(5,this)">
+            <div class="upload-preview" id="cat5Prev">🍜</div>
+            <div class="links-container" id="cat5Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(5)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>6. Heavy Duty Tools 🔧</h4>
+            <input type="text" class="cat-name" data-cat="6" value="Heavy Duty Tools" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(6,this)">
+            <div class="upload-preview" id="cat6Prev">🔧</div>
+            <div class="links-container" id="cat6Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(6)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>7. Motor & Vehicle Parts 🏍️</h4>
+            <input type="text" class="cat-name" data-cat="7" value="Motor & Vehicle Parts" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(7,this)">
+            <div class="upload-preview" id="cat7Prev">🏍️</div>
+            <div class="links-container" id="cat7Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(7)">+ Add Another Link</button>
+          </div>
+
+          <div class="category-block">
+            <h4>8. Books & Learning 📚</h4>
+            <input type="text" class="cat-name" data-cat="8" value="Books & Learning" placeholder="Category Name">
+            <input type="file" accept="image/*" onchange="previewCatThumb(8,this)">
+            <div class="upload-preview" id="cat8Prev">📚</div>
+            <div class="links-container" id="cat8Links">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <button class="add-link-btn" onclick="addLinkField(8)">+ Add Another Link</button>
+          </div>
+        </div>
+
+        <button class="btn btn-red" style="width:100%;margin-top:20px;" onclick="saveAllProducts()">💾 Save All Categories</button>
+      </div>
+
+      <div id="tab-music" class="tab-content hidden">
+        <h3>Background Music</h3>
+        <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file</p>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:20px;">
+        <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
+      </div>
+    </div>
   </div>
 
-  <div class="music-player" id="musicPlayer" style="display:none;">
-    <button onclick="toggleMusic()" id="musicBtn">▶️</button>
-    <span id="musicTitle">Background Music</span>
-  </div>
+  <!-- Main content / Home page -->
+  <div class="home" id="homePage">
+    <div class="profile">
+      <div class="avatar" id="dispAvatar">👤</div>
+      <h1 class="name" id="dispName">Allan</h1>
+      <p class="bio" id="dispBio">Affiliate & Creator</p>
+    </div>
 
-  <div class="social-row">
-    <a href="#" class="social-link fb" id="socLinkFb" target="_blank"><i class="fab fa-facebook-f"></i></a>
-    <a href="#" class="social-link ig" id="socLinkIg" target="_blank"><i class="fab fa-instagram"></i></a>
-    <a href="#" class="social-link tt" id="socLinkTt" target="_blank"><i class="fab fa-tiktok"></i></a>
-    <a href="#" class="social-link shopee" id="socLinkShopee" target="_blank"><i class="fas fa-shopping-bag"></i></a>
-    <a href="#" class="social-link yt" id="socLinkYt" target="_blank"><i class="fab fa-youtube"></i></a>
-    <a href="#" class="social-link tw" id="socLinkTw" target="_blank"><i class="fab fa-twitter"></i></a>
-  </div>
+    <div class="music-player hidden" id="musicPlayer">
+      <button onclick="toggleMusic()" id="musicBtn">▶️</button>
+      <span id="musicTitle">Background Music</span>
+    </div>
 
-  <p class="section-title">Shop by Category</p>
-  <div class="products-grid">
-    <a href="#" class="product-card" id="prod1">
-      <div class="product-thumb" id="thumb1">💄</div>
-      <div class="product-info"><div class="product-name" id="name1">Health & Beauty</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod2">
-      <div class="product-thumb" id="thumb2">👕</div>
-      <div class="product-info"><div class="product-name" id="name2">Clothes & Fashion</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod3">
-      <div class="product-thumb" id="thumb3">📱</div>
-      <div class="product-info"><div class="product-name" id="name3">Gadgets & Accessories</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod4">
-      <div class="product-thumb" id="thumb4">📢</div>
-      <div class="product-info"><div class="product-name" id="name4">Campaign Tools</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod5">
-      <div class="product-thumb" id="thumb5">🍜</div>
-      <div class="product-info"><div class="product-name" id="name5">Foods & Groceries</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod6">
-      <div class="product-thumb" id="thumb6">🔧</div>
-      <div class="product-info"><div class="product-name" id="name6">Heavy Duty Tools</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod7">
-      <div class="product-thumb" id="thumb7">🏍️</div>
-      <div class="product-info"><div class="product-name" id="name7">Motor & Vehicle Parts</div></div>
-    </a>
-    <a href="#" class="product-card" id="prod8">
-      <div class="product-thumb" id="thumb8">📚</div>
-      <div class="product-info"><div class="product-name" id="name8">Books & Learning</div></div>
-    </a>
-  </div>
-</div>
+    <div class="social-row">
+      <a href="#" class="social-link fb" id="socLinkFb" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="social-link ig" id="socLinkIg" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="social-link tt" id="socLinkTt" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+      <a href="#" class="social-link shopee" id="socLinkShopee" target="_blank" rel="noopener noreferrer"><i class="fas fa-shopping-bag"></i></a>
+      <a href="#" class="social-link yt" id="socLinkYt" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+      <a href="#" class="social-link tw" id="socLinkTw" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+    </div>
 
-<script>
-let PASSWORD = "allan123";
-let otpCode = "";
-let musicUrl = "";
-let isPlaying = false;
-let catThumbs = {1:'💄',2:'👕',3:'📱',4:'📢',5:'🍜',6:'🔧',7:'🏍️',8:'📚'};
-let catImgData = {};
-
-function openLogin(){document.getElementById('loginModal').classList.add('on');}
-function closeLogin(){document.getElementById('loginModal').classList.remove('on');document.getElementById('passInput').value='';}
-function closeAdminModal(){document.getElementById('adminModal').classList.remove('on');}
-
-function checkPass(){
-  let p=document.getElementById('passInput').value;
-  if(p===PASSWORD){closeLogin();document.getElementById('adminModal').classList.add('on');switchTab('profile');}
-  else alert("❌ Wrong password!");
-}
-
-function showForgotPass(){closeLogin();document.getElementById('forgotModal').classList.add('on');}
-function closeForgotModal(){document.getElementById('forgotModal').classList.remove('on');}
-function sendOTP(){otpCode=Math.floor(100000+Math.random()*900000).toString();alert(`✅ OTP Sent! Demo OTP: ${otpCode}`);document.getElementById('forgotStep1').classList.add('hidden');document.getElementById('forgotStep2').classList.remove('hidden');}
-function verifyOTP(){if(document.getElementById('otpInput').value===otpCode){document.getElementById('forgotStep2').classList.add('hidden');document.getElementById('forgotStep3').classList.remove('hidden');}else alert("❌ Wrong OTP!");}
-function saveNewPass(){let p1=document.getElementById('newPass1').value,p2=document.getElementById('newPass2').value;if(p1!==p2){alert("❌ Passwords don't match!");return;}PASSWORD=p1;alert("✅ Password Updated!");closeForgotModal();}
-
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{switchTab(t.dataset.tab);}));
-function switchTab(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));
-  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
-  document.getElementById('tab-'+name).classList.remove('hidden');
-}
-
-let avatarData="";
-function previewAvatar(input){if(input.files&&input.files[0]){let r=new FileReader();r.onload=e=>{avatarData=e.target.result;document.getElementById('avatarPreview').innerHTML='<img src="'+avatarData+'">';};r.readAsDataURL(input.files[0]);}}
-function saveProfile(){
-  let n=document.getElementById('adminName').value,b=document.getElementById('adminBio').value;
-  if(n)document.getElementById('dispName').innerText=n;
-  if(b)document.getElementById('dispBio').innerText=b;
-  if(avatarData)document.getElementById('dispAvatar').innerHTML='<img src="'+avatarData+'">';
-  alert("✅ Profile Saved!");
-}
-
-function saveSocial(){
-  document.getElementById('socLinkFb').href=document.getElementById('socFb').value||'#';
-  document.getElementById('socLinkIg').href=document.getElementById('socIg').value||'#';
-  document.getElementById('socLinkTt').href=document.getElementById('socTt').value||'#';
-  document.getElementById('socLinkShopee').href=document.getElementById('socShopee').value||'#';
-  document.getElementById('socLinkYt').href=document.getElementById('socYt').value||'#';
-  document.getElementById('socLinkTw').href=document.getElementById('socTw').value||'#';
-  alert("✅ Social Links Saved!");
-}
-
-function previewCatThumb(num,input){if(input.files&&input.files[0]){let r=new FileReader();r.onload=e=>{catImgData[num]=e.target.result;document.getElementById('cat'+num+'Prev').innerHTML='<img src="'+catImgData[num]+'">';};r.readAsDataURL(input.files[0]);}}
-function addLinkField(catNum){let c=document.getElementById('cat'+catNum+'Links');let f=document.createElement('div');f.className='link-item';f.innerHTML='<input type="url" placeholder="New Link"><button onclick="this.parentElement.remove()">✕</button>';c.appendChild(f);}
-function saveAllProducts(){
-  for(let i=1;i<=8;i++){
-    let name=document.querySelector(`.cat-name[data-cat="${i}"]`).value;
-    if(name)document.getElementById('name'+i).innerText=name;
-    if(catImgData[i])document.getElementById('thumb'+i).innerHTML='<img src="'+catImgData[i]+'">';
-    let firstLink=document.querySelector(`#cat${i}Links .link-item input`);
-    if(firstLink&&firstLink.value)document.getElementById('prod'+i).href=firstLink.value;
-  }
-  alert("✅ All Categories Saved!");
-}
-
-function previewMusic(input){if(input.files&&input.files[0]){musicUrl=URL.createObjectURL(input.files[0]);document.getElementById('bgMusic').src=musicUrl;document.getElementById('musicPlayer').style.display='flex';document.getElementById('musicTitle').innerText=input.files[0].name;}}
-function playMusic(){document.getElementById('bgMusic').play();isPlaying=true;document.getElementById('musicBtn').innerText='⏸️';}
-function pauseMusic(){document.getElementById('bgMusic').pause();isPlaying=false;document.getElementById('musicBtn').innerText='▶️';}
-function toggleMusic(){isPlaying?pauseMusic():playMusic();}
-</script>
-
-</body>
-</html>
+    <p class="section-title">Shop by Category</p>
+    <div class="products-grid">
+      <a href="#" class="product-card" id="prod1">
+        <div class="product-thumb" id="thumb1">💄</div>
+        <div class="product-info"><div class="product-name" id="name1">Health & Beauty</div></div>
+      </a>
+      <a href="#" class="product-card" id="prod2">
+        <div class="product-thumb" id="thumb2">👕</div>
+        <div class="product-info"><div class="product-name" id="name2">Clothes & Fashion</div></div>
+      </a>
+      <a href="#" class="product-card" id="prod3">
+        <div class="product-thumb" id="thumb3">📱</div>
+        <div class="product-info"><div class="product-name" id="name3">Gadgets & Accessories</div></div>
+      </a>
+      <a href="#" class="product-card" id="prod4">
+        <div class="product-thumb" id="thumb4">📢</div>
+        <div class="product-info"><div class="product-name" id="name4">Campaign Tools</div></div>
+      

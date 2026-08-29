@@ -115,7 +115,7 @@
 
   .home { max-width:480px; margin: 0 auto; padding: 60px 16px 40px; }
   .profile { text-align:center; margin-bottom:20px; }
-  .avatar { width:90px; height:90px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:38px; overflow:hidden; }
+  .avatar { width:90px; height:90px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:40px; overflow:hidden; }
   .avatar img { width:100%; height:100%; object-fit:cover; }
   .name { font-size:22px; font-weight:700; margin-bottom:6px; }
   .bio { color:var(--text2); font-size:14px; margin-bottom:16px; }
@@ -166,40 +166,7 @@
         <button class="btn btn-gray" onclick="closeLogin()">Cancel</button>
         <button class="btn btn-red" onclick="checkPass()">Login</button>
       </div>
-      <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2);">
-        <a href="#" onclick="showForgotPass();return false;" style="color:var(--accent);text-decoration:none;">Forgot Password?</a>
-      </p>
-    </div>
-  </div>
-
-  <!-- Forgot / Recover Modal -->
-  <div class="modal" id="forgotModal" aria-hidden="true">
-    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="forgotTitle">
-      <h2 id="forgotTitle">🔑 Recover Password</h2>
-
-      <div id="forgotStep1">
-        <h3>Send OTP via</h3>
-        <input type="email" id="recoveryEmail" placeholder="Email Address">
-        <input type="tel" id="recoveryPhone" placeholder="Phone Number" style="margin-top:8px;">
-        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="sendOTP()">Send OTP Code</button>
-      </div>
-
-      <div id="forgotStep2" class="hidden">
-        <h3>Enter OTP Code</h3>
-        <input type="text" id="otpInput" placeholder="6-digit OTP Code" maxlength="6" inputmode="numeric">
-        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="verifyOTP()">Verify OTP</button>
-      </div>
-
-      <div id="forgotStep3" class="hidden">
-        <h3>Set New Password</h3>
-        <input type="password" id="newPass1" placeholder="New Password" autocomplete="new-password">
-        <input type="password" id="newPass2" placeholder="Confirm Password" style="margin-top:8px;" autocomplete="new-password">
-        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveNewPass()">Save Password</button>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-gray" style="flex:1;" onclick="closeForgotModal()">Back</button>
-      </div>
+      <!-- Forgot Password link REMOVED per request (keep login but remove recovery) -->
     </div>
   </div>
 
@@ -248,8 +215,6 @@
         <!-- Generate 8 category blocks -->
         <div id="categoriesContainer">
           <!-- Static markup for categories; JS will manage link lists -->
-          <!-- Each category has a links-container with editable link items -->
-          <!-- Categories are similar to previous structure -->
         </div>
 
         <div style="display:flex;gap:10px;margin-top:10px;">
@@ -261,7 +226,7 @@
       <div id="tab-music" class="tab-content hidden">
         <h3>Background Music</h3>
         <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file (session only)</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file (will be saved locally)</p>
         <div style="display:flex;gap:10px;margin-top:10px;">
           <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
           <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
@@ -273,6 +238,17 @@
         <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Category Links Modal (shows all links for a clicked category) -->
+  <div class="modal" id="categoryModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="categoryTitle">
+      <h2 id="categoryTitle">Category Links</h2>
+      <div id="categoryLinksList" style="margin-top:12px;"></div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn btn-gray" onclick="closeCategoryModal()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -392,12 +368,14 @@
   }
 
   // state variables
-  let musicUrl = "";
+  let musicDataUrl = ""; // stored data URL for bg music
   let isPlaying = false;
   const catImgData = {}; // store data URLs for category thumbs
   let avatarData = "";
   const STATE_KEY = 'settings';
   const AUTH_KEY = 'auth';
+  const BG_STORAGE_KEY = 'aiallan_bg_state_v1';
+  const BG_SRC_KEY = 'aiallan_bg_src_v1';
 
   // default categories data
   const defaultCats = [
@@ -446,6 +424,7 @@
       a.href = '#';
       a.className = 'product-card';
       a.id = 'prod' + i;
+      a.setAttribute('data-cat', i);
       a.innerHTML = `
         <div class="product-thumb" id="thumb${i}">${cat.icon}</div>
         <div class="product-info"><div class="product-name" id="name${i}">${cat.name}</div></div>
@@ -500,18 +479,6 @@
     return h === auth.hash;
   }
 
-  // forgot password flow uses demo OTP; saveNewPass now stores hashed password
-  async function saveNewPass() {
-    const p1 = document.getElementById('newPass1').value || "";
-    const p2 = document.getElementById('newPass2').value || "";
-    if (!p1 || !p2) { alert('❌ Please fill both password fields.'); return; }
-    if (p1 !== p2) { alert("❌ Passwords don't match!"); return; }
-    await savePasswordHash(p1);
-    alert('✅ Password updated. You can login with your new password.');
-    closeForgotModal();
-    openLogin();
-  }
-
   // Login check using hashed password from IDB
   async function checkPass() {
     const p = document.getElementById('passInput').value || '';
@@ -530,11 +497,6 @@
     if (ok) { closeLogin(); openAdminModal(); switchTab('profile'); }
     else alert('❌ Wrong password!');
   }
-
-  function showForgotPass() { closeLogin(); const m = document.getElementById('forgotModal'); m.classList.add('on'); m.setAttribute('aria-hidden','false'); document.getElementById('forgotStep1').classList.remove('hidden'); document.getElementById('forgotStep2').classList.add('hidden'); document.getElementById('forgotStep3').classList.add('hidden'); }
-  function closeForgotModal() { const m = document.getElementById('forgotModal'); m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }
-  function sendOTP() { otpCode = Math.floor(100000 + Math.random() * 900000).toString(); alert(`✅ OTP Sent! Demo OTP: ${otpCode}`); document.getElementById('forgotStep1').classList.add('hidden'); document.getElementById('forgotStep2').classList.remove('hidden'); }
-  function verifyOTP() { const entered = (document.getElementById('otpInput').value || '').trim(); if (entered === otpCode) { document.getElementById('forgotStep2').classList.add('hidden'); document.getElementById('forgotStep3').classList.remove('hidden'); } else alert('❌ Incorrect OTP code.'); }
 
   // Tabs
   document.addEventListener('click', (e) => {
@@ -586,14 +548,14 @@
     if (!num || !input) return;
     if (input.files && input.files[0]) {
       const r = new FileReader();
-      r.onload = e => { catImgData[num] = e.target.result; const prev = document.getElementById('cat' + num + 'Prev'); if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; };
+      r.onload = e => { catImgData[num] = e.target.result; const prev = document.getElementById('cat' + num + 'Prev'); if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; const thumb = document.getElementById('thumb' + num); if (thumb) thumb.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; };
       r.readAsDataURL(input.files[0]);
     }
   }
 
   // Add link input field
   function addLinkField(catNum) {
-    const c = document.getElementById('cat' + catNum + 'Links'); if (!c) return; const f = document.createElement('div'); f.className = 'link-item'; f.innerHTML = '<input type="url" placeholder="New Link"><button onclick="this.parentElement.remove()">✕</button>'; c.appendChild(f);
+    const c = document.getElementById('cat' + catNum + 'Links'); if (!c) return; const f = document.createElement('div'); f.className = 'link-item'; f.innerHTML = '<input type="url" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>'; c.appendChild(f);
   }
 
   // Save categories (update tiles and first link hrefs)
@@ -602,42 +564,54 @@
       const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
       if (nameEl && nameEl.value) { const nameTarget = document.getElementById('name' + i); if (nameTarget) nameTarget.innerText = nameEl.value; }
       if (catImgData[i]) { const thumb = document.getElementById('thumb' + i); if (thumb) thumb.innerHTML = '<img src="' + catImgData[i] + '" alt="thumb">'; }
-      const firstLink = document.querySelector(`#cat${i}Links .link-item input`);
-      if (firstLink && firstLink.value) { const prod = document.getElementById('prod' + i); if (prod) prod.href = firstLink.value; }
+      // DO NOT set product tile href to a single link anymore — product click should open modal showing ALL links.
+      // Keep previous behavior of setting default first link as href optional (commented out).
+      // const firstLink = document.querySelector(`#cat${i}Links .link-item input`);
+      // if (firstLink && firstLink.value) { const prod = document.getElementById('prod' + i); if (prod) prod.href = firstLink.value; }
     }
     saveStateToDB();
     alert('✅ All Categories Saved!');
   }
 
-  // Music preview / playback
-  function previewMusic(input) {
+  // Music preview / playback — read file as data URL and persist to localStorage so it can be restored across refreshes
+  async function previewMusic(input) {
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      musicUrl = URL.createObjectURL(file);
-      const audio = document.getElementById('bgMusic');
-      audio.src = musicUrl;
-      audio.load();
-      const player = document.getElementById('musicPlayer'); if (player) player.classList.remove('hidden');
-      const musicTitle = document.getElementById('musicTitle'); if (musicTitle) musicTitle.innerText = file.name;
+      const r = new FileReader();
+      r.onload = e => {
+        musicDataUrl = e.target.result;
+        try { localStorage.setItem(BG_SRC_KEY, musicDataUrl); } catch (er) { console.warn('Could not save music to localStorage', er); }
+        const audio = document.getElementById('bgMusic');
+        audio.src = musicDataUrl;
+        audio.load();
+        // start playing
+        audio.play().then(()=>{ isPlaying = true; updateMusicUI(); }).catch(err => { console.warn('Autoplay prevented', err); updateMusicUI(); });
+        const player = document.getElementById('musicPlayer'); if (player) player.classList.remove('hidden');
+        const musicTitle = document.getElementById('musicTitle'); if (musicTitle) musicTitle.innerText = file.name;
+      };
+      r.readAsDataURL(file);
     }
   }
-  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; const btn=document.getElementById('musicBtn'); if(btn)btn.innerText='⏸️'; }).catch(()=>{}); }
-  function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; const btn=document.getElementById('musicBtn'); if(btn)btn.innerText='▶️'; }
+  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Play failed',err); }); }
+  function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; updateMusicUI(); }
   function toggleMusic() { isPlaying ? pauseMusic() : playMusic(); }
+  function updateMusicUI(){ const btn=document.getElementById('musicBtn'); if(btn) btn.innerText = isPlaying ? '⏸️' : '▶️'; const player=document.getElementById('musicPlayer'); if(player) player.classList.remove('hidden'); }
 
   // Build and persist state to IndexedDB
   async function saveStateToDB() {
     try {
-      const state = { profile: {}, social: {}, categories: [] };
+      const state = { profile: {}, social: {}, categories: [], music: null };
       state.profile.name = document.getElementById('adminName').value || document.getElementById('dispName').innerText || '';
       state.profile.bio = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '';
       state.profile.avatar = avatarData || null;
-      state.social.fb = document.getElementById('socFb').value || '';
-      state.social.ig = document.getElementById('socIg').value || '';
-      state.social.tt = document.getElementById('socTt').value || '';
-      state.social.shopee = document.getElementById('socShopee').value || '';
-      state.social.yt = document.getElementById('socYt').value || '';
-      state.social.tw = document.getElementById('socTw').value || '';
+      state.social = {
+        fb: document.getElementById('socFb').value || '',
+        ig: document.getElementById('socIg').value || '',
+        tt: document.getElementById('socTt').value || '',
+        shopee: document.getElementById('socShopee').value || '',
+        yt: document.getElementById('socYt').value || '',
+        tw: document.getElementById('socTw').value || ''
+      };
 
       for (let i=1;i<=8;i++){
         const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
@@ -646,6 +620,9 @@
         linkInputs.forEach(li => { if (li.value) links.push(li.value); });
         state.categories.push({ name: nameEl ? (nameEl.value || '') : '', thumb: catImgData[i] || null, links });
       }
+
+      // save music data url if available to state so import/export works
+      try { state.music = musicDataUrl || localStorage.getItem(BG_SRC_KEY) || null; } catch(e) { state.music = null; }
 
       await idbSet(STATE_KEY, state);
       return true;
@@ -684,9 +661,14 @@
           if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
           if (cat.thumb) { catImgData[i] = cat.thumb; const thumb = document.getElementById('thumb' + i); const prev = document.getElementById('cat' + i + 'Prev'); if (thumb) thumb.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; if (prev) prev.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; }
           const linksContainer = document.getElementById('cat' + i + 'Links');
-          if (linksContainer && Array.isArray(cat.links)) { linksContainer.innerHTML = ''; cat.links.forEach(link => { const div=document.createElement('div'); div.className='link-item'; div.innerHTML = `<input type="url" value="${link}" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>`; linksContainer.appendChild(div); });
-            const prod = document.getElementById('prod' + i); if (prod && cat.links && cat.links[0]) prod.href = cat.links[0]; }
+          if (linksContainer && Array.isArray(cat.links)) { linksContainer.innerHTML = ''; cat.links.forEach(link => { const div=document.createElement('div'); div.className='link-item'; div.innerHTML = '<input type="url" value="'+link+'"><button onclick="this.parentElement.remove()">✕</button>'; linksContainer.appendChild(div); });
+            const prod = document.getElementById('prod' + i); if (prod && cat.links && cat.links[0]) { /* do not set prod.href; clicking opens modal with all links */ }
+          }
         });
+      }
+      // restore music if present in state
+      if (state.music) {
+        try { musicDataUrl = state.music; localStorage.setItem(BG_SRC_KEY, musicDataUrl); } catch(e){}
       }
     } catch (e) { console.warn('loadState failed', e); }
   }
@@ -704,14 +686,58 @@
 
   function triggerImport() { document.getElementById('importFile').click(); }
   async function importStateFromFile(e) {
-    const file = e.target.files && e.target.files[0]; if (!file) return; const text = await file.text(); try { const state = JSON.parse(text); await idbSet(STATE_KEY, state); await loadStateFromDB(); alert('✅ Import complete'); } catch (err) { alert('❌ Import failed: invalid JSON'); }
+    const file = e.target.files && e.target.files[0]; if (!file) return; const text = await file.text(); try { const state = JSON.parse(text); await idbSet(STATE_KEY, state); await loadStateFromDB(); alert('✅ Imported'); } catch(err){ alert('Import failed'); }
   }
 
   // Clear all data (IDB)
   async function clearAllData() {
     if (!confirm('Clear all saved data? This cannot be undone.')) return;
-    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ alert('✅ All data cleared'); location.reload(); }; tx.onerror = ()=>{ alert('❌ Failed to clear data'); }; } catch (e) { console.warn(e); }
+    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ location.reload(); }; } catch(e){ console.warn(e); }
   }
+
+  // Category modal handling: clicking a product tile shows ALL links for that category
+  function openCategoryModal(title, links) {
+    const mdl = document.getElementById('categoryModal');
+    const list = document.getElementById('categoryLinksList');
+    const titleEl = document.getElementById('categoryTitle');
+    titleEl.textContent = title || 'Category Links';
+    list.innerHTML = '';
+    if (!links || links.length === 0) {
+      const p = document.createElement('div'); p.style.color = 'var(--text2)'; p.textContent = 'No links available for this category.'; list.appendChild(p);
+    } else {
+      links.forEach((l, idx) => {
+        const a = document.createElement('a');
+        a.href = l;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.style.display = 'block';
+        a.style.padding = '10px';
+        a.style.background = '#111';
+        a.style.border = '1px solid var(--border)';
+        a.style.borderRadius = '8px';
+        a.style.marginBottom = '8px';
+        a.style.color = 'var(--text)';
+        a.textContent = 'Product ' + (idx+1) + ' — ' + l.replace(/^https?:\/\//,'');
+        list.appendChild(a);
+      });
+    }
+    mdl.classList.add('on'); mdl.setAttribute('aria-hidden','false');
+  }
+  function closeCategoryModal(){ const m = document.getElementById('categoryModal'); m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }
+
+  // Initialize click handlers for product tiles to open category modal
+  document.addEventListener('click', (e)=>{
+    const card = e.target.closest('.product-card');
+    if (!card) return;
+    const catIndex = parseInt(card.getAttribute('data-cat'), 10);
+    if (!catIndex) return;
+    // gather links from admin fields
+    const linkInputs = document.querySelectorAll(`#cat${catIndex}Links .link-item input`);
+    const links = [];
+    linkInputs.forEach(li => { if (li.value) links.push(li.value); });
+    const title = document.getElementById('name' + catIndex).innerText || ('Category ' + catIndex);
+    openCategoryModal(title, links);
+  });
 
   // Initialize
   window.addEventListener('DOMContentLoaded', async () => {
@@ -719,9 +745,67 @@
     await loadStateFromDB();
     switchTab('profile');
 
+    // restore background music source from localStorage if available
+    try {
+      const audio = document.getElementById('bgMusic');
+      const savedSrc = localStorage.getItem(BG_SRC_KEY);
+      const savedStateRaw = localStorage.getItem(BG_STORAGE_KEY);
+      let savedState = null;
+      if (savedStateRaw) {
+        try { savedState = JSON.parse(savedStateRaw); } catch(e) { savedState = null; }
+      }
+      if (savedSrc) {
+        musicDataUrl = savedSrc;
+        audio.src = musicDataUrl;
+      }
+
+      if (savedState && typeof savedState.time === 'number'){
+        const setTime = ()=>{
+          try{
+            if (audio.duration && !isNaN(audio.duration)){
+              audio.currentTime = Math.min(savedState.time, Math.max(0, audio.duration - 0.1));
+            }
+          }catch(e){}
+        };
+        if (audio.readyState > 0) setTime(); else audio.addEventListener('loadedmetadata', setTime, {once:true});
+      }
+
+      // attempt to autoplay if saved playing is true or default to play
+      const shouldPlay = savedState ? !!savedState.playing : true;
+      if (shouldPlay) {
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Autoplay prevented', err); updateMusicUI(); });
+        } else { isPlaying = true; updateMusicUI(); }
+      }
+
+      // show music player if we have a source
+      if (audio.src) { document.getElementById('musicPlayer').classList.remove('hidden'); }
+
+      // update saved time & playing state frequently
+      const saveNow = ()=>{
+        try{
+          const nowState = { time: audio.currentTime || 0, playing: !audio.paused };
+          localStorage.setItem(BG_STORAGE_KEY, JSON.stringify(nowState));
+        }catch(e){}
+      };
+      audio.addEventListener('timeupdate', function(){
+        try{ localStorage.setItem(BG_STORAGE_KEY, JSON.stringify({ time: audio.currentTime || 0, playing: !audio.paused })); }catch(e){}
+      });
+      audio.addEventListener('play', ()=>{ isPlaying=true; updateMusicUI(); saveNow(); });
+      audio.addEventListener('pause', ()=>{ isPlaying=false; updateMusicUI(); saveNow(); });
+      window.addEventListener('beforeunload', saveNow);
+
+    } catch (e) { console.warn('bgMusic init failed', e); }
+
     // close modals by clicking outside
     document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','true'); } }); });
+
   });
+
+  // Close admin/login modals with esc
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' || e.key === 'Esc') { document.querySelectorAll('.modal.on').forEach(m=>{ m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }); }});
+
 </script>
 </body>
 </html>

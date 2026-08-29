@@ -8,7 +8,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 :root{--bg:#000;--card:#1c1c1e;--accent:#ff2d55;--text:#fff;--text2:#8e8e93;--border:#38383a;}
-body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px;}
 
 /* ADMIN BUTTON */
 .admin-btn{position:fixed;top:12px;right:12px;background:transparent;color:var(--text2);border:none;font-size:18px;cursor:pointer;z-index:10;}
@@ -16,51 +16,50 @@ body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px
 /* LOGIN MODAL */
 .login-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:100;}
 .login-modal.on{display:flex;}
-.login-box{background:var(--card);padding:24px;border-radius:16px;width:85%;max-width:320px;border:1px solid var(--border);}
+.login-box{background:var(--card);padding:24px;border-radius:16px;width:85%;max-width:340px;border:1px solid var(--border);max-height:90vh;overflow-y:auto;}
 .login-box h2{text-align:center;margin-bottom:18px;font-size:18px;}
-.login-box input{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:#2c2c2e;color:var(--text);font-size:15px;margin-bottom:14px;}
+.login-box input,.login-box textarea{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:#2c2c2e;color:var(--text);font-size:15px;margin-bottom:12px;}
 .login-buttons{display:flex;gap:10px;}
 .btn{flex:1;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;}
 .btn-red{background:var(--accent);color:white;}
 .btn-gray{background:var(--border);color:var(--text);}
 
 /* HOMEPAGE */
-.home{max-width:480px;margin:0 auto;padding:60px 20px 40px;}
+.home{max-width:480px;margin:0 auto;padding:60px 16px 40px;}
 .profile{text-align:center;margin-bottom:20px;}
 .avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff9500);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:38px;}
 .name{font-size:22px;font-weight:700;margin-bottom:6px;}
 .bio{color:var(--text2);font-size:14px;margin-bottom:16px;}
 
-/* LINKS — PATAGILID SA ILALIM NG PROFILE */
+/* SOCIAL LINKS — PATAGILID */
 .social-row{display:flex;justify-content:center;gap:14px;margin-bottom:30px;}
 .social-link{width:44px;height:44px;border-radius:12px;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px;border:1px solid var(--border);transition:.2s;}
 .social-link:hover{background:var(--accent);border-color:var(--accent);transform:scale(1.05);}
 
-/* PRODUCTS — PANGUNAHING NILALAMAN */
-.section-title{font-size:16px;font-weight:600;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;}
+/* PRODUCTS SECTION */
+.section-title{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;}
 .products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.product-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:.2s;}
+.product-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:.2s;cursor:pointer;}
 .product-card:hover{transform:translateY(-3px);border-color:var(--accent);}
-.product-img{width:100%;aspect-ratio:1;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.product-thumb{width:100%;aspect-ratio:1;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;}
+.product-thumb img{width:100%;height:100%;object-fit:cover;}
 .product-info{padding:12px;}
-.product-name{font-size:15px;font-weight:600;margin-bottom:4px;}
-.product-price{font-size:16px;font-weight:700;color:var(--accent);}
+.product-name{font-size:14px;font-weight:600;line-height:1.3;}
 
-/* DASHBOARD */
+/* DASHBOARD — FULL SCREEN, SMOOTH SCROLL */
 .dash{display:none;position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;}
 .dash.on{display:block;}
 .dash-top{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);}
 .dash-top h2{font-size:17px;}
 .close{background:var(--card);color:var(--text);border:none;padding:8px 14px;border-radius:8px;font-size:14px;cursor:pointer;}
-.dash-content{padding:18px;max-width:500px;margin:0 auto;}
+.dash-content{padding:18px;max-width:520px;margin:0 auto;}
 .dash-card{background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;}
 .dash-card h3{font-size:16px;margin-bottom:12px;}
-.dash-input{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:#2c2c2e;color:var(--text);font-size:15px;margin-bottom:10px;}
-.dash-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:15px;font-weight:600;cursor:pointer;}
-.dash-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.stat{background:#2c2c2e;padding:14px;border-radius:10px;text-align:center;}
-.stat-num{font-size:20px;font-weight:700;color:var(--accent);}
-.stat-label{font-size:12px;color:var(--text2);margin-top:4px;}
+.dash-input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#2c2c2e;color:var(--text);font-size:14px;margin-bottom:10px;}
+.dash-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
+.dash-small{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.upload-preview{width:60px;height:60px;border-radius:8px;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:24px;margin-top:8px;overflow:hidden;}
+.upload-preview img{width:100%;height:100%;object-fit:cover;}
 </style>
 </head>
 <body>
@@ -80,6 +79,101 @@ body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px
   </div>
 </div>
 
+<!-- DASHBOARD MODAL — PAGKATAPUS MAG LOGIN -->
+<div class="login-modal" id="adminModal">
+  <div class="login-box" style="max-width:420px;">
+    <h2>🛍️ Edit Categories</h2>
+    
+    <!-- PRODUCT 1 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">1. Health & Beauty</strong>
+      <input type="text" class="dash-input" id="p1Name" value="Health & Beauty" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p1Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(1,this)">
+      <div class="upload-preview" id="p1Prev">💄</div>
+    </div>
+
+    <!-- PRODUCT 2 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">2. Clothes & Fashion</strong>
+      <input type="text" class="dash-input" id="p2Name" value="Clothes & Fashion" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p2Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(2,this)">
+      <div class="upload-preview" id="p2Prev">👕</div>
+    </div>
+
+    <!-- PRODUCT 3 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">3. Gadgets & Accessories</strong>
+      <input type="text" class="dash-input" id="p3Name" value="Gadgets & Accessories" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p3Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(3,this)">
+      <div class="upload-preview" id="p3Prev">📱</div>
+    </div>
+
+    <!-- PRODUCT 4 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">4. Campaign Tools</strong>
+      <input type="text" class="dash-input" id="p4Name" value="Campaign Tools" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p4Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(4,this)">
+      <div class="upload-preview" id="p4Prev">📢</div>
+    </div>
+
+    <!-- PRODUCT 5 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">5. Foods & Groceries</strong>
+      <input type="text" class="dash-input" id="p5Name" value="Foods & Groceries" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p5Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(5,this)">
+      <div class="upload-preview" id="p5Prev">🍜</div>
+    </div>
+
+    <!-- PRODUCT 6 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">6. Heavy Duty Tools</strong>
+      <input type="text" class="dash-input" id="p6Name" value="Heavy Duty Tools" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p6Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(6,this)">
+      <div class="upload-preview" id="p6Prev">🔧</div>
+    </div>
+
+    <!-- PRODUCT 7 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">7. Motor & Vehicle Parts</strong>
+      <input type="text" class="dash-input" id="p7Name" value="Motor & Vehicle Parts" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p7Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(7,this)">
+      <div class="upload-preview" id="p7Prev">🏍️</div>
+    </div>
+
+    <!-- PRODUCT 8 -->
+    <div style="margin-bottom:14px;">
+      <strong style="font-size:14px;">8. Books & Learning</strong>
+      <input type="text" class="dash-input" id="p8Name" value="Books & Learning" placeholder="Category Name">
+      <input type="url" class="dash-input" id="p8Link" placeholder="Link (optional)">
+      <input type="file" accept="image/*" onchange="previewThumb(8,this)">
+      <div class="upload-preview" id="p8Prev">📚</div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
+
+    <!-- PROFILE & SOCIAL -->
+    <strong style="font-size:14px;">👤 Profile</strong>
+    <input type="text" class="dash-input" id="inName" placeholder="Your Name">
+    <input type="text" class="dash-input" id="inBio" placeholder="Short Bio">
+    
+    <strong style="font-size:14px;">🔗 Social Links</strong>
+    <input type="url" class="dash-input" id="inFb" placeholder="Facebook URL">
+    <input type="url" class="dash-input" id="inTt" placeholder="TikTok URL">
+    <input type="url" class="dash-input" id="inShop" placeholder="Shopee URL">
+    <input type="url" class="dash-input" id="inIg" placeholder="Instagram URL">
+
+    <button class="btn btn-red" style="width:100%;margin-top:12px;" onclick="saveAll()">💾 Save All Changes</button>
+    <button class="btn btn-gray" style="width:100%;margin-top:8px;" onclick="closeAdminModal()">Close</button>
+  </div>
+</div>
+
 <!-- HOMEPAGE -->
 <div class="home" id="homePage">
   <div class="profile">
@@ -88,7 +182,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px
     <p class="bio" id="dispBio">Affiliate & Creator</p>
   </div>
 
-  <!-- LINKS — PATAGILID SA ILALIM NG PROFILE -->
+  <!-- SOCIAL LINKS -->
   <div class="social-row">
     <a href="#" class="social-link" id="linkFb"><i class="fab fa-facebook-f"></i></a>
     <a href="#" class="social-link" id="linkTt"><i class="fab fa-tiktok"></i></a>
@@ -96,80 +190,119 @@ body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px
     <a href="#" class="social-link" id="linkIg"><i class="fab fa-instagram"></i></a>
   </div>
 
-  <!-- PRODUCTS — PANGUNAHING NILALAMAN -->
-  <p class="section-title">Featured Products</p>
+  <!-- PRODUCTS — 8 CATEGORIES, WALANG PRESYO, SCROLLABLE -->
+  <p class="section-title">Shop by Category</p>
   <div class="products-grid">
-    <a href="#" class="product-card">
-      <div class="product-img">🔥</div>
-      <div class="product-info">
-        <div class="product-name">Product 1</div>
-        <div class="product-price">₱0.00</div>
-      </div>
+    <a href="#" class="product-card" id="card1">
+      <div class="product-thumb" id="thumb1">💄</div>
+      <div class="product-info"><div class="product-name" id="name1">Health & Beauty</div></div>
     </a>
-    <a href="#" class="product-card">
-      <div class="product-img">⭐</div>
-      <div class="product-info">
-        <div class="product-name">Product 2</div>
-        <div class="product-price">₱0.00</div>
-      </div>
+    <a href="#" class="product-card" id="card2">
+      <div class="product-thumb" id="thumb2">👕</div>
+      <div class="product-info"><div class="product-name" id="name2">Clothes & Fashion</div></div>
     </a>
-    <a href="#" class="product-card">
-      <div class="product-img">🎮</div>
-      <div class="product-info">
-        <div class="product-name">Product 3</div>
-        <div class="product-price">₱0.00</div>
-      </div>
+    <a href="#" class="product-card" id="card3">
+      <div class="product-thumb" id="thumb3">📱</div>
+      <div class="product-info"><div class="product-name" id="name3">Gadgets & Accessories</div></div>
     </a>
-    <a href="#" class="product-card">
-      <div class="product-img">✨</div>
-      <div class="product-info">
-        <div class="product-name">Product 4</div>
-        <div class="product-price">₱0.00</div>
-      </div>
+    <a href="#" class="product-card" id="card4">
+      <div class="product-thumb" id="thumb4">📢</div>
+      <div class="product-info"><div class="product-name" id="name4">Campaign Tools</div></div>
     </a>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div class="dash" id="dashPage">
-  <div class="dash-top">
-    <h2>Dashboard</h2>
-    <button class="close" onclick="closeDash()">Close</button>
-  </div>
-  <div class="dash-content">
-    <div class="dash-card">
-      <h3>📊 Stats</h3>
-      <div class="dash-stats">
-        <div class="stat"><div class="stat-num">4</div><div class="stat-label">Products</div></div>
-        <div class="stat"><div class="stat-num">128</div><div class="stat-label">Clicks</div></div>
-      </div>
-    </div>
-    <div class="dash-card">
-      <h3>👤 Edit Profile</h3>
-      <input type="text" class="dash-input" id="inName" placeholder="Your Name">
-      <input type="text" class="dash-input" id="inBio" placeholder="Short Bio">
-      <button class="dash-btn" onclick="saveProfile()">Save Profile</button>
-    </div>
-    <div class="dash-card">
-      <h3>🔗 Social Links</h3>
-      <input type="url" class="dash-input" id="inFb" placeholder="Facebook URL">
-      <input type="url" class="dash-input" id="inTt" placeholder="TikTok URL">
-      <input type="url" class="dash-input" id="inShop" placeholder="Shopee URL">
-      <input type="url" class="dash-input" id="inIg" placeholder="Instagram URL">
-      <button class="dash-btn" onclick="saveLinks()">Save Links</button>
-    </div>
+    <a href="#" class="product-card" id="card5">
+      <div class="product-thumb" id="thumb5">🍜</div>
+      <div class="product-info"><div class="product-name" id="name5">Foods & Groceries</div></div>
+    </a>
+    <a href="#" class="product-card" id="card6">
+      <div class="product-thumb" id="thumb6">🔧</div>
+      <div class="product-info"><div class="product-name" id="name6">Heavy Duty Tools</div></div>
+    </a>
+    <a href="#" class="product-card" id="card7">
+      <div class="product-thumb" id="thumb7">🏍️</div>
+      <div class="product-info"><div class="product-name" id="name7">Motor & Vehicle Parts</div></div>
+    </a>
+    <a href="#" class="product-card" id="card8">
+      <div class="product-thumb" id="thumb8">📚</div>
+      <div class="product-info"><div class="product-name" id="name8">Books & Learning</div></div>
+    </a>
   </div>
 </div>
 
 <script>
 const PASS = "allan123";
+const icons = ['💄','👕','📱','📢','🍜','🔧','🏍️','📚'];
+
+// OPEN/CLOSE LOGIN
 function openLogin(){document.getElementById('loginModal').classList.add('on');}
 function closeLogin(){document.getElementById('loginModal').classList.remove('on');document.getElementById('passInput').value='';}
-function checkPass(){let p=document.getElementById('passInput').value;if(p===PASS){closeLogin();document.getElementById('dashPage').classList.add('on');window.scrollTo(0,0);}else alert("❌ Wrong password!");}
-function closeDash(){document.getElementById('dashPage').classList.remove('on');}
-function saveProfile(){let n=document.getElementById('inName').value,b=document.getElementById('inBio').value;if(n)document.getElementById('dispName').innerText=n;if(b)document.getElementById('dispBio').innerText=b;alert('✅ Profile Saved!');}
-function saveLinks(){document.getElementById('linkFb').href=document.getElementById('inFb').value||'#';document.getElementById('linkTt').href=document.getElementById('inTt').value||'#';document.getElementById('linkShop').href=document.getElementById('inShop').value||'#';document.getElementById('linkIg').href=document.getElementById('inIg').value||'#';alert('✅ Links Saved!');}
+
+// CHECK PASSWORD → OPEN ADMIN PANEL
+function checkPass(){
+  let p=document.getElementById('passInput').value;
+  if(p===PASS){
+    closeLogin();
+    document.getElementById('adminModal').classList.add('on');
+    loadCurrentData();
+  }else alert("❌ Wrong password!");
+}
+
+function closeAdminModal(){document.getElementById('adminModal').classList.remove('on');}
+
+// THUMBNAIL PREVIEW
+let thumbData = {};
+function previewThumb(num,input){
+  if(input.files && input.files[0]){
+    let r = new FileReader();
+    r.onload = function(e){
+      thumbData[num] = e.target.result;
+      document.getElementById('p'+num+'Prev').innerHTML = '<img src="'+e.target.result+'">';
+    };
+    r.readAsDataURL(input.files[0]);
+  }
+}
+
+// LOAD SAVED DATA
+function loadCurrentData(){
+  document.getElementById('inName').value = document.getElementById('dispName').innerText;
+  document.getElementById('inBio').value = document.getElementById('dispBio').innerText;
+  document.getElementById('inFb').value = document.getElementById('linkFb').href;
+  document.getElementById('inTt').value = document.getElementById('linkTt').href;
+  document.getElementById('inShop').value = document.getElementById('linkShop').href;
+  document.getElementById('inIg').value = document.getElementById('linkIg').href;
+  
+  for(let i=1;i<=8;i++){
+    document.getElementById('p'+i+'Name').value = document.getElementById('name'+i).innerText;
+    document.getElementById('p'+i+'Link').value = document.getElementById('card'+i).href;
+  }
+}
+
+// SAVE ALL CHANGES
+function saveAll(){
+  // Profile
+  let n=document.getElementById('inName').value,b=document.getElementById('inBio').value;
+  if(n)document.getElementById('dispName').innerText=n;
+  if(b)document.getElementById('dispBio').innerText=b;
+  
+  // Social Links
+  document.getElementById('linkFb').href = document.getElementById('inFb').value || '#';
+  document.getElementById('linkTt').href = document.getElementById('inTt').value || '#';
+  document.getElementById('linkShop').href = document.getElementById('inShop').value || '#';
+  document.getElementById('linkIg').href = document.getElementById('inIg').value || '#';
+  
+  // 8 Categories
+  for(let i=1;i<=8;i++){
+    let name = document.getElementById('p'+i+'Name').value;
+    let link = document.getElementById('p'+i+'Link').value;
+    if(name) document.getElementById('name'+i).innerText = name;
+    if(link) document.getElementById('card'+i).href = link;
+    if(thumbData[i]) document.getElementById('thumb'+i).innerHTML = '<img src="'+thumbData[i]+'">';
+  }
+  
+  alert('✅ All Saved! Refresh to see changes!');
+  closeAdminModal();
+}
 </script>
 
 </body>
-</html>
+      </html>
+      

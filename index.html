@@ -57,7 +57,7 @@
     padding: 24px;
     border-radius: 16px;
     width: 90%;
-    max-width: 520px;
+    max-width: 720px;
     border: 1px solid var(--border);
     margin: auto;
     color: var(--text);
@@ -205,7 +205,7 @@
 
   <!-- Admin Modal -->
   <div class="modal" id="adminModal" aria-hidden="true">
-    <div class="modal-box" style="max-width:680px; max-height:90vh; overflow-y:auto;" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
       <h2 id="adminTitle">🛠️ Admin Panel</h2>
 
       <div class="tabs" role="tablist" aria-label="Admin tabs">
@@ -222,7 +222,10 @@
         </div>
         <input type="text" id="adminName" placeholder="Your Name">
         <input type="text" id="adminBio" placeholder="Short Bio">
-        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveProfile()">Save Profile</button>
+        <div class="btn-row">
+          <button class="btn btn-red" style="flex:1;" onclick="saveProfile()">Save Profile</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="exportState()">Export JSON</button>
+        </div>
       </div>
 
       <div id="tab-social" class="tab-content hidden">
@@ -233,120 +236,43 @@
         <input type="url" id="socShopee" placeholder="Shopee URL" style="border-left:4px solid var(--shopee);">
         <input type="url" id="socYt" placeholder="YouTube URL" style="border-left:4px solid var(--yt);">
         <input type="url" id="socTw" placeholder="Twitter/X URL" style="border-left:4px solid var(--tw);">
-        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveSocial()">Save Social Links</button>
+        <div class="btn-row">
+          <button class="btn btn-red" style="flex:1;" onclick="saveSocial()">Save Social Links</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="triggerImport()">Import JSON</button>
+        </div>
       </div>
 
       <div id="tab-products" class="tab-content">
-        <h3>8 Categories — Unlimited Links Each</h3>
+        <h3>8 Categories — Editable Links</h3>
 
         <!-- Generate 8 category blocks -->
         <div id="categoriesContainer">
-          <!-- We'll output category blocks using static markup similar to original -->
-          <div class="category-block">
-            <h4>1. Health & Beauty 💄</h4>
-            <input type="text" class="cat-name" data-cat="1" value="Health & Beauty" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(1,this)">
-            <div class="upload-preview" id="cat1Prev">💄</div>
-            <div class="links-container" id="cat1Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(1)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>2. Clothes & Fashion 👕</h4>
-            <input type="text" class="cat-name" data-cat="2" value="Clothes & Fashion" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(2,this)">
-            <div class="upload-preview" id="cat2Prev">👕</div>
-            <div class="links-container" id="cat2Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(2)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>3. Gadgets & Accessories 📱</h4>
-            <input type="text" class="cat-name" data-cat="3" value="Gadgets & Accessories" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(3,this)">
-            <div class="upload-preview" id="cat3Prev">📱</div>
-            <div class="links-container" id="cat3Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(3)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>4. Campaign Tools 📢</h4>
-            <input type="text" class="cat-name" data-cat="4" value="Campaign Tools" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(4,this)">
-            <div class="upload-preview" id="cat4Prev">📢</div>
-            <div class="links-container" id="cat4Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(4)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>5. Foods & Groceries 🍜</h4>
-            <input type="text" class="cat-name" data-cat="5" value="Foods & Groceries" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(5,this)">
-            <div class="upload-preview" id="cat5Prev">🍜</div>
-            <div class="links-container" id="cat5Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(5)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>6. Heavy Duty Tools 🔧</h4>
-            <input type="text" class="cat-name" data-cat="6" value="Heavy Duty Tools" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(6,this)">
-            <div class="upload-preview" id="cat6Prev">🔧</div>
-            <div class="links-container" id="cat6Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(6)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>7. Motor & Vehicle Parts 🏍️</h4>
-            <input type="text" class="cat-name" data-cat="7" value="Motor & Vehicle Parts" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(7,this)">
-            <div class="upload-preview" id="cat7Prev">🏍️</div>
-            <div class="links-container" id="cat7Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(7)">+ Add Another Link</button>
-          </div>
-
-          <div class="category-block">
-            <h4>8. Books & Learning 📚</h4>
-            <input type="text" class="cat-name" data-cat="8" value="Books & Learning" placeholder="Category Name">
-            <input type="file" accept="image/*" onchange="previewCatThumb(8,this)">
-            <div class="upload-preview" id="cat8Prev">📚</div>
-            <div class="links-container" id="cat8Links">
-              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
-            </div>
-            <button class="add-link-btn" onclick="addLinkField(8)">+ Add Another Link</button>
-          </div>
+          <!-- Static markup for categories; JS will manage link lists -->
+          <!-- Each category has a links-container with editable link items -->
+          <!-- Categories are similar to previous structure -->
         </div>
 
-        <button class="btn btn-red" style="width:100%;margin-top:20px;" onclick="saveAllProducts()">💾 Save All Categories</button>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-red" style="flex:1;" onclick="saveAllProducts()">💾 Save All Categories</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="clearAllData()">Clear All Data</button>
+        </div>
       </div>
 
       <div id="tab-music" class="tab-content hidden">
         <h3>Background Music</h3>
         <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file (session only)</p>
         <div style="display:flex;gap:10px;margin-top:10px;">
           <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
           <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
         </div>
       </div>
 
-      <div class="btn-row" style="margin-top:20px;">
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importStateFromFile(event)">
         <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
       </div>
+
     </div>
   </div>
 
@@ -373,51 +299,165 @@
     </div>
 
     <p class="section-title">Shop by Category</p>
-    <div class="products-grid">
-      <a href="#" class="product-card" id="prod1">
-        <div class="product-thumb" id="thumb1">💄</div>
-        <div class="product-info"><div class="product-name" id="name1">Health & Beauty</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod2">
-        <div class="product-thumb" id="thumb2">👕</div>
-        <div class="product-info"><div class="product-name" id="name2">Clothes & Fashion</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod3">
-        <div class="product-thumb" id="thumb3">📱</div>
-        <div class="product-info"><div class="product-name" id="name3">Gadgets & Accessories</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod4">
-        <div class="product-thumb" id="thumb4">📢</div>
-        <div class="product-info"><div class="product-name" id="name4">Campaign Tools</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod5">
-        <div class="product-thumb" id="thumb5">🍜</div>
-        <div class="product-info"><div class="product-name" id="name5">Foods & Groceries</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod6">
-        <div class="product-thumb" id="thumb6">🔧</div>
-        <div class="product-info"><div class="product-name" id="name6">Heavy Duty Tools</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod7">
-        <div class="product-thumb" id="thumb7">🏍️</div>
-        <div class="product-info"><div class="product-name" id="name7">Motor & Vehicle Parts</div></div>
-      </a>
-      <a href="#" class="product-card" id="prod8">
-        <div class="product-thumb" id="thumb8">📚</div>
-        <div class="product-info"><div class="product-name" id="name8">Books & Learning</div></div>
-      </a>
+    <div class="products-grid" id="productsGrid">
+      <!-- product tiles injected by JS -->
     </div>
   </div>
 
 <script>
+  // IndexedDB helper (simple)
+  const DB_NAME = 'aiallan_db_v1';
+  const STORE_NAME = 'state';
+  const AUTH_STORE = 'auth';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function (e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+        if (!db.objectStoreNames.contains(AUTH_STORE)) {
+          db.createObjectStore(AUTH_STORE);
+        }
+      };
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror = e => reject(e.target.error);
+    });
+  }
+
+  async function idbSet(key, value) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.put(value, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB set failed', e);
+      return false;
+    }
+  }
+
+  async function idbGet(key) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([STORE_NAME], 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(key);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB get failed', e);
+      return null;
+    }
+  }
+
+  async function idbSetAuth(key, value) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([AUTH_STORE], 'readwrite');
+        const store = tx.objectStore(AUTH_STORE);
+        const req = store.put(value, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB set auth failed', e);
+      return false;
+    }
+  }
+
+  async function idbGetAuth(key) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([AUTH_STORE], 'readonly');
+        const store = tx.objectStore(AUTH_STORE);
+        const req = store.get(key);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB get auth failed', e);
+      return null;
+    }
+  }
+
   // state variables
-  let PASSWORD = "allan123";
-  let otpCode = "";
   let musicUrl = "";
   let isPlaying = false;
   const catImgData = {}; // store data URLs for category thumbs
   let avatarData = "";
-  const STORAGE_KEY = 'aiallan_state_v1';
+  const STATE_KEY = 'settings';
+  const AUTH_KEY = 'auth';
+
+  // default categories data
+  const defaultCats = [
+    {name: 'Health & Beauty', icon: '💄'},
+    {name: 'Clothes & Fashion', icon: '👕'},
+    {name: 'Gadgets & Accessories', icon: '📱'},
+    {name: 'Campaign Tools', icon: '📢'},
+    {name: 'Foods & Groceries', icon: '🍜'},
+    {name: 'Heavy Duty Tools', icon: '🔧'},
+    {name: 'Motor & Vehicle Parts', icon: '🏍️'},
+    {name: 'Books & Learning', icon: '📚'}
+  ];
+
+  // Build products UI and categories editor
+  function buildCategoriesUI() {
+    const container = document.getElementById('categoriesContainer');
+    const productsGrid = document.getElementById('productsGrid');
+    container.innerHTML = '';
+    productsGrid.innerHTML = '';
+    for (let i = 1; i <= 8; i++) {
+      const cat = defaultCats[i-1] || {name: 'Category ' + i, icon: '🔖'};
+      // admin category block
+      const block = document.createElement('div');
+      block.className = 'category-block';
+      block.innerHTML = `
+        <h4>${i}. ${cat.name} ${cat.icon}</h4>
+        <input type="text" class="cat-name" data-cat="${i}" value="${cat.name}" placeholder="Category Name">
+        <input type="file" accept="image/*" onchange="previewCatThumb(${i},this)">
+        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+          <div class="upload-preview" id="cat${i}Prev">${cat.icon}</div>
+          <div style="flex:1;">
+            <div id="cat${i}Links" class="links-container">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button class="add-link-btn" onclick="addLinkField(${i})">+ Add Link</button>
+              <button class="btn btn-gray" onclick="clearCategoryLinks(${i})">Clear Links</button>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(block);
+
+      // product tile
+      const a = document.createElement('a');
+      a.href = '#';
+      a.className = 'product-card';
+      a.id = 'prod' + i;
+      a.innerHTML = `
+        <div class="product-thumb" id="thumb${i}">${cat.icon}</div>
+        <div class="product-info"><div class="product-name" id="name${i}">${cat.name}</div></div>
+      `;
+      productsGrid.appendChild(a);
+    }
+  }
+
+  function clearCategoryLinks(i) {
+    const c = document.getElementById('cat' + i + 'Links');
+    if (c) c.innerHTML = '';
+  }
 
   // Modal controls
   function openLogin() {
@@ -429,93 +469,82 @@
     const m = document.getElementById('loginModal');
     m.classList.remove('on');
     m.setAttribute('aria-hidden', 'true');
-    const pi = document.getElementById('passInput');
-    if (pi) pi.value = '';
+    const pi = document.getElementById('passInput'); if (pi) pi.value = '';
   }
-  function openAdminModal() {
-    const m = document.getElementById('adminModal');
-    m.classList.add('on');
-    m.setAttribute('aria-hidden', 'false');
+  function openAdminModal() { const m = document.getElementById('adminModal'); m.classList.add('on'); m.setAttribute('aria-hidden', 'false'); }
+  function closeAdminModal() { const m = document.getElementById('adminModal'); m.classList.remove('on'); m.setAttribute('aria-hidden', 'true'); }
+
+  // Password hashing (SHA-256) using SubtleCrypto
+  async function generateSalt(len = 16) {
+    const arr = new Uint8Array(len);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => ('00' + b.toString(16)).slice(-2)).join('');
   }
-  function closeAdminModal() {
-    const m = document.getElementById('adminModal');
-    m.classList.remove('on');
-    m.setAttribute('aria-hidden', 'true');
+  async function hashPassword(password, salt) {
+    const enc = new TextEncoder();
+    const data = enc.encode(salt + password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
-  // Login check
-  function checkPass() {
-    const p = document.getElementById('passInput').value || "";
-    if (p === PASSWORD) {
-      closeLogin();
-      openAdminModal();
-      switchTab('profile');
-    } else {
-      alert("❌ Wrong password!");
-    }
+  async function savePasswordHash(password) {
+    const salt = await generateSalt();
+    const hash = await hashPassword(password, salt);
+    await idbSetAuth(AUTH_KEY, { salt, hash });
+  }
+  async function verifyPassword(password) {
+    const auth = await idbGetAuth(AUTH_KEY);
+    if (!auth || !auth.salt || !auth.hash) return false;
+    const h = await hashPassword(password, auth.salt);
+    return h === auth.hash;
   }
 
-  // Forgot password flow
-  function showForgotPass() {
-    closeLogin();
-    const m = document.getElementById('forgotModal');
-    m.classList.add('on');
-    m.setAttribute('aria-hidden', 'false');
-    // reset steps
-    document.getElementById('forgotStep1').classList.remove('hidden');
-    document.getElementById('forgotStep2').classList.add('hidden');
-    document.getElementById('forgotStep3').classList.add('hidden');
-  }
-  function closeForgotModal() {
-    const m = document.getElementById('forgotModal');
-    m.classList.remove('on');
-    m.setAttribute('aria-hidden', 'true');
-  }
-  function sendOTP() {
-    // generate demo OTP and show step 2
-    otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    // In real app, send OTP to user's email or phone.
-    alert(`✅ OTP Sent! Demo OTP: ${otpCode}`);
-    document.getElementById('forgotStep1').classList.add('hidden');
-    document.getElementById('forgotStep2').classList.remove('hidden');
-  }
-  function verifyOTP() {
-    const entered = (document.getElementById('otpInput').value || "").trim();
-    if (entered === otpCode) {
-      // proceed to change password
-      document.getElementById('forgotStep2').classList.add('hidden');
-      document.getElementById('forgotStep3').classList.remove('hidden');
-    } else {
-      alert("❌ Incorrect OTP code.");
-    }
-  }
-  function saveNewPass() {
+  // forgot password flow uses demo OTP; saveNewPass now stores hashed password
+  async function saveNewPass() {
     const p1 = document.getElementById('newPass1').value || "";
     const p2 = document.getElementById('newPass2').value || "";
-    if (!p1 || !p2) {
-      alert("❌ Please fill both password fields.");
-      return;
-    }
-    if (p1 !== p2) {
-      alert("❌ Passwords don't match!");
-      return;
-    }
-    PASSWORD = p1;
-    alert("✅ Password updated. You can login with your new password.");
-    // close forgot modal and open login
+    if (!p1 || !p2) { alert('❌ Please fill both password fields.'); return; }
+    if (p1 !== p2) { alert("❌ Passwords don't match!"); return; }
+    await savePasswordHash(p1);
+    alert('✅ Password updated. You can login with your new password.');
     closeForgotModal();
     openLogin();
   }
 
+  // Login check using hashed password from IDB
+  async function checkPass() {
+    const p = document.getElementById('passInput').value || '';
+    const auth = await idbGetAuth(AUTH_KEY);
+    // If no auth stored yet, allow default demo password 'allan123' and then save its hash
+    if (!auth) {
+      if (p === 'allan123') {
+        await savePasswordHash(p);
+        closeLogin(); openAdminModal(); switchTab('profile');
+        return;
+      } else {
+        alert('❌ Wrong password!'); return;
+      }
+    }
+    const ok = await verifyPassword(p);
+    if (ok) { closeLogin(); openAdminModal(); switchTab('profile'); }
+    else alert('❌ Wrong password!');
+  }
+
+  function showForgotPass() { closeLogin(); const m = document.getElementById('forgotModal'); m.classList.add('on'); m.setAttribute('aria-hidden','false'); document.getElementById('forgotStep1').classList.remove('hidden'); document.getElementById('forgotStep2').classList.add('hidden'); document.getElementById('forgotStep3').classList.add('hidden'); }
+  function closeForgotModal() { const m = document.getElementById('forgotModal'); m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }
+  function sendOTP() { otpCode = Math.floor(100000 + Math.random() * 900000).toString(); alert(`✅ OTP Sent! Demo OTP: ${otpCode}`); document.getElementById('forgotStep1').classList.add('hidden'); document.getElementById('forgotStep2').classList.remove('hidden'); }
+  function verifyOTP() { const entered = (document.getElementById('otpInput').value || '').trim(); if (entered === otpCode) { document.getElementById('forgotStep2').classList.add('hidden'); document.getElementById('forgotStep3').classList.remove('hidden'); } else alert('❌ Incorrect OTP code.'); }
+
   // Tabs
-  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-    switchTab(t.dataset.tab);
-  }));
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (t && t.dataset && t.dataset.tab) {
+      switchTab(t.dataset.tab);
+    }
+  });
   function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(t => {
-      t.classList.toggle('active', t.dataset.tab === name);
-      t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false');
-    });
+    document.querySelectorAll('.tab').forEach(t => { t.classList.toggle('active', t.dataset.tab === name); t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false'); });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     const el = document.getElementById('tab-' + name);
     if (el) el.classList.remove('hidden');
@@ -526,25 +555,18 @@
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const r = new FileReader();
-      r.onload = e => {
-        avatarData = e.target.result;
-        const preview = document.getElementById('avatarPreview');
-        if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
-      };
+      r.onload = e => { avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; };
       r.readAsDataURL(file);
     }
   }
   function saveProfile() {
-    const n = document.getElementById('adminName').value;
-    const b = document.getElementById('adminBio').value;
+    const n = document.getElementById('adminName').value || document.getElementById('dispName').innerText;
+    const b = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText;
     if (n) document.getElementById('dispName').innerText = n;
     if (b) document.getElementById('dispBio').innerText = b;
-    if (avatarData) {
-      const disp = document.getElementById('dispAvatar');
-      if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
-    }
-    saveState();
-    alert("✅ Profile Saved!");
+    if (avatarData) { const disp = document.getElementById('dispAvatar'); if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; }
+    saveStateToDB();
+    alert('✅ Profile Saved!');
   }
 
   // Social links
@@ -555,8 +577,8 @@
     document.getElementById('socLinkShopee').href = document.getElementById('socShopee').value || '#';
     document.getElementById('socLinkYt').href = document.getElementById('socYt').value || '#';
     document.getElementById('socLinkTw').href = document.getElementById('socTw').value || '#';
-    saveState();
-    alert("✅ Social Links Saved!");
+    saveStateToDB();
+    alert('✅ Social Links Saved!');
   }
 
   // Category thumb preview
@@ -564,45 +586,27 @@
     if (!num || !input) return;
     if (input.files && input.files[0]) {
       const r = new FileReader();
-      r.onload = e => {
-        catImgData[num] = e.target.result;
-        const prev = document.getElementById('cat' + num + 'Prev');
-        if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">';
-      };
+      r.onload = e => { catImgData[num] = e.target.result; const prev = document.getElementById('cat' + num + 'Prev'); if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; };
       r.readAsDataURL(input.files[0]);
     }
   }
 
   // Add link input field
   function addLinkField(catNum) {
-    const c = document.getElementById('cat' + catNum + 'Links');
-    if (!c) return;
-    const f = document.createElement('div');
-    f.className = 'link-item';
-    f.innerHTML = '<input type="url" placeholder="New Link"><button onclick="this.parentElement.remove()">✕</button>';
-    c.appendChild(f);
+    const c = document.getElementById('cat' + catNum + 'Links'); if (!c) return; const f = document.createElement('div'); f.className = 'link-item'; f.innerHTML = '<input type="url" placeholder="New Link"><button onclick="this.parentElement.remove()">✕</button>'; c.appendChild(f);
   }
 
   // Save categories (update tiles and first link hrefs)
   function saveAllProducts() {
     for (let i = 1; i <= 8; i++) {
       const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
-      if (nameEl && nameEl.value) {
-        const nameTarget = document.getElementById('name' + i);
-        if (nameTarget) nameTarget.innerText = nameEl.value;
-      }
-      if (catImgData[i]) {
-        const thumb = document.getElementById('thumb' + i);
-        if (thumb) thumb.innerHTML = '<img src="' + catImgData[i] + '" alt="thumb">';
-      }
+      if (nameEl && nameEl.value) { const nameTarget = document.getElementById('name' + i); if (nameTarget) nameTarget.innerText = nameEl.value; }
+      if (catImgData[i]) { const thumb = document.getElementById('thumb' + i); if (thumb) thumb.innerHTML = '<img src="' + catImgData[i] + '" alt="thumb">'; }
       const firstLink = document.querySelector(`#cat${i}Links .link-item input`);
-      if (firstLink && firstLink.value) {
-        const prod = document.getElementById('prod' + i);
-        if (prod) prod.href = firstLink.value;
-      }
+      if (firstLink && firstLink.value) { const prod = document.getElementById('prod' + i); if (prod) prod.href = firstLink.value; }
     }
-    saveState();
-    alert("✅ All Categories Saved!");
+    saveStateToDB();
+    alert('✅ All Categories Saved!');
   }
 
   // Music preview / playback
@@ -613,102 +617,50 @@
       const audio = document.getElementById('bgMusic');
       audio.src = musicUrl;
       audio.load();
-      const player = document.getElementById('musicPlayer');
-      if (player) player.classList.remove('hidden');
-      const musicTitle = document.getElementById('musicTitle');
-      if (musicTitle) musicTitle.innerText = file.name;
-      // Auto-play short preview?
-      // No autoplay forced here; user controls play/pause
+      const player = document.getElementById('musicPlayer'); if (player) player.classList.remove('hidden');
+      const musicTitle = document.getElementById('musicTitle'); if (musicTitle) musicTitle.innerText = file.name;
     }
   }
-  function playMusic() {
-    const audio = document.getElementById('bgMusic');
-    if (!audio.src) return;
-    audio.play().then(() => {
-      isPlaying = true;
-      const btn = document.getElementById('musicBtn');
-      if (btn) btn.innerText = '⏸️';
-    }).catch(err => {
-      // autoplay might be blocked by browser; user must interact
-      console.warn('Play prevented:', err);
-    });
-  }
-  function pauseMusic() {
-    const audio = document.getElementById('bgMusic');
-    audio.pause();
-    isPlaying = false;
-    const btn = document.getElementById('musicBtn');
-    if (btn) btn.innerText = '▶️';
-  }
-  function toggleMusic() {
-    isPlaying ? pauseMusic() : playMusic();
-  }
+  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; const btn=document.getElementById('musicBtn'); if(btn)btn.innerText='⏸️'; }).catch(()=>{}); }
+  function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; const btn=document.getElementById('musicBtn'); if(btn)btn.innerText='▶️'; }
+  function toggleMusic() { isPlaying ? pauseMusic() : playMusic(); }
 
-  // Persist/load state to localStorage
-  function saveState() {
+  // Build and persist state to IndexedDB
+  async function saveStateToDB() {
     try {
-      const state = {
-        profile: {
-          name: document.getElementById('adminName').value || document.getElementById('dispName').innerText || '',
-          bio: document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '',
-          avatar: avatarData || null
-        },
-        social: {
-          fb: document.getElementById('socFb').value || '',
-          ig: document.getElementById('socIg').value || '',
-          tt: document.getElementById('socTt').value || '',
-          shopee: document.getElementById('socShopee').value || '',
-          yt: document.getElementById('socYt').value || '',
-          tw: document.getElementById('socTw').value || ''
-        },
-        categories: []
-      };
+      const state = { profile: {}, social: {}, categories: [] };
+      state.profile.name = document.getElementById('adminName').value || document.getElementById('dispName').innerText || '';
+      state.profile.bio = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '';
+      state.profile.avatar = avatarData || null;
+      state.social.fb = document.getElementById('socFb').value || '';
+      state.social.ig = document.getElementById('socIg').value || '';
+      state.social.tt = document.getElementById('socTt').value || '';
+      state.social.shopee = document.getElementById('socShopee').value || '';
+      state.social.yt = document.getElementById('socYt').value || '';
+      state.social.tw = document.getElementById('socTw').value || '';
 
-      for (let i = 1; i <= 8; i++) {
+      for (let i=1;i<=8;i++){
         const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
         const links = [];
         const linkInputs = document.querySelectorAll(`#cat${i}Links .link-item input`);
         linkInputs.forEach(li => { if (li.value) links.push(li.value); });
-        state.categories.push({
-          name: nameEl ? (nameEl.value || '') : '',
-          thumb: catImgData[i] || null,
-          links: links
-        });
+        state.categories.push({ name: nameEl ? (nameEl.value || '') : '', thumb: catImgData[i] || null, links });
       }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-      console.warn('Saving state failed', e);
-    }
+      await idbSet(STATE_KEY, state);
+      return true;
+    } catch (e) { console.warn('saveState failed', e); return false; }
   }
 
-  function loadState() {
+  async function loadStateFromDB() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const state = JSON.parse(raw);
+      const state = await idbGet(STATE_KEY);
       if (!state) return;
-
-      // profile
       if (state.profile) {
-        if (state.profile.name) {
-          document.getElementById('dispName').innerText = state.profile.name;
-          document.getElementById('adminName').value = state.profile.name;
-        }
-        if (state.profile.bio) {
-          document.getElementById('dispBio').innerText = state.profile.bio;
-          document.getElementById('adminBio').value = state.profile.bio;
-        }
-        if (state.profile.avatar) {
-          avatarData = state.profile.avatar;
-          const prev = document.getElementById('avatarPreview');
-          if (prev) prev.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
-          const disp = document.getElementById('dispAvatar');
-          if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">';
-        }
+        if (state.profile.name) { document.getElementById('dispName').innerText = state.profile.name; document.getElementById('adminName').value = state.profile.name; }
+        if (state.profile.bio) { document.getElementById('dispBio').innerText = state.profile.bio; document.getElementById('adminBio').value = state.profile.bio; }
+        if (state.profile.avatar) { avatarData = state.profile.avatar; const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+avatarData+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp)disp.innerHTML='<img src="'+avatarData+'" alt="avatar">'; }
       }
-
-      // social
       if (state.social) {
         document.getElementById('socFb').value = state.social.fb || '';
         document.getElementById('socIg').value = state.social.ig || '';
@@ -716,7 +668,6 @@
         document.getElementById('socShopee').value = state.social.shopee || '';
         document.getElementById('socYt').value = state.social.yt || '';
         document.getElementById('socTw').value = state.social.tw || '';
-
         document.getElementById('socLinkFb').href = state.social.fb || '#';
         document.getElementById('socLinkIg').href = state.social.ig || '#';
         document.getElementById('socLinkTt').href = state.social.tt || '#';
@@ -724,8 +675,6 @@
         document.getElementById('socLinkYt').href = state.social.yt || '#';
         document.getElementById('socLinkTw').href = state.social.tw || '#';
       }
-
-      // categories
       if (Array.isArray(state.categories)) {
         state.categories.forEach((cat, idx) => {
           const i = idx + 1;
@@ -733,51 +682,45 @@
           if (nameEl) nameEl.value = cat.name || '';
           const nameTarget = document.getElementById('name' + i);
           if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
-
-          if (cat.thumb) {
-            catImgData[i] = cat.thumb;
-            const thumb = document.getElementById('thumb' + i);
-            const prev = document.getElementById('cat' + i + 'Prev');
-            if (thumb) thumb.innerHTML = '<img src="' + cat.thumb + '" alt="thumb">';
-            if (prev) prev.innerHTML = '<img src="' + cat.thumb + '" alt="thumb">';
-          }
-
-          // restore links
+          if (cat.thumb) { catImgData[i] = cat.thumb; const thumb = document.getElementById('thumb' + i); const prev = document.getElementById('cat' + i + 'Prev'); if (thumb) thumb.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; if (prev) prev.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; }
           const linksContainer = document.getElementById('cat' + i + 'Links');
-          if (linksContainer && Array.isArray(cat.links)) {
-            linksContainer.innerHTML = ''; // clear
-            cat.links.forEach(link => {
-              const div = document.createElement('div');
-              div.className = 'link-item';
-              div.innerHTML = `<input type="url" value="${link}" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>`;
-              linksContainer.appendChild(div);
-            });
-            // set product href to first link
-            const prod = document.getElementById('prod' + i);
-            if (prod && cat.links[0]) prod.href = cat.links[0];
-          }
+          if (linksContainer && Array.isArray(cat.links)) { linksContainer.innerHTML = ''; cat.links.forEach(link => { const div=document.createElement('div'); div.className='link-item'; div.innerHTML = `<input type="url" value="${link}" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>`; linksContainer.appendChild(div); });
+            const prod = document.getElementById('prod' + i); if (prod && cat.links && cat.links[0]) prod.href = cat.links[0]; }
         });
       }
-
-    } catch (e) {
-      console.warn('Loading state failed', e);
-    }
+    } catch (e) { console.warn('loadState failed', e); }
   }
 
-  // Accessibility: close modals when clicking outside modal-box
-  document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('on');
-        modal.setAttribute('aria-hidden', 'true');
-      }
-    });
-  });
+  // Export / Import
+  async function exportState() {
+    try {
+      const state = await idbGet(STATE_KEY) || {};
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'aiallan-state.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    } catch (e) { console.warn('export failed', e); }
+  }
 
-  // Initialize on DOM ready
-  window.addEventListener('DOMContentLoaded', () => {
-    loadState();
+  function triggerImport() { document.getElementById('importFile').click(); }
+  async function importStateFromFile(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return; const text = await file.text(); try { const state = JSON.parse(text); await idbSet(STATE_KEY, state); await loadStateFromDB(); alert('✅ Import complete'); } catch (err) { alert('❌ Import failed: invalid JSON'); }
+  }
+
+  // Clear all data (IDB)
+  async function clearAllData() {
+    if (!confirm('Clear all saved data? This cannot be undone.')) return;
+    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ alert('✅ All data cleared'); location.reload(); }; tx.onerror = ()=>{ alert('❌ Failed to clear data'); }; } catch (e) { console.warn(e); }
+  }
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', async () => {
+    buildCategoriesUI();
+    await loadStateFromDB();
     switchTab('profile');
+
+    // close modals by clicking outside
+    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','true'); } }); });
   });
 </script>
 </body>

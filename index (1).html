@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Allan — aiallan.shop</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  :root {
+    --bg: #000;
+    --card: #1c1c1e;
+    --accent: #ff2d55;
+    --text: #fff;
+    --text2: #8e8e93;
+    --border: #38383a;
+    --fb: #1877f2;
+    --ig: #e1306c;
+    --tt: #000;
+    --shopee: #f4512c;
+    --yt: #ff0000;
+    --tw: #1da1f2;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  .admin-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    color: var(--text2);
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 20;
+  }
+
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    overflow-y: auto;
+    padding: 20px 0;
+  }
+  .modal.on { display: flex; }
+  .modal-box {
+    background: var(--card);
+    padding: 24px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 720px;
+    border: 1px solid var(--border);
+    margin: auto;
+    color: var(--text);
+  }
+  .modal-box h2 { text-align: center; margin-bottom: 18px; font-size: 18px; }
+  .modal-box h3 { font-size: 15px; margin: 16px 0 10px; color: var(--text2); }
+  .modal-box input,
+  .modal-box textarea,
+  .modal-box select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #2c2c2e;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .modal-box textarea { resize: vertical; min-height: 80px; }
+
+  .btn { padding: 12px; border-radius: 10px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .btn-red { background: var(--accent); color: white; }
+  .btn-gray { background: var(--border); color: var(--text); }
+  .btn-row { display:flex; gap: 10px; margin-top: 12px; }
+  .btn-row .btn { flex: 1; }
+
+  .link-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .link-item input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: var(--text); }
+  .link-item button { width: 36px; height: 36px; padding: 0; border-radius: 8px; border: none; background: #ff4444; color: white; cursor: pointer; }
+
+  .add-link-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px dashed var(--text2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+
+  .category-block { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+  .category-block h4 { font-size: 15px; margin-bottom: 10px; color: var(--accent); }
+  .upload-preview { width: 60px; height: 60px; border-radius: 8px; background: #2c2c2e; display:flex; align-items:center; justify-content:center; font-size:24px; margin-top:8px; overflow:hidden; }
+  .upload-preview img { width:100%; height:100%; object-fit:cover; }
+
+  .avatar-upload { text-align:center; margin-bottom:16px; }
+  .avatar-upload .preview { width:100px; height:100px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto 10px; overflow:hidden; }
+  .avatar-upload .preview img { width:100%; height:100%; object-fit:cover; }
+
+  .tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .tab { padding:8px 14px; border-radius:8px; background:var(--border); color:var(--text2); font-size:14px; cursor:pointer; }
+  .tab.active { background:var(--accent); color:white; }
+  .hidden { display: none !important; }
+
+  .home { max-width:480px; margin: 0 auto; padding: 60px 16px 40px; }
+  .profile { text-align:center; margin-bottom:20px; }
+  .avatar { width:90px; height:90px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:38px; overflow:hidden; }
+  .avatar img { width:100%; height:100%; object-fit:cover; }
+  .name { font-size:22px; font-weight:700; margin-bottom:6px; }
+  .bio { color:var(--text2); font-size:14px; margin-bottom:16px; }
+
+  .music-player { display:flex; align-items:center; gap:10px; background:var(--card); padding:10px; border-radius:12px; margin-bottom:20px; border:1px solid var(--border); }
+  .music-player button { width:40px; height:40px; border-radius:50%; border:none; background:var(--accent); color:white; font-size:16px; cursor:pointer; }
+  .music-player span { font-size:13px; color:var(--text2); flex:1; }
+
+  .social-row { display:flex; justify-content:center; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+  .social-link { width:50px; height:50px; border-radius:12px; color:white; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:22px; transition:.2s; }
+  .social-link.fb { background:var(--fb); }
+  .social-link.ig { background:var(--ig); }
+  .social-link.tt { background:var(--tt); border:1px solid #333; }
+  .social-link.shopee { background:var(--shopee); }
+  .social-link.yt { background:var(--yt); }
+  .social-link.tw { background:var(--tw); }
+  .social-link:hover { transform: scale(1.1); }
+
+  .section-title { font-size:15px; font-weight:600; margin-bottom:16px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
+  .products-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
+  .product-card { background:var(--card); border-radius:14px; overflow:hidden; border:1px solid var(--border); text-decoration:none; color:var(--text); transition:.2s; cursor:pointer; display:block; }
+  .product-card:hover { transform: translateY(-3px); border-color:var(--accent); }
+  .product-thumb { width:100%; aspect-ratio:1; background:#2c2c2e; display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
+  .product-thumb img { width:100%; height:100%; object-fit:cover; }
+  .product-info { padding:12px; }
+  .product-name { font-size:14px; font-weight:600; line-height:1.3; }
+
+  /* small screens */
+  @media (max-width: 420px) {
+    .modal-box { padding: 18px; border-radius: 12px; }
+    .home { padding: 48px 12px 40px; }
+  }
+</style>
+</head>
+<body>
+  <!-- Background audio element (closed properly) -->
+  <audio id="bgMusic" loop></audio>
+
+  <!-- Admin button -->
+  <button class="admin-btn" onclick="openLogin()" aria-label="Open admin">⚙️</button>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <h2 id="loginTitle">🔐 Admin Login</h2>
+      <input type="password" id="passInput" placeholder="Enter Password" autocomplete="current-password">
+      <div class="btn-row">
+        <button class="btn btn-gray" onclick="closeLogin()">Cancel</button>
+        <button class="btn btn-red" onclick="checkPass()">Login</button>
+      </div>
+      <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2);">
+        <a href="#" onclick="showForgotPass();return false;" style="color:var(--accent);text-decoration:none;">Forgot Password?</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Forgot / Recover Modal -->
+  <div class="modal" id="forgotModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="forgotTitle">
+      <h2 id="forgotTitle">🔑 Recover Password</h2>
+
+      <div id="forgotStep1">
+        <h3>Send OTP via</h3>
+        <input type="email" id="recoveryEmail" placeholder="Email Address">
+        <input type="tel" id="recoveryPhone" placeholder="Phone Number" style="margin-top:8px;">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="sendOTP()">Send OTP Code</button>
+      </div>
+
+      <div id="forgotStep2" class="hidden">
+        <h3>Enter OTP Code</h3>
+        <input type="text" id="otpInput" placeholder="6-digit OTP Code" maxlength="6" inputmode="numeric">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="verifyOTP()">Verify OTP</button>
+      </div>
+
+      <div id="forgotStep3" class="hidden">
+        <h3>Set New Password</h3>
+        <input type="password" id="newPass1" placeholder="New Password" autocomplete="new-password">
+        <input type="password" id="newPass2" placeholder="Confirm Password" style="margin-top:8px;" autocomplete="new-password">
+        <button class="btn btn-red" style="width:100%;margin-top:10px;" onclick="saveNewPass()">Save Password</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-gray" style="flex:1;" onclick="closeForgotModal()">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal" id="adminModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <h2 id="adminTitle">🛠️ Admin Panel</h2>
+
+      <div class="tabs" role="tablist" aria-label="Admin tabs">
+        <span class="tab active" data-tab="profile" role="tab" aria-selected="true">👤 Profile</span>
+        <span class="tab" data-tab="social" role="tab" aria-selected="false">🔗 Social</span>
+        <span class="tab" data-tab="products" role="tab" aria-selected="false">🛍️ Products</span>
+        <span class="tab" data-tab="music" role="tab" aria-selected="false">🎵 Music</span>
+      </div>
+
+      <div id="tab-profile" class="tab-content">
+        <div class="avatar-upload">
+          <div class="preview" id="avatarPreview">👤</div>
+          <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)">
+        </div>
+        <input type="text" id="adminName" placeholder="Your Name">
+        <input type="text" id="adminBio" placeholder="Short Bio">
+        <div class="btn-row">
+          <button class="btn btn-red" style="flex:1;" onclick="saveProfile()">Save Profile</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="exportState()">Export JSON</button>
+        </div>
+      </div>
+
+      <div id="tab-social" class="tab-content hidden">
+        <h3>Social Links (brand colors)</h3>
+        <input type="url" id="socFb" placeholder="Facebook URL" style="border-left:4px solid var(--fb);">
+        <input type="url" id="socIg" placeholder="Instagram URL" style="border-left:4px solid var(--ig);">
+        <input type="url" id="socTt" placeholder="TikTok URL" style="border-left:4px solid #555;">
+        <input type="url" id="socShopee" placeholder="Shopee URL" style="border-left:4px solid var(--shopee);">
+        <input type="url" id="socYt" placeholder="YouTube URL" style="border-left:4px solid var(--yt);">
+        <input type="url" id="socTw" placeholder="Twitter/X URL" style="border-left:4px solid var(--tw);">
+        <div class="btn-row">
+          <button class="btn btn-red" style="flex:1;" onclick="saveSocial()">Save Social Links</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="triggerImport()">Import JSON</button>
+        </div>
+      </div>
+
+      <div id="tab-products" class="tab-content">
+        <h3>8 Categories — Editable Links</h3>
+
+        <!-- Generate 8 category blocks -->
+        <div id="categoriesContainer">
+          <!-- Static markup for categories; JS will manage link lists -->
+          <!-- Each category has a links-container with editable link items -->
+          <!-- Categories are similar to previous structure -->
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-red" style="flex:1;" onclick="saveAllProducts()">💾 Save All Categories</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="clearAllData()">Clear All Data</button>
+        </div>
+      </div>
+
+      <div id="tab-music" class="tab-content hidden">
+        <h3>Background Music</h3>
+        <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file (session only)</p>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importStateFromFile(event)">
+        <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main content / Home page -->
+  <div class="home" id="homePage">
+    <div class="profile">
+      <div class="avatar" id="dispAvatar">👤</div>
+      <h1 class="name" id="dispName">Allan</h1>
+      <p class="bio" id="dispBio">Affiliate & Creator</p>
+    </div>
+
+    <div class="music-player hidden" id="musicPlayer">
+      <button onclick="toggleMusic()" id="musicBtn">▶️</button>
+      <span id="musicTitle">Background Music</span>
+    </div>
+
+    <div class="social-row">
+      <a href="#" class="social-link fb" id="socLinkFb" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="social-link ig" id="socLinkIg" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="social-link tt" id="socLinkTt" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+      <a href="#" class="social-link shopee" id="socLinkShopee" target="_blank" rel="noopener noreferrer"><i class="fas fa-shopping-bag"></i></a>
+      <a href="#" class="social-link yt" id="socLinkYt" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+      <a href="#" class="social-link tw" id="socLinkTw" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+    </div>
+
+    <p class="section-title">Shop by Category</p>
+    <div class="products-grid" id="productsGrid">
+      <!-- product tiles injected by JS -->
+    </div>
+  </div>
+
+<script>
+  // IndexedDB helper (simple)
+  const DB_NAME = 'aiallan_db_v1';
+  const STORE_NAME = 'state';
+  const AUTH_STORE = 'auth';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function (e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+        if (!db.objectStoreNames.contains(AUTH_STORE)) {
+          db.createObjectStore(AUTH_STORE);
+        }
+      };
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror = e => reject(e.target.error);
+    });
+  }
+
+  async function idbSet(key, value) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.put(value, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB set failed', e);
+      return false;
+    }
+  }
+
+  async function idbGet(key) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([STORE_NAME], 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(key);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB get failed', e);
+      return null;
+    }
+  }
+
+  async function idbSetAuth(key, value) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([AUTH_STORE], 'readwrite');
+        const store = tx.objectStore(AUTH_STORE);
+        const req = store.put(value, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB set auth failed', e);
+      return false;
+    }
+  }
+
+  async function idbGetAuth(key) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([AUTH_STORE], 'readonly');
+        const store = tx.objectStore(AUTH_STORE);
+        const req = store.get(key);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB get auth failed', e);
+      return null;
+    }
+  }
+
+  // state variables
+  let musicUrl = "";
+  let isPlaying = false;
+  const catImgData = {}; // store data URLs for category thumbs
+  let avatarData = "";
+  const STATE_KEY = 'settings';
+  const AUTH_KEY = 'auth';
+
+  // default categories data
+  const defaultCats = [
+    {name: 'Health & Beauty', icon: '💄'},
+    {name: 'Clothes & Fashion', icon: '👕'},
+    {name: 'Gadgets & Accessories', icon: '📱'},
+    {name: 'Campaign Tools', icon: '📢'},
+    {name: 'Foods & Groceries', icon: '🍜'},
+    {name: 'Heavy Duty Tools', icon: '🔧'},
+    {name: 'Motor & Vehicle Parts', icon: '🏍️'},
+    {name: 'Books & Learning', icon: '📚'}
+  ];
+
+  // Build products UI and categories editor
+  function buildCategoriesUI() {
+    const container = document.getElementById('categoriesContainer');
+    const productsGrid = document.getElementById('productsGrid');
+    container.innerHTML = '';
+    productsGrid.innerHTML = '';
+    for (let i = 1; i <= 8; i++) {
+      const cat = defaultCats[i-1] || {name: 'Category ' + i, icon: '🔖'};
+      // admin category block
+      const block = document.createElement('div');
+      block.className = 'category-block';
+      block.innerHTML = `
+        <h4>${i}. ${cat.name} ${cat.icon}</h4>
+        <input type="text" class="cat-name" data-cat="${i}" value="${cat.name}" placeholder="Category Name">
+        <input type="file" accept="image/*" onchange="previewCatThumb(${i},this)">
+        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+          <div class="upload-preview" id="cat${i}Prev">${cat.icon}</div>
+          <div style="flex:1;">
+            <div id="cat${i}Links" class="links-container">
+              <div class="link-item"><input type="url" placeholder="Link #1"><button onclick="this.parentElement.remove()">✕</button></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button class="add-link-btn" onclick="addLinkField(${i})">+ Add Link</button>
+              <button class="btn btn-gray" onclick="clearCategoryLinks(${i})">Clear Links</button>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(block);
+
+      // product tile
+      const a = document.createElement('a');
+      a.href = '#';
+      a.className = 'product-card';
+      a.id = 'prod' + i;
+      a.innerHTML = `
+        <div class="product-thumb" id="thumb${i}">${cat.icon}</div>
+        <div class="product-info"><div class="product-name" id="name${i}">${cat.name}</div></div>
+      `;
+      productsGrid.appendChild(a);
+    }
+  }
+
+  function clearCategoryLinks(i) {
+    const c = document.getElementById('cat' + i + 'Links');
+    if (c) c.innerHTML = '';
+  }
+
+  // Modal controls
+  function openLogin() {
+    const m = document.getElementById('loginModal');
+    m.classList.add('on');
+    m.setAttribute('aria-hidden', 'false');
+  }
+  function closeLogin() {
+    const m = document.getElementById('loginModal');
+    m.classList.remove('on');
+    m.setAttribute('aria-hidden', 'true');
+    const pi = document.getElementById('passInput'); if (pi) pi.value = '';
+  }
+  function openAdminModal() { const m = document.getElementById('adminModal'); m.classList.add('on'); m.setAttribute('aria-hidden', 'false'); }
+  function closeAdminModal() { const m = document.getElementById('adminModal'); m.classList.remove('on'); m.setAttribute('aria-hidden', 'true'); }
+
+  // Password hashing (SHA-256) using SubtleCrypto
+  async function generateSalt(len = 16) {
+    const arr = new Uint8Array(len);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => ('00' + b.toString(16)).slice(-2)).join('');
+  }
+  async function hashPassword(password, salt) {
+    const enc = new TextEncoder();
+    const data = enc.encode(salt + password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function savePasswordHash(password) {
+    const salt = await generateSalt();
+    const hash = await hashPassword(password, salt);
+    await idbSetAuth(AUTH_KEY, { salt, hash });
+  }
+  async function verifyPassword(password) {
+    const auth = await idbGetAuth(AUTH_KEY);
+    if (!auth || !auth.salt || !auth.hash) return false;
+    const h = await hashPassword(password, auth.salt);
+    return h === auth.hash;
+  }
+
+  // forgot password flow uses demo OTP; saveNewPass now stores hashed password
+  async function saveNewPass() {
+    const p1 = document.getElementById('newPass1').value || "";
+    const p2 = document.getElementById('newPass2').value || "";
+    if (!p1 || !p2) { alert('❌ Please fill both password fields.'); return; }
+    if (p1 !== p2) { alert("❌ Passwords don't match!"); return; }
+    await savePasswordHash(p1);
+    alert('✅ Password updated. You can login with your new password.');
+    closeForgotModal();
+    openLogin();
+  }
+
+  // Login check using hashed password from IDB
+  async function checkPass() {
+    const p = document.getElementById('passInput').value || '';
+    const auth = await idbGetAuth(AUTH_KEY);
+    // If no auth stored yet, allow default demo password 'allan123' and then save its hash
+    if (!auth) {
+      if (p === 'allan123') {
+        await savePasswordHash(p);
+        closeLogin(); openAdminModal(); switchTab('profile');
+        return;
+      } else {
+        alert('❌ Wrong password!'); return;
+      }
+    }
+    const ok = await verifyPassword(p);
+    if (ok) { closeLogin(); openAdminModal(); switchTab('profile'); }
+    else alert('❌ Wrong password!');
+  }
+
+  function showForgotPass() { closeLogin(); const m = document.getElementById('forgotModal'); m.classList.add('on'); m.setAttribute('aria-hidden','false'); document.getElementById('forgotStep1').classList.remove('hidden'); document.getElementById('forgotStep2').classList.add('hidden'); document.getElementById('forgotStep3').classList.add('hidden'); }
+  function closeForgotModal() { const m = document.getElementById('forgotModal'); m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }
+  function sendOTP() { otpCode = Math.floor(100000 + Math.random() * 900000).toString(); alert(`✅ OTP Sent! Demo OTP: ${otpCode}`); document.getElementById('forgotStep1').classList.add('hidden'); document.getElementById('forgotStep2').classList.remove('hidden'); }
+  function verifyOTP() { const entered = (document.getElementById('otpInput').value || '').trim(); if (entered === otpCode) { document.getElementById('forgotStep2').classList.add('hidden'); document.getElementById('forgotStep3').classList.remove('hidden'); } else alert('❌ Incorrect OTP code.'); }
+
+  // Tabs
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (t && t.dataset && t.dataset.tab) {
+      switchTab(t.dataset.tab);
+    }
+  });
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => { t.classList.toggle('active', t.dataset.tab === name); t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false'); });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    const el = document.getElementById('tab-' + name);
+    if (el) el.classList.remove('hidden');
+  }
+
+  // Avatar preview
+  function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const r = new FileReader();
+      r.onload = e => { avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; };
+      r.readAsDataURL(file);
+    }
+  }
+  function saveProfile() {
+    const n = document.getElementById('adminName').value || document.getElementById('dispName').innerText;
+    const b = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText;
+    if (n) document.getElementById('dispName').innerText = n;
+    if (b) document.getElementById('dispBio').innerText = b;
+    if (avatarData) { const disp = document.getElementById('dispAvatar'); if (disp) disp.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; }
+    saveStateToDB();
+    alert('✅ Profile Saved!');
+  }
+
+  // Social links
+  function saveSocial() {
+    document.getElementById('socLinkFb').href = document.getElementById('socFb').value || '#';
+    document.getElementById('socLinkIg').href = document.getElementById('socIg').value || '#';
+    document.getElementById('socLinkTt').href = document.getElementById('socTt').value || '#';
+    document.getElementById('socLinkShopee').href = document.getElementById('socShopee').value || '#';
+    document.getElementById('socLinkYt').href = document.getElementById('socYt').value || '#';
+    document.getElementById('socLinkTw').href = document.getElementById('socTw').value || '#';
+    saveStateToDB();
+    alert('✅ Social Links Saved!');
+  }
+
+  // Category thumb preview
+  function previewCatThumb(num, input) {
+    if (!num || !input) return;
+    if (input.files && input.files[0]) {
+      const r = new FileReader();
+      r.onload = e => { catImgData[num] = e.target.result; const prev = document.getElementById('cat' + num + 'Prev'); if (prev) prev.innerHTML = '<img src="' + catImgData[num] + '" alt="thumb">'; };
+      r.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Add link input field
+  function addLinkField(catNum) {
+    const c = document.getElementById('cat' + catNum + 'Links'); if (!c) return; const f = document.createElement('div'); f.className = 'link-item'; f.innerHTML = '<input type="url" placeholder="New Link"><button onclick="this.parentElement.remove()">✕</button>'; c.appendChild(f);
+  }
+
+  // Save categories (update tiles and first link hrefs)
+  function saveAllProducts() {
+    for (let i = 1; i <= 8; i++) {
+      const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+      if (nameEl && nameEl.value) { const nameTarget = document.getElementById('name' + i); if (nameTarget) nameTarget.innerText = nameEl.value; }
+      if (catImgData[i]) { const thumb = document.getElementById('thumb' + i); if (thumb) thumb.innerHTML = '<img src="' + catImgData[i] + '" alt="thumb">'; }
+      const firstLink = document.querySelector(`#cat${i}Links .link-item input`);
+      if (firstLink && firstLink.value) { const prod = document.getElementById('prod' + i); if (prod) prod.href = firstLink.value; }
+    }
+    saveStateToDB();
+    alert('✅ All Categories Saved!');
+  }
+
+  // Music preview / playback
+  function previewMusic(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      musicUrl = URL.createObjectURL(file);
+      const audio = document.getElementById('bgMusic');
+      audio.src = musicUrl;
+      audio.load();
+      const player = document.getElementById('musicPlayer'); if (player) player.classList.remove('hidden');
+      const musicTitle = document.getElementById('musicTitle'); if (musicTitle) musicTitle.innerText = file.name;
+    }
+  }
+  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; const btn=document.getElementById('musicBtn'); if(btn)btn.innerText='⏸️'; }).catch(()=>{}); }
+  function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; const btn=document.getElementById('musicBtn'); if(btn)btn.innerText='▶️'; }
+  function toggleMusic() { isPlaying ? pauseMusic() : playMusic(); }
+
+  // Build and persist state to IndexedDB
+  async function saveStateToDB() {
+    try {
+      const state = { profile: {}, social: {}, categories: [] };
+      state.profile.name = document.getElementById('adminName').value || document.getElementById('dispName').innerText || '';
+      state.profile.bio = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '';
+      state.profile.avatar = avatarData || null;
+      state.social.fb = document.getElementById('socFb').value || '';
+      state.social.ig = document.getElementById('socIg').value || '';
+      state.social.tt = document.getElementById('socTt').value || '';
+      state.social.shopee = document.getElementById('socShopee').value || '';
+      state.social.yt = document.getElementById('socYt').value || '';
+      state.social.tw = document.getElementById('socTw').value || '';
+
+      for (let i=1;i<=8;i++){
+        const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+        const links = [];
+        const linkInputs = document.querySelectorAll(`#cat${i}Links .link-item input`);
+        linkInputs.forEach(li => { if (li.value) links.push(li.value); });
+        state.categories.push({ name: nameEl ? (nameEl.value || '') : '', thumb: catImgData[i] || null, links });
+      }
+
+      await idbSet(STATE_KEY, state);
+      return true;
+    } catch (e) { console.warn('saveState failed', e); return false; }
+  }
+
+  async function loadStateFromDB() {
+    try {
+      const state = await idbGet(STATE_KEY);
+      if (!state) return;
+      if (state.profile) {
+        if (state.profile.name) { document.getElementById('dispName').innerText = state.profile.name; document.getElementById('adminName').value = state.profile.name; }
+        if (state.profile.bio) { document.getElementById('dispBio').innerText = state.profile.bio; document.getElementById('adminBio').value = state.profile.bio; }
+        if (state.profile.avatar) { avatarData = state.profile.avatar; const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+avatarData+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp)disp.innerHTML='<img src="'+avatarData+'" alt="avatar">'; }
+      }
+      if (state.social) {
+        document.getElementById('socFb').value = state.social.fb || '';
+        document.getElementById('socIg').value = state.social.ig || '';
+        document.getElementById('socTt').value = state.social.tt || '';
+        document.getElementById('socShopee').value = state.social.shopee || '';
+        document.getElementById('socYt').value = state.social.yt || '';
+        document.getElementById('socTw').value = state.social.tw || '';
+        document.getElementById('socLinkFb').href = state.social.fb || '#';
+        document.getElementById('socLinkIg').href = state.social.ig || '#';
+        document.getElementById('socLinkTt').href = state.social.tt || '#';
+        document.getElementById('socLinkShopee').href = state.social.shopee || '#';
+        document.getElementById('socLinkYt').href = state.social.yt || '#';
+        document.getElementById('socLinkTw').href = state.social.tw || '#';
+      }
+      if (Array.isArray(state.categories)) {
+        state.categories.forEach((cat, idx) => {
+          const i = idx + 1;
+          const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+          if (nameEl) nameEl.value = cat.name || '';
+          const nameTarget = document.getElementById('name' + i);
+          if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
+          if (cat.thumb) { catImgData[i] = cat.thumb; const thumb = document.getElementById('thumb' + i); const prev = document.getElementById('cat' + i + 'Prev'); if (thumb) thumb.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; if (prev) prev.innerHTML = '<img src="'+cat.thumb+'" alt="thumb">'; }
+          const linksContainer = document.getElementById('cat' + i + 'Links');
+          if (linksContainer && Array.isArray(cat.links)) { linksContainer.innerHTML = ''; cat.links.forEach(link => { const div=document.createElement('div'); div.className='link-item'; div.innerHTML = `<input type="url" value="${link}" placeholder="Link"><button onclick="this.parentElement.remove()">✕</button>`; linksContainer.appendChild(div); });
+            const prod = document.getElementById('prod' + i); if (prod && cat.links && cat.links[0]) prod.href = cat.links[0]; }
+        });
+      }
+    } catch (e) { console.warn('loadState failed', e); }
+  }
+
+  // Export / Import
+  async function exportState() {
+    try {
+      const state = await idbGet(STATE_KEY) || {};
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'aiallan-state.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    } catch (e) { console.warn('export failed', e); }
+  }
+
+  function triggerImport() { document.getElementById('importFile').click(); }
+  async function importStateFromFile(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return; const text = await file.text(); try { const state = JSON.parse(text); await idbSet(STATE_KEY, state); await loadStateFromDB(); alert('✅ Import complete'); } catch (err) { alert('❌ Import failed: invalid JSON'); }
+  }
+
+  // Clear all data (IDB)
+  async function clearAllData() {
+    if (!confirm('Clear all saved data? This cannot be undone.')) return;
+    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ alert('✅ All data cleared'); location.reload(); }; tx.onerror = ()=>{ alert('❌ Failed to clear data'); }; } catch (e) { console.warn(e); }
+  }
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', async () => {
+    buildCategoriesUI();
+    await loadStateFromDB();
+    switchTab('profile');
+
+    // close modals by clicking outside
+    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','true'); } }); });
+  });
+</script>
+</body>
+</html>

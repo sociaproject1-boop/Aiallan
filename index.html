@@ -1849,6 +1849,9 @@ async function captureStateFromUI(){
   const av=document.querySelector('#dispAvatar img');
   if(av) state.profile.avatar=av.src;
 
+ const cover = window.profileCoverDataUrl || null;
+if (cover) state.profile.cover = cover;
+
   for(const key of ['fb','ig','tt','shopee','yt','tw']){
     const input=document.getElementById('soc'+key.charAt(0).toUpperCase()+key.slice(1));
     if(input) state.social[key]=input.value||'';

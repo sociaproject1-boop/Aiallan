@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Allan — aiallan.shop</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  :root {
+    --bg: #000;
+    --card: #1c1c1e;
+    --accent: #ff2d55;
+    --text: #fff;
+    --text2: #8e8e93;
+    --border: #38383a;
+    --fb: #1877f2;
+    --ig: #e1306c;
+    --tt: #000;
+    --shopee: #f4512c;
+    --yt: #ff0000;
+    --tw: #1da1f2;
+    --muted: #101010;
+    --amazon: #ff8c00;
+    --shein: #d63384;
+    --lazada: #ff3b30;
+    --ebay: #0064d2;
+    --ttshop: #000000;
+    --btn-gray: #2b2b2b;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  .admin-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    color: var(--text2);
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 20;
+  }
+
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    overflow-y: auto;
+    padding: 20px 12px;
+  }
+  .modal.on { display: flex; }
+  .modal-box {
+    background: var(--card);
+    padding: 18px;
+    border-radius: 12px;
+    width: 92%;
+    max-width: 760px;
+    border: 1px solid var(--border);
+    margin: auto;
+    color: var(--text);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  }
+  /* Admin modal slightly more compact when it's admin */
+  .modal-box.compact { padding: 14px; max-height: 80vh; overflow:auto; }
+
+  .modal-box h2 { text-align: center; margin-bottom: 12px; font-size: 18px; }
+  .modal-box h3 { font-size: 14px; margin: 12px 0 8px; color: var(--text2); }
+  .modal-box input,
+  .modal-box textarea,
+  .modal-box select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #171717;
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .modal-box textarea { resize: vertical; min-height: 72px; }
+
+  .btn { padding: 10px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-red { background: var(--accent); color: white; }
+  .btn-gray { background: var(--border); color: var(--text); }
+  .btn-row { display:flex; gap: 8px; margin-top: 8px; }
+  .btn-row .btn { flex: 1; }
+
+  .link-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .link-item input[type="url"], .link-item input[type="text"] { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #171717; color: var(--text); }
+  .link-item .thumb-preview { width: 56px; height: 56px; border-radius: 8px; background: #121212; display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden; border:1px solid #222; }
+  .link-item .thumb-preview img { width:100%; height:100%; object-fit:cover; }
+  .link-item .remove-btn { width:36px; height:36px; padding:0; border-radius:8px; border:none; background:#ff4444; color:white; cursor:pointer; }
+  .small-file { display:none; }
+  .add-link-btn {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px dashed var(--text2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    margin-bottom: 8px;
+    font-size:13px;
+  }
+
+  .category-block { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .category-block h4 { font-size: 14px; margin-bottom: 8px; color: var(--accent); }
+
+  .tabs { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .tab { padding:8px 12px; border-radius:8px; background:var(--border); color:var(--text2); font-size:13px; cursor:pointer; }
+  .tab.active { background:var(--accent); color:white; }
+  .hidden { display: none !important; }
+
+  .home { max-width:480px; margin: 0 auto; padding: 40px 16px 36px; }
+  .profile { text-align:center; margin-bottom:14px; }
+  .avatar { width:82px; height:82px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; overflow:hidden; }
+  .avatar img { width:100%; height:100%; object-fit:cover; }
+  .name { font-size:20px; font-weight:700; margin-bottom:6px; }
+  .bio { color:var(--text2); font-size:13px; margin-bottom:12px; }
+
+  /* Slim music player */
+  .music-player { display:flex; align-items:center; gap:8px; background:var(--card); padding:4px 7px; border-radius:10px; margin-bottom:12px; border:1px solid var(--border); height:38px; min-height:38px; max-height:38px; overflow:hidden; }
+  .music-player button { width:32px; height:32px; border-radius:8px; border:none; background:var(--accent); color:white; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .music-player .icon { font-size:16px; }
+  .music-player span { font-size:13px; color:var(--text2); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .social-row { display:flex; justify-content:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .social-link { width:46px; height:46px; border-radius:10px; color:white; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:20px; transition:.12s; }
+  .social-link.fb { background:var(--fb); }
+  .social-link.ig { background:var(--ig); }
+  .social-link.tt { background:var(--tt); border:1px solid #333; }
+  .social-link.shopee { background:var(--shopee); }
+  .social-link.yt { background:var(--yt); }
+  .social-link.tw { background:var(--tw); }
+  .social-link:hover { transform: scale(1.06); }
+
+  .section-title { font-size:13px; font-weight:600; margin-bottom:12px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px; }
+  .products-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+  .product-card { background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); text-decoration:none; color:var(--text); transition:.12s; cursor:pointer; display:block; }
+  .product-card:hover { transform: translateY(-3px); border-color:var(--accent); }
+  .product-thumb { width:100%; aspect-ratio:1; background:#171717; display:flex; align-items:center; justify-content:center; font-size:28px; overflow:hidden; }
+  .product-thumb img { width:100%; height:100%; object-fit:cover; }
+  .product-info { padding:8px; }
+  .product-name { font-size:13px; font-weight:600; line-height:1.2; }
+
+  /* Category modal custom */
+  .category-modal .modal-box { max-width: 640px; width: 92%; border-radius: 12px; padding: 12px; }
+  .category-modal .modal-box h2 { text-align:left; font-size:16px; margin-bottom:10px; }
+  /* Category links: one clean row per product, no horizontal overflow */
+  .product-list { display:grid; grid-template-columns:1fr; gap:10px; width:100%; }
+  .product-card-modal {
+    background:#121212;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px;
+    display:grid;
+    grid-template-columns:72px minmax(0,1fr) auto;
+    gap:10px;
+    align-items:center;
+    min-height:88px;
+    width:100%;
+    overflow:hidden;
+  }
+  .product-card-modal .img {
+    width:72px;
+    height:72px;
+    border-radius:8px;
+    overflow:hidden;
+    background:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text2);
+    font-weight:700;
+  }
+  .product-card-modal .img img { width:100%; height:100%; object-fit:cover; }
+  .product-card-modal .meta { min-width:0; display:flex; flex-direction:column; justify-content:center; gap:5px; }
+  .product-card-modal .meta .title {
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .product-card-modal .meta .url-label {
+    font-size:11px;
+    color:var(--text2);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .product-card-modal .cta { min-width:0; }
+  .product-card-modal .cta button { white-space:nowrap; font-size:12px; }
+  .btn-shopee { background:var(--shopee); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-amazon { background:var(--amazon); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-shein { background:var(--shein); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-lazada { background:var(--lazada); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-ttshop { background:var(--ttshop); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-ebay { background:var(--ebay); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-default { background:var(--btn-gray); color:var(--text); border:1px solid #2f2f2f; padding:8px 12px; border-radius:8px; }
+
+  /* Compact admin product editor */
+  .prod-row {
+    display:grid;
+    grid-template-columns:56px minmax(0,1fr) auto;
+    gap:8px;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .prod-row .prod-thumb {
+    width:56px;
+    height:56px;
+    border-radius:8px;
+    overflow:hidden;
+    background:#121212;
+    border:1px solid #222;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text2);
+    flex:0 0 56px;
+  }
+  .prod-row .prod-thumb img { width:100%; height:100%; object-fit:cover; }
+  .prod-row .prod-inputs { display:grid; grid-template-columns:minmax(0,1fr); gap:6px; min-width:0; }
+  .prod-row .prod-inputs input[type="text"],
+  .prod-row .prod-inputs input[type="url"] {
+    width:100%;
+    min-width:0;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#171717;
+    color:var(--text);
+    font-size:13px;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .prod-row .prod-inputs input[type="url"].platform-shopee { border-left:4px solid var(--shopee); }
+  .prod-row .prod-inputs input[type="url"].platform-amazon { border-left:4px solid var(--amazon); }
+  .prod-row .prod-inputs input[type="url"].platform-shein { border-left:4px solid var(--shein); }
+  .prod-row .prod-inputs input[type="url"].platform-lazada { border-left:4px solid var(--lazada); }
+  .prod-row .prod-inputs input[type="url"].platform-ebay { border-left:4px solid var(--ebay); }
+  .prod-row .prod-inputs input[type="url"].platform-ttshop { border-left:4px solid #777; }
+  .prod-row .prod-inputs input[type="url"].platform-other { border-left:4px solid #777; }
+
+  .thumb-actions { display:flex; flex-direction:column; gap:6px; align-items:stretch; }
+  .upload-thumb-btn {
+    padding:7px 9px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#2b2b2b;
+    color:var(--text);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .upload-thumb-btn:hover { border-color:var(--accent); }
+  .upload-thumb-btn.has-thumb { border-color:#34c759; }
+  .category-thumb-editor {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin:8px 0 10px;
+    padding:8px;
+    border:1px dashed var(--border);
+    border-radius:10px;
+    background:#151515;
+  }
+  .category-thumb-preview {
+    width:52px;
+    height:52px;
+    border-radius:8px;
+    overflow:hidden;
+    background:#101010;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text2);
+    flex:0 0 52px;
+  }
+  .category-thumb-preview img { width:100%; height:100%; object-fit:cover; }
+  .category-thumb-info { min-width:0; flex:1; }
+  .category-thumb-info strong { display:block; font-size:12px; margin-bottom:2px; }
+  .category-thumb-info span { display:block; font-size:11px; color:var(--text2); }
+
+  /* Automatic platform detection badge */
+  .platform-hint {
+    font-size:10px;
+    color:var(--text2);
+    margin-top:-2px;
+    min-height:12px;
+  }
+  .product-meta-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; align-items:center; }
+  .prod-price {
+    width:100%;
+    min-width:0;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#171717;
+    color:var(--text);
+    font-size:13px;
+  }
+  .auto-detect-btn {
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #315b7d;
+    background:#10283b;
+    color:#dff3ff;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .auto-detect-btn:hover { border-color:#56b9ff; background:#12344d; }
+  .metadata-status { font-size:10px; color:var(--text2); min-height:12px; }
+  .price-badge { color:#7dffad; font-weight:800; font-size:13px; }
+  .product-card-modal .meta .price-badge { margin-top:1px; }
+
+  /* small screens adjustments */
+  @media (max-width: 520px) {
+    .modal-box { padding:12px; border-radius:12px; }
+    .home { padding:34px 12px 36px; }
+    .product-card-modal { grid-template-columns:60px minmax(0,1fr); min-height:78px; }
+    .product-card-modal .img { width:60px; height:60px; }
+    .product-card-modal .cta { grid-column:2; width:100%; }
+    .product-card-modal .cta button { width:100%; }
+    .product-card-modal .meta .title { white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .prod-row { grid-template-columns:52px minmax(0,1fr); align-items:start; }
+    .prod-row .prod-thumb { width:52px; height:52px; flex-basis:52px; }
+    .prod-row .thumb-actions { grid-column:1 / -1; display:grid; grid-template-columns:1fr auto; }
+  }
+
+  /* ===== v3 visual upgrade ===== */
+  body::before { content:""; position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle at 50% -10%, rgba(255,45,85,.16), transparent 34%), radial-gradient(circle at 100% 80%, rgba(0,140,255,.08), transparent 28%); z-index:-1; }
+  .admin-btn { width:34px; height:34px; border-radius:11px; background:rgba(28,28,30,.9); border:1px solid #343438; display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+  .admin-btn:hover { color:#fff; border-color:var(--accent); transform:translateY(-1px); }
+  .modal { backdrop-filter:blur(12px); }
+  .modal-box { box-shadow:0 24px 80px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.03); }
+  .login-box { max-width:390px; padding:24px; text-align:left; }
+  .login-mark { width:48px; height:48px; border-radius:16px; background:linear-gradient(135deg,#ff2d55,#ff7a45); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:22px; box-shadow:0 10px 30px rgba(255,45,85,.25); }
+  .login-box h2 { margin-bottom:4px; font-size:22px; text-align:center; }
+  .login-subtitle { text-align:center; color:var(--text2); font-size:12px; margin-bottom:18px; }
+  .field-label { display:block; font-size:11px; color:#a8a8ad; margin:9px 0 6px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+  .login-status { min-height:17px; color:#ff6b81; font-size:12px; margin:4px 0 2px; }
+  .admin-header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-bottom:12px; border-bottom:1px solid #2a2a2d; margin-bottom:12px; }
+  .admin-header h2 { margin:0; text-align:left; font-size:20px; }
+  .eyebrow { color:#ff5d7a; font-size:9px; font-weight:800; letter-spacing:1.2px; margin-bottom:3px; }
+  .online-status { display:flex; align-items:center; gap:6px; padding:7px 9px; border:1px solid #303034; border-radius:999px; background:#151517; font-size:10px; color:#929298; white-space:nowrap; }
+  .online-status span { width:7px; height:7px; border-radius:50%; background:#777; box-shadow:0 0 0 3px rgba(119,119,119,.08); }
+  .online-status.online { color:#8ee8b1; border-color:rgba(52,199,89,.35); }
+  .online-status.online span { background:#34c759; box-shadow:0 0 0 3px rgba(52,199,89,.12); }
+  .online-status.syncing span { background:#ff9f0a; }
+  .tabs { background:#121214; padding:5px; border:1px solid #29292d; border-radius:13px; gap:5px; }
+  .tab { background:transparent; border-radius:9px; padding:8px 10px; }
+  .tab.active { background:linear-gradient(135deg,#ff2d55,#ff375f); box-shadow:0 6px 18px rgba(255,45,85,.2); }
+  .category-block { background:linear-gradient(180deg,#1b1b1e,#151517); border-color:#303035; border-radius:14px; padding:13px; box-shadow:inset 0 1px 0 rgba(255,255,255,.02); }
+  .category-block h4 { font-size:15px; }
+  .category-thumb-editor { background:#101012; border-color:#303035; }
+  .prod-row { background:#101012; border:1px solid #2c2c30; border-radius:11px; padding:8px; margin-bottom:7px; }
+  .prod-row .prod-thumb { border-color:#333337; }
+  .prod-row .prod-inputs input { background:#171719; border-color:#2d2d32; }
+  .prod-row .prod-inputs input:focus { outline:none; border-color:#ff375f; box-shadow:0 0 0 3px rgba(255,55,95,.08); }
+  .upload-thumb-btn { background:#202024; border-color:#3b3b40; }
+  .upload-thumb-btn.has-thumb { color:#8ee8b1; background:rgba(52,199,89,.08); }
+  .btn-red { background:linear-gradient(135deg,#ff2d55,#ff375f); box-shadow:0 7px 18px rgba(255,45,85,.16); }
+  .btn-gray { background:#27272b; }
+  .admin-footer { margin-top:12px; padding-top:10px; border-top:1px solid #29292d; display:flex; gap:10px; align-items:center; }
+  .sync-status { font-size:10px; color:#8e8e93; min-width:105px; }
+  .sync-status.ok { color:#8ee8b1; }
+  .sync-status.err { color:#ff6b81; }
+  .music-player { background:linear-gradient(135deg,#1c1c1f,#151517); border:1px solid #343438; box-shadow:0 10px 28px rgba(0,0,0,.25); }
+  .music-player button { box-shadow:0 5px 15px rgba(255,45,85,.18); }
+  .products-grid { gap:12px; }
+  .product-card { position:relative; background:linear-gradient(180deg,#1c1c1f,#151517); border-radius:16px; border-color:#323236; box-shadow:0 10px 25px rgba(0,0,0,.22); }
+  .product-card::after { content:""; position:absolute; inset:0; border-radius:16px; pointer-events:none; box-shadow:inset 0 1px 0 rgba(255,255,255,.03); }
+  .product-card:hover { border-color:#ff375f; box-shadow:0 14px 32px rgba(255,45,85,.12); }
+  .product-thumb { background:radial-gradient(circle at center,#222226,#111113); }
+  .product-info { padding:10px; }
+  .product-name { font-size:13px; }
+  .category-modal .modal-box { background:linear-gradient(180deg,#1c1c1f,#111113); }
+  .product-card-modal { border-color:#333337; background:linear-gradient(135deg,#171719,#111113); border-radius:14px; transition:.15s; }
+  .product-card-modal:hover { border-color:#ff375f; transform:translateY(-1px); }
+  .product-card-modal .cta button { border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,.2); }
+  @media(max-width:520px){ .admin-footer{flex-direction:column;align-items:stretch}.sync-status{min-width:0}.admin-header h2{font-size:18px}.online-status{font-size:9px;padding:6px 8px}.login-box{padding:20px} }
+</style>
+</head>
+<body>
+  <!-- Background audio element (closed properly) -->
+  <audio id="bgMusic" loop></audio>
+
+  <!-- Admin button -->
+  <button class="admin-btn" onclick="openLogin()" aria-label="Open admin profile">👤</button>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal" aria-hidden="true">
+    <div class="modal-box login-box" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <div class="login-mark">👤</div>
+      <h2 id="loginTitle">Admin Access</h2>
+      <p class="login-subtitle">Private control center · Supabase secured</p>
+      <label class="field-label">Email</label>
+      <input type="email" id="adminEmailInput" placeholder="Admin email" autocomplete="username" value="business@aiallan.shop">
+      <label class="field-label">Password</label>
+      <input type="password" id="passInput" placeholder="Password" autocomplete="current-password">
+      <div id="loginStatus" class="login-status"></div>
+      <div class="btn-row">
+        <button class="btn btn-gray" onclick="closeLogin()">Cancel</button>
+        <button class="btn btn-red" onclick="checkPass()">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal" id="adminModal" aria-hidden="true">
+    <div class="modal-box compact" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <div class="admin-header"><div><div class="eyebrow">PRIVATE CONTROL CENTER</div><h2 id="adminTitle">🛠️ Admin Panel</h2></div><div class="online-status" id="onlineStatus"><span></span> Offline</div></div>
+
+      <div class="tabs" role="tablist" aria-label="Admin tabs">
+        <span class="tab active" data-tab="profile" role="tab" aria-selected="true">👤 Profile</span>
+        <span class="tab" data-tab="social" role="tab" aria-selected="false">🔗 Social</span>
+        <span class="tab" data-tab="products" role="tab" aria-selected="false">🛍️ Products</span>
+        <span class="tab" data-tab="music" role="tab" aria-selected="false">🎵 Music</span>
+      </div>
+
+      <div id="tab-profile" class="tab-content">
+        <div class="avatar-upload" style="text-align:left;margin-bottom:10px;">
+          <div class="preview" id="avatarPreview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--card);display:inline-block;vertical-align:middle;margin-right:8px;">👤</div>
+          <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)" style="display:inline-block;vertical-align:middle;">
+        </div>
+        <input type="text" id="adminName" placeholder="Your Name">
+        <input type="text" id="adminBio" placeholder="Short Bio">
+        <div class="btn-row">
+          <button class="btn btn-red" style="flex:1;" onclick="saveProfile()">Save Profile</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="exportState()">Export JSON</button>
+        </div>
+      </div>
+
+      <div id="tab-social" class="tab-content hidden">
+        <h3>Social Links (brand colors)</h3>
+        <input type="url" id="socFb" placeholder="Facebook URL" style="border-left:4px solid var(--fb);">
+        <input type="url" id="socIg" placeholder="Instagram URL" style="border-left:4px solid var(--ig);">
+        <input type="url" id="socTt" placeholder="TikTok URL" style="border-left:4px solid #555;">
+        <input type="url" id="socShopee" placeholder="Shopee URL" style="border-left:4px solid var(--shopee);">
+        <input type="url" id="socYt" placeholder="YouTube URL" style="border-left:4px solid var(--yt);">
+        <input type="url" id="socTw" placeholder="Twitter/X URL" style="border-left:4px solid var(--tw);">
+        <div class="btn-row">
+          <button class="btn btn-red" style="flex:1;" onclick="saveSocial()">Save Social Links</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="triggerImport()">Import JSON</button>
+        </div>
+      </div>
+
+      <div id="tab-products" class="tab-content hidden">
+        <h3 style="margin-bottom:8px;">8 Categories — Editable Products</h3>
+
+        <div id="categoriesContainer"></div>
+
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-red" style="flex:1;" onclick="saveAllProducts()">💾 Save All Categories</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="clearAllData()">Clear All Data</button>
+        </div>
+      </div>
+
+      <div id="tab-music" class="tab-content hidden">
+        <h3>Background Music</h3>
+        <input type="file" accept="audio/*" id="musicUpload" onchange="previewMusic(this)">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Upload MP3 / M4A file — saved online to Supabase</p>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-red" style="flex:1;" onclick="playMusic()">▶️ Play</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="pauseMusic()">⏸️ Pause</button>
+        </div>
+      </div>
+
+      <div class="admin-footer">
+        <div id="syncStatus" class="sync-status">● Ready</div>
+        <div style="display:flex;gap:8px;flex:1;">
+          <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importStateFromFile(event)">
+          <button class="btn btn-gray" style="flex:1;" onclick="signOutAdmin()">Sign Out</button>
+          <button class="btn btn-gray" style="flex:1;" onclick="closeAdminModal()">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Category Links Modal (shows all products for a clicked category) -->
+  <div class="modal category-modal" id="categoryModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="categoryTitle">
+      <h2 id="categoryTitle">Category Links</h2>
+      <div id="categoryLinksList" style="margin-top:8px;"></div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn btn-gray" onclick="closeCategoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content / Home page -->
+  <div class="home" id="homePage">
+    <div class="profile">
+      <div class="avatar" id="dispAvatar">👤</div>
+      <h1 class="name" id="dispName">Allan</h1>
+      <p class="bio" id="dispBio">Affiliate & Creator</p>
+    </div>
+
+    <div class="music-player hidden" id="musicPlayer">
+      <button onclick="toggleMusic()" id="musicBtn" aria-label="Play/Pause"><i class="fa fa-music icon"></i></button>
+      <span id="musicTitle">Background Music</span>
+    </div>
+
+    <div class="social-row">
+      <a href="#" class="social-link fb" id="socLinkFb" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="social-link ig" id="socLinkIg" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="social-link tt" id="socLinkTt" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+      <a href="#" class="social-link shopee" id="socLinkShopee" target="_blank" rel="noopener noreferrer"><i class="fas fa-shopping-bag"></i></a>
+      <a href="#" class="social-link yt" id="socLinkYt" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+      <a href="#" class="social-link tw" id="socLinkTw" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+    </div>
+
+    <p class="section-title">Shop by Category</p>
+    <div class="products-grid" id="productsGrid">
+      <!-- product tiles injected by JS -->
+    </div>
+  </div>
+
+<script>
+  // IndexedDB helper (simple)
+  const DB_NAME = 'aiallan_db_v1';
+  const STORE_NAME = 'state';
+  const AUTH_STORE = 'auth';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function (e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+        if (!db.objectStoreNames.contains(AUTH_STORE)) {
+          db.createObjectStore(AUTH_STORE);
+        }
+      };
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror = e => reject(e.target.error);
+    });
+  }
+
+  async function idbSet(key, value) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.put(value, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB set failed', e);
+      return false;
+    }
+  }
+
+  async function idbGet(key) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([STORE_NAME], 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(key);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB get failed', e);
+      return null;
+    }
+  }
+
+  async function idbSetAuth(key, value) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([AUTH_STORE], 'readwrite');
+        const store = tx.objectStore(AUTH_STORE);
+        const req = store.put(value, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB set auth failed', e);
+      return false;
+    }
+  }
+
+  async function idbGetAuth(key) {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction([AUTH_STORE], 'readonly');
+        const store = tx.objectStore(AUTH_STORE);
+        const req = store.get(key);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e.target.error);
+      });
+    } catch (e) {
+      console.warn('IDB get auth failed', e);
+      return null;
+    }
+  }
+
+  // state variables
+  let musicDataUrl = ""; // stored data URL for bg music
+  let isPlaying = false;
+  const STATE_KEY = 'settings';
+  const AUTH_KEY = 'auth';
+  const BG_STORAGE_KEY = 'aiallan_bg_state_v1';
+  const BG_SRC_KEY = 'aiallan_bg_src_v1';
+
+  // default categories data
+  const defaultCats = [
+    {name: 'Health & Beauty', icon: '💄'},
+    {name: 'Clothes & Fashion', icon: '👕'},
+    {name: 'Gadgets & Accessories', icon: '📱'},
+    {name: 'Campaign Tools', icon: '📢'},
+    {name: 'Foods & Groceries', icon: '🍜'},
+    {name: 'Heavy Duty Tools', icon: '🔧'},
+    {name: 'Motor & Vehicle Parts', icon: '🏍️'},
+    {name: 'Books & Learning', icon: '📚'}
+  ];
+
+  // local in-memory mapping for product thumbnails while editing: {catIndex: {prodIndex: dataURL}}
+  const prodThumbs = {};
+
+  // Build products UI and categories editor
+  function buildCategoriesUI(savedState) {
+    const container = document.getElementById('categoriesContainer');
+    const productsGrid = document.getElementById('productsGrid');
+    container.innerHTML = '';
+    productsGrid.innerHTML = '';
+    for (let i = 1; i <= 8; i++) {
+      const catDefaults = defaultCats[i-1] || {name: 'Category ' + i, icon: '🔖'};
+      const catName = (savedState && savedState.categories && savedState.categories[i-1] && savedState.categories[i-1].name) || catDefaults.name;
+      // admin category block
+      const block = document.createElement('div');
+      block.className = 'category-block';
+      block.innerHTML = `
+        <h4>${i}. ${escapeHtml(catName)} ${catDefaults.icon}</h4>
+        <input type="text" class="cat-name" data-cat="${i}" value="${escapeHtml(catName)}" placeholder="Category Name">
+        <div class="category-thumb-editor">
+          <div class="category-thumb-preview" id="catThumbPreview-${i}">${catDefaults.icon}</div>
+          <div class="category-thumb-info">
+            <strong>Category Thumbnail</strong>
+            <span>Upload image for this category card.</span>
+          </div>
+          <input type="file" accept="image/*" class="small-file" id="catFile-${i}" onchange="previewCategoryThumb(${i}, this)">
+          <button type="button" class="upload-thumb-btn" id="catUploadBtn-${i}" onclick="document.getElementById('catFile-${i}').click()">Upload</button>
+        </div>
+        <div id="cat${i}Products"></div>
+        <button class="add-link-btn" onclick="addProductField(${i})">+ Add Product</button>
+      `;
+      container.appendChild(block);
+
+      // product tile
+      const a = document.createElement('a');
+      a.href = '#';
+      a.className = 'product-card';
+      a.id = 'prod' + i;
+      a.setAttribute('data-cat', i);
+      a.innerHTML = `
+        <div class="product-thumb" id="thumb${i}">${catDefaults.icon}</div>
+        <div class="product-info"><div class="product-name" id="name${i}">${catName}</div></div>
+      `;
+      productsGrid.appendChild(a);
+
+      // If saved state has products, render them in admin area
+      if (savedState && Array.isArray(savedState.categories) && savedState.categories[i-1]) {
+        const cat = savedState.categories[i-1];
+        if (Array.isArray(cat.products)) {
+          cat.products.forEach((p, idx) => addProductField(i, p));
+        }
+        // update thumbnail for category if provided
+        if (cat.thumb) {
+          const thumb = document.getElementById('thumb' + i);
+          if (thumb) thumb.innerHTML = `<img src="${cat.thumb}" alt="Category thumbnail">`;
+          const preview = document.getElementById(`catThumbPreview-${i}`);
+          if (preview) preview.innerHTML = `<img src="${cat.thumb}" alt="Category thumbnail">`;
+          const blockForThumb = document.querySelector(`.cat-name[data-cat="${i}"]`)?.closest('.category-block');
+          if (blockForThumb) blockForThumb.dataset.categoryThumb = cat.thumb;
+          const uploadBtn = document.getElementById(`catUploadBtn-${i}`);
+          if (uploadBtn) { uploadBtn.textContent = '✓ Thumbnail'; uploadBtn.classList.add('has-thumb'); }
+        }
+        // update product tile name
+        const nameTarget = document.getElementById('name' + i);
+        if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
+      } else {
+        // add a single empty product field by default for convenience
+        addProductField(i);
+      }
+    }
+  }
+
+  function addProductField(catNum, product) {
+    const container = document.getElementById('cat' + catNum + 'Products');
+    if (!container) return;
+
+    const idx = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const row = document.createElement('div');
+    row.className = 'prod-row';
+    row.dataset.index = idx;
+
+    const safeName = product && product.name ? escapeHtml(product.name) : '';
+    const safeUrl = product && product.url ? escapeHtml(product.url) : '';
+    const safePrice = product && product.price != null ? escapeHtml(String(product.price)) : '';
+    const thumbMarkup = product && product.thumb ? '<img src="' + product.thumb + '" alt="Product thumbnail">' : '📦';
+
+    row.innerHTML = `
+      <div class="prod-thumb" id="prodThumb-${catNum}-${idx}">${thumbMarkup}</div>
+      <div class="prod-inputs">
+        <input type="text" class="prod-name" placeholder="Product name — auto-filled when API is connected" value="${safeName}">
+        <input type="url" class="prod-url" placeholder="Paste TikTok Shop / Shopee / other product link" value="${safeUrl}">
+        <div class="product-meta-row">
+          <input type="text" class="prod-price" inputmode="decimal" placeholder="Price (e.g. ₱199.00)" value="${safePrice}">
+          <button type="button" class="auto-detect-btn" onclick="autoDetectProduct(${catNum}, '${idx}')">⚡ Auto Detect</button>
+        </div>
+        <div class="platform-hint" id="platformHint-${catNum}-${idx}"></div>
+        <div class="metadata-status" id="metadataStatus-${catNum}-${idx}"></div>
+      </div>
+      <div class="thumb-actions">
+        <input type="file" accept="image/*" class="small-file" id="prodFile-${catNum}-${idx}" onchange="previewProductThumb(${catNum}, '${idx}', this)">
+        <button type="button" class="upload-thumb-btn${product && product.thumb ? ' has-thumb' : ''}" id="prodUploadBtn-${catNum}-${idx}" onclick="document.getElementById('prodFile-${catNum}-${idx}').click()">${product && product.thumb ? '✓ Thumbnail' : 'Upload Thumbnail'}</button>
+        <button type="button" class="remove-btn" onclick="removeProductRow(this, ${catNum}, '${idx}')">✕</button>
+      </div>
+    `;
+    container.appendChild(row);
+
+    if (product && product.thumb) {
+      prodThumbs[catNum] = prodThumbs[catNum] || {};
+      prodThumbs[catNum][idx] = product.thumb;
+    }
+
+    const urlInput = row.querySelector('.prod-url');
+    if (urlInput) {
+      urlInput.addEventListener('input', () => detectProductPlatform(urlInput));
+      urlInput.addEventListener('change', () => detectProductPlatform(urlInput));
+      detectProductPlatform(urlInput);
+    }
+  }
+
+
+  function removeProductRow(button, catNum, prodIndex) {
+    const row = button.closest('.prod-row');
+    if (row) row.remove();
+    if (prodThumbs[catNum]) delete prodThumbs[catNum][prodIndex];
+  }
+
+
+  function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
+  function previewProductThumb(catNum, prodIndex, input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      input.value = '';
+      return;
+    }
+    const r = new FileReader();
+    r.onload = e => {
+      const data = e.target.result;
+      prodThumbs[catNum] = prodThumbs[catNum] || {};
+      prodThumbs[catNum][prodIndex] = data;
+
+      const preview = document.getElementById(`prodThumb-${catNum}-${prodIndex}`);
+      if (preview) preview.innerHTML = `<img src="${data}" alt="Product thumbnail">`;
+
+      const btn = document.getElementById(`prodUploadBtn-${catNum}-${prodIndex}`);
+      if (btn) {
+        btn.textContent = '✓ Thumbnail';
+        btn.classList.add('has-thumb');
+      }
+    };
+    r.readAsDataURL(file);
+  }
+
+  async function autoDetectProduct(catNum, prodIndex) {
+    const row = document.querySelector(`#cat${catNum}Products .prod-row[data-index="${prodIndex}"]`);
+    if (!row) return;
+    const urlInput = row.querySelector('.prod-url');
+    const nameInput = row.querySelector('.prod-name');
+    const priceInput = row.querySelector('.prod-price');
+    const thumb = document.getElementById(`prodThumb-${catNum}-${prodIndex}`);
+    const status = document.getElementById(`metadataStatus-${catNum}-${prodIndex}`);
+    const url = (urlInput?.value || '').trim();
+
+    if (!url) {
+      if (status) status.textContent = 'Paste a product link first.';
+      return;
+    }
+    detectProductPlatform(urlInput);
+    if (status) status.textContent = 'Checking product metadata…';
+
+    try {
+      const response = await fetch(PRODUCT_RESOLVER_URL, {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          ...(supabaseClient ? { 'apikey': SUPABASE_PUBLISHABLE_KEY } : {})
+        },
+        body: JSON.stringify({ url })
+      });
+      if (!response.ok) throw new Error(`Resolver returned ${response.status}`);
+      const data = await response.json();
+
+      if (data.name && nameInput) nameInput.value = data.name;
+      if (data.price != null && priceInput) priceInput.value = String(data.price);
+      if (data.thumbnail && thumb) {
+        thumb.innerHTML = `<img src="${escapeHtml(data.thumbnail)}" alt="Product thumbnail">`;
+        prodThumbs[catNum] = prodThumbs[catNum] || {};
+        prodThumbs[catNum][prodIndex] = data.thumbnail;
+        const btn=document.getElementById(`prodUploadBtn-${catNum}-${prodIndex}`);
+        if(btn){btn.textContent='✓ Auto Thumbnail';btn.classList.add('has-thumb');}
+      }
+      if (status) status.textContent = data.source ? `✓ Detected from ${data.source}` : '✓ Product data detected';
+      setSyncStatus('Product metadata detected','ok');
+    } catch (e) {
+      console.warn('Product metadata resolver:', e);
+      if (status) status.textContent = 'Automatic lookup is not connected yet. You can still upload the thumbnail and enter the price manually.';
+      setSyncStatus('Metadata API not connected','');
+    }
+  }
+
+  function previewCategoryThumb(catNum, input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      input.value = '';
+      return;
+    }
+    const r = new FileReader();
+    r.onload = e => {
+      const data = e.target.result;
+      const preview = document.getElementById(`catThumbPreview-${catNum}`);
+      if (preview) preview.innerHTML = `<img src="${data}" alt="Category thumbnail">`;
+
+      const homeThumb = document.getElementById(`thumb${catNum}`);
+      if (homeThumb) homeThumb.innerHTML = `<img src="${data}" alt="Category thumbnail">`;
+
+      const btn = document.getElementById(`catUploadBtn-${catNum}`);
+      if (btn) {
+        btn.textContent = '✓ Thumbnail';
+        btn.classList.add('has-thumb');
+      }
+
+      // Keep it in a DOM data attribute until Save All is pressed.
+      const block = preview ? preview.closest('.category-block') : null;
+      if (block) block.dataset.categoryThumb = data;
+    };
+    r.readAsDataURL(file);
+  }
+
+  function detectProductPlatform(input) {
+    if (!input) return { key:'other', label:'Other / Website' };
+    const url = (input.value || '').trim();
+    input.classList.remove('platform-shopee','platform-amazon','platform-shein','platform-lazada','platform-ebay','platform-ttshop','platform-other');
+
+    let key = 'other';
+    let label = 'Other / Website';
+    if (/shopee\./i.test(url)) { key='shopee'; label='Shopee detected'; }
+    else if (/amazon\.|amzn\./i.test(url)) { key='amazon'; label='Amazon detected'; }
+    else if (/shein\./i.test(url)) { key='shein'; label='Shein detected'; }
+    else if (/lazada\./i.test(url)) { key='lazada'; label='Lazada detected'; }
+    else if (/ebay\./i.test(url)) { key='ebay'; label='eBay detected'; }
+    else if (/tiktok(?:shop)?\.|tiktokshop/i.test(url)) { key='ttshop'; label='TikTok Shop detected'; }
+    else if (/^https?:\/\//i.test(url)) { key='other'; label='Website link detected'; }
+    else if (url) { key='other'; label='Paste a full https:// link'; }
+
+    input.classList.add('platform-' + key);
+    input.dataset.platform = key;
+
+    const row = input.closest('.prod-row');
+    const hint = row ? row.querySelector('.platform-hint') : null;
+    if (hint) hint.textContent = url ? label : '';
+    input.placeholder = key === 'other' ? 'Paste product link (auto-detects platform)' : label + ' — paste product link';
+    return { key, label };
+  }
+
+
+  // Modal controls
+  function openLogin() {
+    const m = document.getElementById('loginModal');
+    m.classList.add('on');
+    m.setAttribute('aria-hidden', 'false');
+  }
+  function closeLogin() {
+    const m = document.getElementById('loginModal');
+    m.classList.remove('on');
+    m.setAttribute('aria-hidden', 'true');
+    const pi = document.getElementById('passInput'); if (pi) pi.value = '';
+  }
+  function openAdminModal() { const m = document.getElementById('adminModal'); m.classList.add('on'); m.setAttribute('aria-hidden', 'false'); }
+  function closeAdminModal() { const m = document.getElementById('adminModal'); m.classList.remove('on'); m.setAttribute('aria-hidden', 'true'); }
+
+  // Password hashing (SHA-256) using SubtleCrypto
+  async function generateSalt(len = 16) {
+    const arr = new Uint8Array(len);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => ('00' + b.toString(16)).slice(-2)).join('');
+  }
+  async function hashPassword(password, salt) {
+    const enc = new TextEncoder();
+    const data = enc.encode(salt + password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function savePasswordHash(password) {
+    const salt = await generateSalt();
+    const hash = await hashPassword(password, salt);
+    await idbSetAuth(AUTH_KEY, { salt, hash });
+  }
+  async function verifyPassword(password) {
+    const auth = await idbGetAuth(AUTH_KEY);
+    if (!auth || !auth.salt || !auth.hash) return false;
+    const h = await hashPassword(password, auth.salt);
+    return h === auth.hash;
+  }
+
+  // Login check using hashed password from IDB
+  async function checkPass() {
+    const p = document.getElementById('passInput').value || '';
+    const auth = await idbGetAuth(AUTH_KEY);
+    // If no auth stored yet, allow default demo password 'allan123' and then save its hash
+    if (!auth) {
+      if (p === 'allan123') {
+        await savePasswordHash(p);
+        closeLogin(); openAdminModal(); switchTab('profile');
+        return;
+      } else {
+        alert('❌ Wrong password!'); return;
+      }
+    }
+    const ok = await verifyPassword(p);
+    if (ok) { closeLogin(); openAdminModal(); switchTab('profile'); }
+    else alert('❌ Wrong password!');
+  }
+
+  // Tabs
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (t && t.dataset && t.dataset.tab) {
+      switchTab(t.dataset.tab);
+    }
+  });
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => { t.classList.toggle('active', t.dataset.tab === name); t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false'); });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    const el = document.getElementById('tab-' + name);
+    if (el) el.classList.remove('hidden');
+  }
+
+  // Avatar preview
+  function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const r = new FileReader();
+      r.onload = e => { const avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; const disp = document.getElementById('dispAvatar'); if(disp) disp.innerHTML = '<img src="'+avatarData+'" alt="avatar">'; };
+      r.readAsDataURL(file);
+    }
+  }
+  function saveProfile() {
+    const n = document.getElementById('adminName').value || document.getElementById('dispName').innerText;
+    const b = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText;
+    if (n) document.getElementById('dispName').innerText = n;
+    if (b) document.getElementById('dispBio').innerText = b;
+    saveStateToDB();
+    alert('✅ Profile Saved!');
+  }
+
+  // Social links
+  function saveSocial() {
+    document.getElementById('socLinkFb').href = document.getElementById('socFb').value || '#';
+    document.getElementById('socLinkIg').href = document.getElementById('socIg').value || '#';
+    document.getElementById('socLinkTt').href = document.getElementById('socTt').value || '#';
+    document.getElementById('socLinkShopee').href = document.getElementById('socShopee').value || '#';
+    document.getElementById('socLinkYt').href = document.getElementById('socYt').value || '#';
+    document.getElementById('socLinkTw').href = document.getElementById('socTw').value || '#';
+    saveStateToDB();
+    alert('✅ Social Links Saved!');
+  }
+
+  // Save categories (update tiles and keep products)
+  async function saveAllProducts() {
+    for (let i = 1; i <= 8; i++) {
+      const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+      if (nameEl && nameEl.value) {
+        const nameTarget = document.getElementById('name' + i);
+        if (nameTarget) nameTarget.innerText = nameEl.value;
+      }
+      const block = nameEl ? nameEl.closest('.category-block') : null;
+      const preview = document.getElementById(`catThumbPreview-${i}`);
+      const homeThumb = document.getElementById(`thumb${i}`);
+      const img = preview ? preview.querySelector('img') : null;
+      if (img && img.src) {
+        if (block) block.dataset.categoryThumb = img.src;
+        if (homeThumb) homeThumb.innerHTML = `<img src="${img.src}" alt="Category thumbnail">`;
+      }
+    }
+    const ok = await saveStateToDB();
+    alert(ok ? '✅ All Categories Saved!' : '⚠️ Save failed. Please try again.');
+  }
+
+  // Music preview / playback — read file as data URL and persist to localStorage so it can be restored across refreshes
+  async function previewMusic(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const r = new FileReader();
+      r.onload = e => {
+        musicDataUrl = e.target.result;
+        try { localStorage.setItem(BG_SRC_KEY, musicDataUrl); } catch (er) { console.warn('Could not save music to localStorage', er); }
+        const audio = document.getElementById('bgMusic');
+        audio.src = musicDataUrl;
+        audio.load();
+        audio.play().then(()=>{ isPlaying = true; updateMusicUI(); }).catch(err => { console.warn('Autoplay prevented', err); updateMusicUI(); });
+        const player = document.getElementById('musicPlayer'); if (player) player.classList.remove('hidden');
+        const musicTitle = document.getElementById('musicTitle'); if (musicTitle) musicTitle.innerText = file.name;
+      };
+      r.readAsDataURL(file);
+    }
+  }
+  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Play failed',err); }); }
+  function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; updateMusicUI(); }
+  function toggleMusic() { isPlaying ? pauseMusic() : playMusic(); }
+  function updateMusicUI(){ const btn=document.getElementById('musicBtn'); if(btn) btn.innerHTML = isPlaying ? '<i class="fa fa-pause icon"></i>' : '<i class="fa fa-play icon"></i>'; const player=document.getElementById('musicPlayer'); if(player){ if(isPlaying) player.classList.remove('hidden'); } }
+
+  // Build and persist state to IndexedDB
+  async function saveStateToDB() {
+    try {
+      const state = { profile: {}, social: {}, categories: [], music: null };
+      state.profile.name = document.getElementById('adminName').value || document.getElementById('dispName').innerText || '';
+      state.profile.bio = document.getElementById('adminBio').value || document.getElementById('dispBio').innerText || '';
+      // avatar: if dispAvatar contains img, store its src
+      const dispAvatarImg = document.querySelector('#dispAvatar img');
+      state.profile.avatar = dispAvatarImg ? dispAvatarImg.src : null;
+      state.social = {
+        fb: document.getElementById('socFb').value || '',
+        ig: document.getElementById('socIg').value || '',
+        tt: document.getElementById('socTt').value || '',
+        shopee: document.getElementById('socShopee').value || '',
+        yt: document.getElementById('socYt').value || '',
+        tw: document.getElementById('socTw').value || ''
+      };
+
+      for (let i=1;i<=8;i++){
+        const nameEl = document.querySelector(`.cat-name[data-cat=\"${i}\"]`);
+        const products = [];
+        const rows = document.querySelectorAll(`#cat${i}Products .prod-row`);
+        rows.forEach((r, idx) => {
+          const name = r.querySelector('.prod-name') ? r.querySelector('.prod-name').value : '';
+          const url = r.querySelector('.prod-url') ? r.querySelector('.prod-url').value : '';
+          const thumb = (prodThumbs[i] && prodThumbs[i][r.dataset.index]) ? prodThumbs[i][r.dataset.index] : (r.querySelector(`#prodThumb-${i}-${r.dataset.index} img`) ? r.querySelector(`#prodThumb-${i}-${r.dataset.index} img`).src : null);
+          if (name || url || thumb) products.push({ name: name || '', url: url || '', thumb: thumb || null });
+        });
+        const block = nameEl ? nameEl.closest('.category-block') : null;
+        const catThumbPreview = document.getElementById(`catThumbPreview-${i}`);
+        const thumb = (block && block.dataset.categoryThumb)
+          || (catThumbPreview && catThumbPreview.querySelector('img') ? catThumbPreview.querySelector('img').src : null);
+        state.categories.push({ name: nameEl ? (nameEl.value || '') : '', thumb: thumb || null, products });
+      }
+
+      try { state.music = musicDataUrl || localStorage.getItem(BG_SRC_KEY) || null; } catch(e) { state.music = null; }
+
+      await idbSet(STATE_KEY, state);
+      return true;
+    } catch (e) { console.warn('saveState failed', e); return false; }
+  }
+
+  async function loadStateFromDB() {
+    try {
+      const state = await idbGet(STATE_KEY);
+      buildCategoriesUI(state);
+      if (!state) return;
+      if (state.profile) {
+        if (state.profile.name) { document.getElementById('dispName').innerText = state.profile.name; document.getElementById('adminName').value = state.profile.name; }
+        if (state.profile.bio) { document.getElementById('dispBio').innerText = state.profile.bio; document.getElementById('adminBio').value = state.profile.bio; }
+        if (state.profile.avatar) { const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp) disp.innerHTML = '<img src="'+state.profile.avatar+'" alt="avatar">'; }
+      }
+      if (state.social) {
+        document.getElementById('socFb').value = state.social.fb || '';
+        document.getElementById('socIg').value = state.social.ig || '';
+        document.getElementById('socTt').value = state.social.tt || '';
+        document.getElementById('socShopee').value = state.social.shopee || '';
+        document.getElementById('socYt').value = state.social.yt || '';
+        document.getElementById('socTw').value = state.social.tw || '';
+        document.getElementById('socLinkFb').href = state.social.fb || '#';
+        document.getElementById('socLinkIg').href = state.social.ig || '#';
+        document.getElementById('socLinkTt').href = state.social.tt || '#';
+        document.getElementById('socLinkShopee').href = state.social.shopee || '#';
+        document.getElementById('socLinkYt').href = state.social.yt || '#';
+        document.getElementById('socLinkTw').href = state.social.tw || '#';
+      }
+      if (Array.isArray(state.categories)) {
+        state.categories.forEach((cat, idx) => {
+          const i = idx + 1;
+          const nameEl = document.querySelector(`.cat-name[data-cat=\"${i}\"]`);
+          if (nameEl) nameEl.value = cat.name || '';
+          const nameTarget = document.getElementById('name' + i);
+          if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
+          // render products in admin area
+          const container = document.getElementById('cat' + i + 'Products');
+          if (container && Array.isArray(cat.products)) {
+            container.innerHTML = '';
+            cat.products.forEach((p, pid) => {
+              addProductField(i, p);
+            });
+            // store thumbs
+            prodThumbs[i] = prodThumbs[i] || {};
+            cat.products.forEach((p, pid) => { if (p.thumb) prodThumbs[i][pid] = p.thumb; });
+          }
+          // Category thumbnail wins; otherwise use first product thumbnail as the existing fallback.
+          const thumb = document.getElementById('thumb' + i);
+          if (thumb && cat.thumb) {
+            thumb.innerHTML = `<img src="${cat.thumb}" alt="Category thumbnail">`;
+          } else if (thumb && cat.products && cat.products[0] && cat.products[0].thumb) {
+            thumb.innerHTML = `<img src="${cat.products[0].thumb}" alt="Product thumbnail">`;
+          }
+          if (cat.thumb) {
+            const preview = document.getElementById(`catThumbPreview-${i}`);
+            if (preview) preview.innerHTML = `<img src="${cat.thumb}" alt="Category thumbnail">`;
+            const blockForThumb = nameEl ? nameEl.closest('.category-block') : null;
+            if (blockForThumb) blockForThumb.dataset.categoryThumb = cat.thumb;
+            const uploadBtn = document.getElementById(`catUploadBtn-${i}`);
+            if (uploadBtn) { uploadBtn.textContent = '✓ Thumbnail'; uploadBtn.classList.add('has-thumb'); }
+          }
+        });
+      }
+      if (state.music) {
+        try { musicDataUrl = state.music; localStorage.setItem(BG_SRC_KEY, musicDataUrl); } catch(e){}
+      }
+    } catch (e) { console.warn('loadState failed', e); }
+  }
+
+  // Export / Import
+  async function exportState() {
+    try {
+      const state = await idbGet(STATE_KEY) || {};
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'aiallan-state.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    } catch (e) { console.warn('export failed', e); }
+  }
+
+  function triggerImport() { document.getElementById('importFile').click(); }
+  async function importStateFromFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const importedText = await file.text();
+    try {
+      const state = JSON.parse(importedText);
+      await idbSet(STATE_KEY, state);
+      await loadStateFromDB();
+      alert('✅ Imported state and saved.');
+    } catch (er) {
+      console.warn('import failed', er);
+      alert('Import failed: invalid JSON.');
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  // Clear all data (IDB)
+  async function clearAllData() {
+    if (!confirm('Clear all saved data? This cannot be undone.')) return;
+    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ location.reload(); }; } catch(e) { console.warn('clear failed', e); }
+  }
+
+  // Category modal handling: clicking a product tile shows ALL links for that category as neat cards
+  function getPlatformInfo(url) {
+    const value = (url || '').toString();
+    if (/shopee\./i.test(value)) return { cls:'btn-shopee', text:'Open on Shopee' };
+    if (/amazon\.|amzn\./i.test(value)) return { cls:'btn-amazon', text:'Open on Amazon' };
+    if (/shein\./i.test(value)) return { cls:'btn-shein', text:'Open on Shein' };
+    if (/lazada\./i.test(value)) return { cls:'btn-lazada', text:'Open on Lazada' };
+    if (/ebay\./i.test(value)) return { cls:'btn-ebay', text:'Open on eBay' };
+    if (/tiktok(?:shop)?\.|tiktokshop/i.test(value)) return { cls:'btn-ttshop', text:'Open on TikTok Shop' };
+    return { cls:'btn-default', text:'View Product' };
+  }
+
+  function openCategoryModal(title, products) {
+    const mdl = document.getElementById('categoryModal');
+    const list = document.getElementById('categoryLinksList');
+    const titleEl = document.getElementById('categoryTitle');
+    titleEl.textContent = title || 'Category Links';
+    list.innerHTML = '';
+
+    if (!products || products.length === 0) {
+      const p = document.createElement('div');
+      p.style.color = 'var(--text2)';
+      p.textContent = 'No products available for this category.';
+      list.appendChild(p);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'product-list';
+
+      products.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'product-card-modal';
+
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'img';
+        if (p.thumb) {
+          const img = document.createElement('img');
+          img.src = p.thumb;
+          img.alt = p.name ? p.name + ' thumbnail' : 'Product thumbnail';
+          imgWrap.appendChild(img);
+        } else {
+          const initial = (p.name && p.name.trim()) ? p.name.trim().charAt(0).toUpperCase() : '';
+          imgWrap.textContent = initial || '📦';
+        }
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+
+        const titleNode = document.createElement('div');
+        titleNode.className = 'title';
+        titleNode.textContent = p.name || ('Product ' + (idx + 1));
+
+        const urlNode = document.createElement('div');
+        urlNode.className = 'url-label';
+        const platform = getPlatformInfo(p.url);
+        urlNode.textContent = p.url ? platform.text.replace('Open on ', '') : 'No link added';
+
+        meta.appendChild(titleNode);
+        if (p.price) {
+          const priceNode = document.createElement('div');
+          priceNode.className = 'price-badge';
+          priceNode.textContent = p.price;
+          meta.appendChild(priceNode);
+        }
+        meta.appendChild(urlNode);
+
+        const ctaWrap = document.createElement('div');
+        ctaWrap.className = 'cta';
+        const btn = document.createElement('button');
+        btn.className = platform.cls;
+        btn.textContent = platform.text;
+        btn.type = 'button';
+        btn.onclick = (ev) => {
+          ev.stopPropagation();
+          if (p.url) window.open(p.url, '_blank', 'noopener,noreferrer');
+        };
+        ctaWrap.appendChild(btn);
+
+        card.appendChild(imgWrap);
+        card.appendChild(meta);
+        card.appendChild(ctaWrap);
+
+        card.onclick = () => { if (p.url) window.open(p.url, '_blank', 'noopener,noreferrer'); };
+        grid.appendChild(card);
+      });
+
+      list.appendChild(grid);
+    }
+
+    mdl.classList.add('on');
+    mdl.setAttribute('aria-hidden','false');
+  }
+
+  function closeCategoryModal(){ const m = document.getElementById('categoryModal'); m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }
+
+  // Initialize click handlers for product tiles to open category modal
+  document.addEventListener('click', (e)=>{
+    const card = e.target.closest('.product-card');
+    if (!card) return;
+    const catIndex = parseInt(card.getAttribute('data-cat'), 10);
+    if (!catIndex) return;
+    // gather products from admin fields
+    const rows = document.querySelectorAll(`#cat${catIndex}Products .prod-row`);
+    const products = [];
+    rows.forEach(r => {
+      const name = r.querySelector('.prod-name') ? r.querySelector('.prod-name').value : '';
+      const url = r.querySelector('.prod-url') ? r.querySelector('.prod-url').value : '';
+      const price = r.querySelector('.prod-price') ? r.querySelector('.prod-price').value : '';
+      const thumb = (prodThumbs[catIndex] && prodThumbs[catIndex][r.dataset.index]) ? prodThumbs[catIndex][r.dataset.index] : (r.querySelector(`#prodThumb-${catIndex}-${r.dataset.index} img`) ? r.querySelector(`#prodThumb-${catIndex}-${r.dataset.index} img`).src : null);
+      if (name || url || price || thumb) products.push({ name: name || '', url: url || '', price: price || '', thumb: thumb || null });
+    });
+    const title = document.getElementById('name' + catIndex).innerText || ('Category ' + catIndex);
+    openCategoryModal(title, products);
+  });
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', async () => {
+    // build UI will be called inside loadStateFromDB
+    await loadStateFromDB();
+    switchTab('profile');
+
+    // restore background music source from localStorage if available
+    try {
+      const audio = document.getElementById('bgMusic');
+      const savedSrc = localStorage.getItem(BG_SRC_KEY);
+      const savedStateRaw = localStorage.getItem(BG_STORAGE_KEY);
+      let savedState = null;
+      if (savedStateRaw) {
+        try { savedState = JSON.parse(savedStateRaw); } catch(e) { savedState = null; }
+      }
+      if (savedSrc) {
+        musicDataUrl = savedSrc;
+        audio.src = musicDataUrl;
+      }
+
+      if (savedState && typeof savedState.time === 'number'){
+        const setTime = ()=>{
+          try{
+            if (audio.duration && !isNaN(audio.duration)){
+              audio.currentTime = Math.min(savedState.time, Math.max(0, audio.duration - 0.1));
+            }
+          }catch(e){}
+        };
+        if (audio.readyState > 0) setTime(); else audio.addEventListener('loadedmetadata', setTime, {once:true});
+      }
+
+      const shouldPlay = savedState ? !!savedState.playing : true;
+      if (shouldPlay) {
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Autoplay prevented', err); updateMusicUI(); });
+        } else { isPlaying = true; updateMusicUI(); }
+      }
+
+      if (audio.src) { document.getElementById('musicPlayer').classList.remove('hidden'); }
+
+      const saveNow = ()=>{
+        try{
+          const nowState = { time: audio.currentTime || 0, playing: !audio.paused };
+          localStorage.setItem(BG_STORAGE_KEY, JSON.stringify(nowState));
+        }catch(e){}
+      };
+      audio.addEventListener('timeupdate', function(){ try{ localStorage.setItem(BG_STORAGE_KEY, JSON.stringify({ time: audio.currentTime || 0, playing: !audio.paused })); }catch(e){} });
+      audio.addEventListener('play', ()=>{ isPlaying=true; updateMusicUI(); saveNow(); });
+      audio.addEventListener('pause', ()=>{ isPlaying=false; updateMusicUI(); saveNow(); });
+      window.addEventListener('beforeunload', saveNow);
+
+    } catch (e) { console.warn('bgMusic init failed', e); }
+
+    // close modals by clicking outside
+    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','true'); } }); });
+
+  });
+
+  // Best-effort persistence so a refresh is less likely to lose recent edits.
+  window.addEventListener('beforeunload', () => {
+    try { saveStateToDB(); } catch (e) { console.warn('autosave failed', e); }
+  });
+
+  // Close admin/login modals with esc
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' || e.key === 'Esc') { document.querySelectorAll('.modal.on').forEach(m=>{ m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }); } });
+
+</script>
+
+<script>
+/* =====================================================================
+   AIALAN v3 — Supabase online sync + secure admin auth + realtime
+   Uses the user's publishable key only. Never put a service_role/secret key here.
+   ===================================================================== */
+const SUPABASE_URL = 'https://tqtmssdjfptmbvjtxien.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IeTtQyGxZ0THrBuqPmK9cQ_10JeusoA';
+const SUPABASE_TABLE = 'site_state';
+const SUPABASE_ROW = 'main';
+const SUPABASE_BUCKET = 'site-assets';
+/* Optional Supabase Edge Function for official/API-backed product metadata.
+   Deploy a function named "resolve-product" before enabling automatic price/thumbnail lookup. */
+const PRODUCT_RESOLVER_URL = SUPABASE_URL + '/functions/v1/resolve-product';
+const supabaseClient = window.supabase && window.supabase.createClient
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { autoRefreshToken:true, persistSession:true, detectSessionInUrl:true }
+    }) : null;
+let onlineState = null;
+let onlineUpdatedAt = null;
+let realtimeChannel = null;
+let adminUser = null;
+let suppressRealtimeReload = false;
+
+function setOnlineStatus(kind, label){
+  const el=document.getElementById('onlineStatus'); if(!el) return;
+  el.className='online-status '+(kind||'');
+  el.innerHTML='<span></span> '+(label||'Offline');
+}
+function setSyncStatus(label, kind){
+  const el=document.getElementById('syncStatus'); if(!el) return;
+  el.className='sync-status '+(kind||''); el.textContent='● '+label;
+}
+function setLoginStatus(msg){ const el=document.getElementById('loginStatus'); if(el) el.textContent=msg||''; }
+function showAdminError(msg){ console.error('[Supabase]',msg); setSyncStatus(msg,'err'); }
+
+async function getCurrentAdmin(){
+  if(!supabaseClient) return null;
+  const { data:{ user } } = await supabaseClient.auth.getUser();
+  if(!user) return null;
+  const { data, error } = await supabaseClient.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+  if(error){ console.warn('admin_users check:',error.message); return null; }
+  return data ? user : null;
+}
+
+async function loadOnlineState(){
+  if(!supabaseClient) return null;
+  const { data, error } = await supabaseClient.from(SUPABASE_TABLE).select('state,updated_at').eq('id',SUPABASE_ROW).maybeSingle();
+  if(error){ console.warn('Online state load failed:',error.message); setOnlineStatus('','Offline'); return null; }
+  if(data && data.state){ onlineState=data.state; onlineUpdatedAt=data.updated_at||null; setOnlineStatus('online','Online Sync'); return data.state; }
+  setOnlineStatus('online','Online • Empty');
+  return null;
+}
+
+async function ensureRealtime(){
+  if(!supabaseClient || realtimeChannel) return;
+  realtimeChannel = supabaseClient.channel('aiallan-site-state')
+    .on('postgres_changes',{event:'*',schema:'public',table:SUPABASE_TABLE,filter:'id=eq.main'}, async payload=>{
+      if(suppressRealtimeReload) return;
+      if(payload.new && payload.new.state){
+        onlineState=payload.new.state;
+        await applyStateToUI(onlineState);
+        setOnlineStatus('online','Updated Live');
+      }
+    })
+    .subscribe(status=>{
+      if(status==='SUBSCRIBED') setOnlineStatus('online','Live Sync');
+      else if(status==='CHANNEL_ERROR') setOnlineStatus('online','Online • Polling');
+    });
+}
+
+async function applyStateToUI(state){
+  if(!state) return;
+  buildCategoriesUI(state);
+  if(state.profile){
+    if(state.profile.name){document.getElementById('dispName').innerText=state.profile.name;document.getElementById('adminName').value=state.profile.name;}
+    if(state.profile.bio){document.getElementById('dispBio').innerText=state.profile.bio;document.getElementById('adminBio').value=state.profile.bio;}
+    if(state.profile.avatar){const p=document.getElementById('avatarPreview');if(p)p.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">';const d=document.getElementById('dispAvatar');if(d)d.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">';}
+  }
+  if(state.social){
+    ['fb','ig','tt','shopee','yt','tw'].forEach(k=>{const input=document.getElementById('soc'+k.charAt(0).toUpperCase()+k.slice(1));if(input)input.value=state.social[k]||'';const link=document.getElementById('socLink'+(k==='shopee'?'Shopee':k==='yt'?'Yt':k==='tw'?'Tw':k.charAt(0).toUpperCase()+k.slice(1)));if(link)link.href=state.social[k]||'#';});
+  }
+  if(state.music){
+    musicDataUrl=state.music;
+    const audio=document.getElementById('bgMusic');
+    if(audio && audio.src!==state.music){audio.src=state.music;audio.load();}
+    const player=document.getElementById('musicPlayer');if(player)player.classList.remove('hidden');
+    const title=document.getElementById('musicTitle');if(title)title.textContent=state.musicName||'Background Music';
+  }
+}
+
+function fileExt(file, fallback){
+  const ext=(file && file.name && file.name.split('.').pop().toLowerCase())||fallback||'bin';
+  return ext.replace(/[^a-z0-9]/g,'')||fallback||'bin';
+}
+async function uploadAsset(file, folder){
+  if(!supabaseClient || !file) return null;
+  const user=await getCurrentAdmin();
+  if(!user) throw new Error('Admin authentication required for uploads.');
+  const path=folder+'/'+user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+fileExt(file,'bin');
+  const {error}=await supabaseClient.storage.from(SUPABASE_BUCKET).upload(path,file,{contentType:file.type||undefined,cacheControl:'31536000',upsert:false});
+  if(error) throw error;
+  const {data}=supabaseClient.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function captureStateFromUI(){
+  const state={version:3,profile:{},social:{},categories:[],music:null,musicName:null};
+  state.profile.name=document.getElementById('adminName').value||document.getElementById('dispName').innerText||'';
+  state.profile.bio=document.getElementById('adminBio').value||document.getElementById('dispBio').innerText||'';
+  const av=document.querySelector('#dispAvatar img'); state.profile.avatar=av?av.src:null;
+  state.social={fb:document.getElementById('socFb').value||'',ig:document.getElementById('socIg').value||'',tt:document.getElementById('socTt').value||'',shopee:document.getElementById('socShopee').value||'',yt:document.getElementById('socYt').value||'',tw:document.getElementById('socTw').value||''};
+  for(let i=1;i<=8;i++){
+    const nameEl=document.querySelector(`.cat-name[data-cat="${i}"]`), block=nameEl?.closest('.category-block');
+    const catThumb=block?.dataset.categoryThumb || document.querySelector(`#catThumbPreview-${i} img`)?.src || null;
+    const products=[];
+    document.querySelectorAll(`#cat${i}Products .prod-row`).forEach(r=>{
+      const name=r.querySelector('.prod-name')?.value||''; const url=r.querySelector('.prod-url')?.value||'';
+      const price=r.querySelector('.prod-price')?.value||'';
+      const thumb=(prodThumbs[i]&&prodThumbs[i][r.dataset.index]) || r.querySelector('.prod-thumb img')?.src || null;
+      if(name||url||price||thumb) products.push({name,url,price,thumb});
+    });
+    state.categories.push({name:nameEl?.value||'',thumb:catThumb,products});
+  }
+  state.music=musicDataUrl||onlineState?.music||null;
+  state.musicName=document.getElementById('musicTitle')?.textContent||onlineState?.musicName||null;
+  return state;
+}
+
+async function saveOnlineState(state){
+  if(!supabaseClient) throw new Error('Supabase client unavailable.');
+  const user=await getCurrentAdmin();
+  if(!user) throw new Error('Admin access required.');
+  setOnlineStatus('syncing','Saving…'); setSyncStatus('Saving online…');
+  const row={id:SUPABASE_ROW,state,updated_at:new Date().toISOString(),updated_by:user.id};
+  suppressRealtimeReload=true;
+  const {error}=await supabaseClient.from(SUPABASE_TABLE).upsert(row,{onConflict:'id'});
+  setTimeout(()=>{suppressRealtimeReload=false;},1200);
+  if(error) throw error;
+  onlineState=state; onlineUpdatedAt=row.updated_at; setOnlineStatus('online','Live Sync'); setSyncStatus('Saved to Supabase','ok');
+  return true;
+}
+
+// Override local-only save with shared online save.
+window.saveStateToDB=async function(){
+  try{
+    const state=await captureStateFromUI();
+    await saveOnlineState(state);
+    try{await idbSet(STATE_KEY,state);}catch(e){}
+    return true;
+  }catch(e){ showAdminError(e.message||'Online save failed'); return false; }
+};
+
+window.loadStateFromDB=async function(){
+  try{
+    const state=await loadOnlineState();
+    if(state){ await applyStateToUI(state); return state; }
+    // Keep existing local state as a fallback until Supabase is configured.
+    const local=await idbGet(STATE_KEY).catch(()=>null);
+    if(local) { await applyStateToUI(local); setSyncStatus('Local fallback',''); }
+    await ensureRealtime();
+    return local||null;
+  }catch(e){
+    console.warn(e); const local=await idbGet(STATE_KEY).catch(()=>null); if(local) await applyStateToUI(local); return local||null;
+  }
+};
+
+window.openLogin=function(){
+  const m=document.getElementById('loginModal');m.classList.add('on');m.setAttribute('aria-hidden','false');setLoginStatus('');
+  const email=document.getElementById('adminEmailInput');if(email && !email.value) email.focus();
+};
+window.closeLogin=function(){const m=document.getElementById('loginModal');m.classList.remove('on');m.setAttribute('aria-hidden','true');document.getElementById('passInput').value='';setLoginStatus('');};
+window.checkPass=async function(){
+  if(!supabaseClient){setLoginStatus('Supabase client failed to load.');return;}
+  const email=document.getElementById('adminEmailInput').value.trim();const password=document.getElementById('passInput').value;
+  if(!email||!password){setLoginStatus('Enter your admin email and password.');return;}
+  setLoginStatus('Signing in…');
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){setLoginStatus(error.message||'Sign-in failed.');return;}
+  const user=data.user;
+  const {data:adminRow,error:adminErr}=await supabaseClient.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+  if(adminErr||!adminRow){await supabaseClient.auth.signOut();setLoginStatus('This account is not authorized as the site admin.');return;}
+  adminUser=user;closeLogin();openAdminModal();switchTab('profile');setOnlineStatus('online','Admin Connected');await loadOnlineState();await ensureRealtime();
+};
+window.signOutAdmin=async function(){ if(supabaseClient) await supabaseClient.auth.signOut(); adminUser=null; closeAdminModal(); setOnlineStatus('','Offline'); };
+
+window.saveProfile=async function(){
+  const n=document.getElementById('adminName').value||document.getElementById('dispName').innerText;const b=document.getElementById('adminBio').value||document.getElementById('dispBio').innerText;
+  if(n)document.getElementById('dispName').innerText=n;if(b)document.getElementById('dispBio').innerText=b;
+  const ok=await saveStateToDB(); if(ok) alert('✅ Profile saved online.');
+};
+window.saveSocial=async function(){
+  ['Fb','Ig','Tt','Shopee','Yt','Tw'].forEach(k=>{const input=document.getElementById('soc'+k);const link=document.getElementById('socLink'+k);if(input&&link)link.href=input.value||'#';});
+  const ok=await saveStateToDB(); if(ok) alert('✅ Social links saved online.');
+};
+window.saveAllProducts=async function(){
+  for(let i=1;i<=8;i++){const nameEl=document.querySelector(`.cat-name[data-cat="${i}"]`);const target=document.getElementById('name'+i);if(nameEl&&target)target.innerText=nameEl.value||target.innerText;}
+  const ok=await saveStateToDB(); if(ok) alert('✅ Categories, links and thumbnails saved online.');
+};
+
+// Upload category thumbnail directly to Supabase Storage.
+window.previewCategoryThumb=async function(catNum,input){
+  const file=input.files?.[0];if(!file)return;
+  if(!file.type.startsWith('image/')){alert('Please select an image.');input.value='';return;}
+  try{
+    setSyncStatus('Uploading category image…');
+    const url=await uploadAsset(file,'categories');
+    const preview=document.getElementById(`catThumbPreview-${catNum}`);if(preview)preview.innerHTML=`<img src="${url}" alt="Category thumbnail">`;
+    const home=document.getElementById(`thumb${catNum}`);if(home)home.innerHTML=`<img src="${url}" alt="Category thumbnail">`;
+    const block=preview?.closest('.category-block');if(block)block.dataset.categoryThumb=url;
+    const btn=document.getElementById(`catUploadBtn-${catNum}`);if(btn){btn.textContent='✓ Uploaded';btn.classList.add('has-thumb');}
+    setSyncStatus('Category image uploaded','ok');
+  }catch(e){showAdminError(e.message||'Category upload failed');}
+};
+
+window.previewProductThumb=async function(catNum,prodIndex,input){
+  const file=input.files?.[0];if(!file)return;
+  if(!file.type.startsWith('image/')){alert('Please select an image.');input.value='';return;}
+  try{
+    setSyncStatus('Uploading product image…');
+    const url=await uploadAsset(file,'products');
+    prodThumbs[catNum]=prodThumbs[catNum]||{};prodThumbs[catNum][prodIndex]=url;
+    const preview=document.getElementById(`prodThumb-${catNum}-${prodIndex}`);if(preview)preview.innerHTML=`<img src="${url}" alt="Product thumbnail">`;
+    const btn=document.getElementById(`prodUploadBtn-${catNum}-${prodIndex}`);if(btn){btn.textContent='✓ Uploaded';btn.classList.add('has-thumb');}
+    setSyncStatus('Product image uploaded','ok');
+  }catch(e){showAdminError(e.message||'Product upload failed');}
+};
+
+window.previewAvatar=async function(input){
+  const file=input.files?.[0];if(!file)return;
+  if(!file.type.startsWith('image/')){alert('Please select an image.');return;}
+  try{
+    setSyncStatus('Uploading profile image…');
+    const url=await uploadAsset(file,'profile');
+    const preview=document.getElementById('avatarPreview');if(preview)preview.innerHTML=`<img src="${url}" alt="avatar">`;
+    const disp=document.getElementById('dispAvatar');if(disp)disp.innerHTML=`<img src="${url}" alt="avatar">`;
+    setSyncStatus('Profile image uploaded','ok');
+  }catch(e){showAdminError(e.message||'Avatar upload failed');}
+};
+
+window.previewMusic=async function(input){
+  const file=input.files?.[0];if(!file)return;
+  if(!file.type.startsWith('audio/')){alert('Please select an audio file.');return;}
+  try{
+    setSyncStatus('Uploading music…');
+    const url=await uploadAsset(file,'music');
+    musicDataUrl=url;
+    const audio=document.getElementById('bgMusic');audio.src=url;audio.load();
+    document.getElementById('musicPlayer')?.classList.remove('hidden');
+    document.getElementById('musicTitle').textContent=file.name;
+    setSyncStatus('Music uploaded — press Save All Categories or Profile','ok');
+    await saveStateToDB();
+  }catch(e){showAdminError(e.message||'Music upload failed');}
+};
+
+window.clearAllData=async function(){
+  if(!confirm('Clear the online site data? This cannot be undone.'))return;
+  if(!supabaseClient){return;}
+  const user=await getCurrentAdmin();if(!user){alert('Admin login required.');return;}
+  const {error}=await supabaseClient.from(SUPABASE_TABLE).delete().eq('id',SUPABASE_ROW);
+  if(error){showAdminError(error.message);return;}
+  alert('Online state cleared.');location.reload();
+};
+
+// Poll as a fallback for deployments where Realtime is not enabled yet.
+setInterval(async()=>{
+  if(document.visibilityState==='hidden') return;
+  try{
+    const {data,error}=await supabaseClient.from(SUPABASE_TABLE).select('state,updated_at').eq('id',SUPABASE_ROW).maybeSingle();
+    if(!error && data?.state && data.updated_at!==onlineUpdatedAt){
+      onlineState=data.state; onlineUpdatedAt=data.updated_at; await applyStateToUI(data.state);
+    }
+  }catch(e){}
+},10000);
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  if(!supabaseClient){setOnlineStatus('','Offline');return;}
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  if(session){
+    const u=await getCurrentAdmin();if(u){adminUser=u;await ensureRealtime();}
+  }
+  await loadStateFromDB();
+});
+</script>
+</body>
+</html>

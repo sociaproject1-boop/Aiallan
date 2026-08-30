@@ -4,435 +4,608 @@
    ========================================================= */
 
 (() => {
-  'use strict';
+  "use strict";
 
-  const COVER_KEY = 'aiallan_profile_cover_v1';
+  const DB_NAME = "aiallan-cover-db";
+  const DB_VERSION = 1;
+  const STORE = "settings";
+  const KEY = "profileCover";
 
-  // ---------- Storage ----------
-  function getCover() {
+  const css = `
+    .aiallan-cover-admin {
+      margin: 0 0 18px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .aiallan-cover-admin h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .aiallan-cover-preview {
+      width: 100%;
+      aspect-ratio: 820 / 312;
+      min-height: 120px;
+      max-height: 260px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(135deg,#15101e,#09070d);
+      border: 1px solid rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .aiallan-cover-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .aiallan-cover-empty {
+      opacity: .6;
+      font-size: 14px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .aiallan-cover-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .aiallan-cover-actions label,
+    .aiallan-cover-actions button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .aiallan-cover-actions label {
+      background: linear-gradient(90deg,#ff2f87,#9c4dff);
+      color: #fff;
+    }
+
+    .aiallan-cover-actions button {
+      background: #24202d;
+      color: #fff;
+    }
+
+    .aiallan-cover-file {
+      display: none;
+    }
+
+    .aiallan-cover-status {
+      margin-top: 8px;
+      font-size: 12px;
+      opacity: .7;
+    }
+
+    .aiallan-public-cover {
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 100%;
+      min-height: 180px;
+      background-size: cover;
+      background-position: center;
+      pointer-events: none;
+    }
+
+    .aiallan-public-cover:after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(5,3,10,.08),
+        rgba(5,3,10,.78)
+      );
+    }
+
+    .aiallan-cover-host {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .aiallan-cover-host > *:not(.aiallan-public-cover) {
+      position: relative;
+      z-index: 1;
+    }
+  `;
+
+  function addCSS() {
+    if (document.getElementById("aiallan-cover-css")) return;
+
+    const style = document.createElement("style");
+    style.id = "aiallan-cover-css";
+    style.textContent = css;
+
+    document.head.appendChild(style);
+  }
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(STORE)) {
+          request.result.createObjectStore(STORE);
+        }
+      };
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function saveCover(data) {
     try {
-      return localStorage.getItem(COVER_KEY) || '';
-    } catch (e) {
-      console.warn('[Cover] Cannot read cover:', e);
-      return '';
+      const db = await openDB();
+
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE, "readwrite");
+        transaction.objectStore(STORE).put(data, KEY);
+
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error);
+      });
+
+      db.close();
+    } catch (error) {
+      console.warn("[Cover] IndexedDB save failed:", error);
+
+      try {
+        if (data === null) {
+          localStorage.removeItem("AIALAN_PROFILE_COVER");
+        } else {
+          localStorage.setItem("AIALAN_PROFILE_COVER", data);
+        }
+      } catch (_) {}
     }
   }
 
-  function saveCover(data) {
+  async function loadCover() {
     try {
-      localStorage.setItem(COVER_KEY, data);
-      return true;
-    } catch (e) {
-      console.warn('[Cover] Cannot save cover:', e);
-      return false;
+      const db = await openDB();
+
+      const value = await new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE, "readonly");
+        const request = transaction.objectStore(STORE).get(KEY);
+
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+
+      db.close();
+
+      if (value) return value;
+    } catch (error) {
+      console.warn("[Cover] IndexedDB load failed:", error);
+    }
+
+    try {
+      return localStorage.getItem("AIALAN_PROFILE_COVER") || null;
+    } catch (_) {
+      return null;
     }
   }
 
-  // ---------- Create public cover ----------
-  function createPublicCover() {
-    if (document.getElementById('aiallanProfileCover')) return;
-
-    const profile = document.querySelector('.profile');
-    if (!profile) return;
-
-    const cover = document.createElement('div');
-    cover.id = 'aiallanProfileCover';
-
-    cover.innerHTML = `
-      <div class="aiallan-cover-image"></div>
-    `;
-
-    // Put cover behind the profile content
-    profile.parentNode.insertBefore(cover, profile);
-
-    const image = cover.querySelector('.aiallan-cover-image');
-    const saved = getCover();
-
-    if (saved) {
-      image.style.backgroundImage = `url("${saved}")`;
-      cover.classList.add('has-cover');
-    }
-  }
-
-  // ---------- Create admin controls ----------
-  function createAdminCoverControl() {
-    if (document.getElementById('aiallanCoverAdmin')) return;
-
-    // Find the existing admin Profile tab content
-    const adminName = document.getElementById('adminName');
-    if (!adminName) return;
-
-    const nameInput = adminName;
-
-    // Existing avatar file input is normally before adminName
-    const avatarInput =
-      document.querySelector('input[type="file"]');
-
-    const box = document.createElement('div');
-    box.id = 'aiallanCoverAdmin';
-
-    box.innerHTML = `
-      <div class="cover-admin-title">
-        🖼️ Cover Photo
-      </div>
-
-      <div class="cover-admin-preview" id="aiallanCoverPreview">
-        <span>No cover photo selected</span>
-      </div>
-
-      <label class="cover-file-picker">
-        Choose Cover Photo
-        <input
-          type="file"
-          id="aiallanCoverInput"
-          accept="image/jpeg,image/png,image/webp"
-          hidden
-        >
-      </label>
-
-      <button
-        type="button"
-        id="aiallanRemoveCover"
-        class="btn btn-gray cover-remove-btn"
-      >
-        Remove Cover
-      </button>
-    `;
-
-    /*
-      Put the new section directly before the Name field.
-      This keeps the existing Profile UI untouched.
-    */
-    nameInput.parentNode.insertBefore(box, nameInput);
-
-    const input = document.getElementById('aiallanCoverInput');
-    const preview = document.getElementById('aiallanCoverPreview');
-    const removeBtn = document.getElementById('aiallanRemoveCover');
-
-    const saved = getCover();
-
-    if (saved) {
-      showAdminPreview(saved);
-    }
-
-    input.addEventListener('change', async () => {
-      const file = input.files && input.files[0];
-
-      if (!file) return;
-
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file.');
-        input.value = '';
+  function imageToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      if (!file || !file.type.startsWith("image/")) {
+        reject(new Error("Please choose an image."));
         return;
       }
 
-      try {
-        const data = await resizeCover(file);
-
-        if (!saveCover(data)) {
-          alert('Cover photo could not be saved.');
-          return;
-        }
-
-        showAdminPreview(data);
-        updatePublicCover(data);
-
-        alert('✅ Cover Photo Saved!');
-      } catch (e) {
-        console.error('[Cover] Upload failed:', e);
-        alert('⚠️ Cover photo upload failed.');
-      }
-    });
-
-    removeBtn.addEventListener('click', () => {
-      try {
-        localStorage.removeItem(COVER_KEY);
-      } catch (e) {}
-
-      preview.innerHTML = '<span>No cover photo selected</span>';
-
-      const cover = document.getElementById('aiallanProfileCover');
-      if (cover) {
-        cover.classList.remove('has-cover');
-
-        const image = cover.querySelector('.aiallan-cover-image');
-        if (image) image.style.backgroundImage = '';
-      }
-
-      input.value = '';
-
-      alert('Cover Photo removed.');
-    });
-  }
-
-  // ---------- Image resize ----------
-  function resizeCover(file) {
-    return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
+      reader.onerror = () => {
+        reject(new Error("Could not read image."));
+      };
+
       reader.onload = () => {
-        const img = new Image();
+        const image = new Image();
 
-        img.onload = () => {
-          const MAX_WIDTH = 1640;
-          const MAX_HEIGHT = 720;
-
-          let width = img.width;
-          let height = img.height;
+        image.onload = () => {
+          const maxWidth = 1600;
+          const maxHeight = 650;
 
           const scale = Math.min(
             1,
-            MAX_WIDTH / width,
-            MAX_HEIGHT / height
+            maxWidth / image.naturalWidth,
+            maxHeight / image.naturalHeight
           );
 
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
+          const width = Math.max(
+            1,
+            Math.round(image.naturalWidth * scale)
+          );
 
-          const canvas = document.createElement('canvas');
+          const height = Math.max(
+            1,
+            Math.round(image.naturalHeight * scale)
+          );
+
+          const canvas = document.createElement("canvas");
+
           canvas.width = width;
           canvas.height = height;
 
-          const ctx = canvas.getContext('2d');
+          const context = canvas.getContext("2d");
 
-          ctx.drawImage(
-            img,
+          context.drawImage(
+            image,
             0,
             0,
             width,
             height
           );
 
-          // JPEG keeps storage size much smaller
           const result = canvas.toDataURL(
-            'image/jpeg',
-            0.82
+            "image/jpeg",
+            0.86
           );
 
           resolve(result);
         };
 
-        img.onerror = reject;
-        img.src = reader.result;
+        image.onerror = () => {
+          reject(new Error("Invalid image."));
+        };
+
+        image.src = reader.result;
       };
 
-      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
   }
 
-  // ---------- Admin preview ----------
-  function showAdminPreview(data) {
-    const preview =
-      document.getElementById('aiallanCoverPreview');
+  function findExistingImageInput() {
+    return document.querySelector(
+      '#avatarFile,' +
+      'input[type="file"][accept*="image"],' +
+      'input[type="file"]'
+    );
+  }
 
-    if (!preview) return;
+  function createAdminUI() {
+    if (document.getElementById("aiallanCoverAdmin")) {
+      return;
+    }
 
-    preview.innerHTML = `
-      <img src="${data}" alt="Cover Preview">
+    const avatarInput = findExistingImageInput();
+
+    if (!avatarInput) {
+      return;
+    }
+
+    const box = document.createElement("div");
+
+    box.id = "aiallanCoverAdmin";
+    box.className = "aiallan-cover-admin";
+
+    box.innerHTML = `
+      <h3>🖼️ Profile Cover Photo</h3>
+
+      <div
+        class="aiallan-cover-preview"
+        id="aiallanCoverPreview"
+      >
+        <div class="aiallan-cover-empty">
+          No cover photo selected
+        </div>
+      </div>
+
+      <div class="aiallan-cover-actions">
+
+        <label for="aiallanCoverFile">
+          Choose Cover Photo
+        </label>
+
+        <input
+          id="aiallanCoverFile"
+          class="aiallan-cover-file"
+          type="file"
+          accept="image/*"
+        >
+
+        <button
+          type="button"
+          id="aiallanCoverRemove"
+        >
+          Remove Cover
+        </button>
+
+      </div>
+
+      <div
+        class="aiallan-cover-status"
+        id="aiallanCoverStatus"
+      >
+        Cover photo is saved separately from your existing profile data.
+      </div>
     `;
-  }
 
-  // ---------- Public cover ----------
-  function updatePublicCover(data) {
-    const cover =
-      document.getElementById('aiallanProfileCover');
+    const parent =
+      avatarInput.parentElement &&
+      avatarInput.parentElement.parentElement
+        ? avatarInput.parentElement.parentElement
+        : avatarInput.parentElement;
 
-    if (!cover) return;
+    if (!parent) return;
 
-    const image =
-      cover.querySelector('.aiallan-cover-image');
+    parent.insertAdjacentElement(
+      "afterend",
+      box
+    );
 
-    if (!image) return;
+    const input =
+      box.querySelector("#aiallanCoverFile");
 
-    image.style.backgroundImage = `url("${data}")`;
-    cover.classList.add('has-cover');
-  }
+    const preview =
+      box.querySelector("#aiallanCoverPreview");
 
-  // ---------- CSS ----------
-  function addStyles() {
-    if (document.getElementById('aiallanCoverStyles')) return;
+    const status =
+      box.querySelector("#aiallanCoverStatus");
 
-    const style = document.createElement('style');
-    style.id = 'aiallanCoverStyles';
+    const removeButton =
+      box.querySelector("#aiallanCoverRemove");
 
-    style.textContent = `
-      /* =========================
-         PUBLIC COVER
-         ========================= */
+    input.addEventListener(
+      "change",
+      async () => {
+        const file =
+          input.files &&
+          input.files[0];
 
-      #aiallanProfileCover {
-        width: 100%;
-        height: 0;
-        overflow: hidden;
-        position: relative;
-        margin: 0 auto;
-        transition: height .3s ease;
-      }
+        if (!file) return;
 
-      #aiallanProfileCover.has-cover {
-        height: 260px;
-      }
+        try {
+          status.textContent =
+            "Processing cover photo...";
 
-      #aiallanProfileCover .aiallan-cover-image {
-        position: absolute;
-        inset: 0;
+          const data =
+            await imageToDataURL(file);
 
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
+          await saveCover(data);
 
-        background-color: #17131d;
-      }
-
-      #aiallanProfileCover .aiallan-cover-image::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-
-        background:
-          linear-gradient(
-            to bottom,
-            rgba(0,0,0,.08),
-            rgba(0,0,0,.45)
+          renderPreview(
+            preview,
+            data
           );
+
+          applyPublicCover(data);
+
+          status.textContent =
+            "✓ Cover photo saved.";
+        } catch (error) {
+          console.error(
+            "[Cover] Upload failed:",
+            error
+          );
+
+          status.textContent =
+            "⚠️ " +
+            (
+              error.message ||
+              "Upload failed."
+            );
+        } finally {
+          input.value = "";
+        }
       }
+    );
 
+    removeButton.addEventListener(
+      "click",
+      async () => {
+        await saveCover(null);
 
-      /* =========================
-         ADMIN COVER
-         ========================= */
-
-      #aiallanCoverAdmin {
-        width: 100%;
-        margin: 0 0 16px;
-        padding: 14px;
-
-        box-sizing: border-box;
-
-        border: 1px solid rgba(255,255,255,.10);
-        border-radius: 16px;
-
-        background: rgba(255,255,255,.035);
-      }
-
-      .cover-admin-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin-bottom: 10px;
-      }
-
-      .cover-admin-preview {
-        width: 100%;
-        height: 125px;
-
-        overflow: hidden;
-        border-radius: 12px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        margin-bottom: 10px;
-
-        background: #18151d;
-        color: #888;
-        font-size: 13px;
-      }
-
-      .cover-admin-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-
-      .cover-file-picker {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        width: 100%;
-        min-height: 48px;
-
-        box-sizing: border-box;
-
-        border-radius: 12px;
-
-        background: linear-gradient(
-          90deg,
-          #ff278b,
-          #a84cff
+        renderPreview(
+          preview,
+          null
         );
 
-        color: white;
-        font-weight: 700;
+        removePublicCover();
 
-        cursor: pointer;
-
-        margin-bottom: 8px;
+        status.textContent =
+          "Cover photo removed.";
       }
+    );
 
-      .cover-remove-btn {
-        width: 100%;
-      }
+    loadCover().then(
+      (data) => {
+        renderPreview(
+          preview,
+          data
+        );
 
-
-      /* =========================
-         MOBILE
-         ========================= */
-
-      @media (max-width: 600px) {
-        #aiallanProfileCover.has-cover {
-          height: 190px;
-        }
-
-        .cover-admin-preview {
-          height: 105px;
+        if (data) {
+          applyPublicCover(data);
         }
       }
-    `;
-
-    document.head.appendChild(style);
+    );
   }
 
-  // ---------- Initialize ----------
-  function init() {
-    addStyles();
+  function renderPreview(
+    element,
+    data
+  ) {
+    if (!element) return;
 
-    createPublicCover();
+    element.innerHTML = "";
 
-    /*
-      Admin panel can be rendered dynamically,
-      so try several times.
-    */
-    createAdminCoverControl();
+    if (data) {
+      const image =
+        document.createElement("img");
 
-    setTimeout(createAdminCoverControl, 500);
-    setTimeout(createAdminCoverControl, 1200);
-    setTimeout(createAdminCoverControl, 2500);
+      image.src = data;
+      image.alt =
+        "Cover Preview";
 
-    const observer = new MutationObserver(() => {
-      createPublicCover();
-      createAdminCoverControl();
+      element.appendChild(image);
+    } else {
+      const empty =
+        document.createElement("div");
 
-      const saved = getCover();
+      empty.className =
+        "aiallan-cover-empty";
 
-      if (saved) {
-        updatePublicCover(saved);
+      empty.textContent =
+        "No cover photo selected";
+
+      element.appendChild(empty);
+    }
+  }
+
+  function findPublicHost() {
+    const avatar =
+      document.getElementById("dispAvatar");
+
+    if (!avatar) {
+      return null;
+    }
+
+    let parent =
+      avatar.parentElement;
+
+    for (
+      let i = 0;
+      i < 5 && parent;
+      i++,
+      parent = parent.parentElement
+    ) {
+      const rect =
+        parent.getBoundingClientRect();
+
+      if (
+        rect.width > 280 &&
+        rect.height > 180
+      ) {
+        return parent;
       }
-    });
+    }
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    return avatar.parentElement;
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  function applyPublicCover(data) {
+    const host =
+      findPublicHost();
+
+    if (!host) {
+      return;
+    }
+
+    host.classList.add(
+      "aiallan-cover-host"
+    );
+
+    let cover =
+      host.querySelector(
+        ".aiallan-public-cover"
+      );
+
+    if (!cover) {
+      cover =
+        document.createElement("div");
+
+      cover.className =
+        "aiallan-public-cover";
+
+      host.prepend(cover);
+    }
+
+    cover.style.backgroundImage =
+      data
+        ? `url("${data}")`
+        : "none";
+  }
+
+  function removePublicCover() {
+    document
+      .querySelectorAll(
+        ".aiallan-public-cover"
+      )
+      .forEach(
+        element => element.remove()
+      );
+  }
+
+  function boot() {
+    addCSS();
+
+    let tries = 0;
+
+    const timer =
+      setInterval(
+        async () => {
+          tries++;
+
+          createAdminUI();
+
+          const data =
+            await loadCover();
+
+          if (data) {
+            applyPublicCover(data);
+          }
+
+          if (
+            document.getElementById(
+              "aiallanCoverAdmin"
+            ) ||
+            tries > 30
+          ) {
+            clearInterval(timer);
+          }
+        },
+        500
+      );
+
+    const observer =
+      new MutationObserver(
+        () => {
+          createAdminUI();
+
+          loadCover().then(
+            data => {
+              if (data) {
+                applyPublicCover(data);
+              }
+            }
+          );
+        }
+      );
+
+    observer.observe(
+      document.body,
+      {
+        childList: true,
+        subtree: true
+      }
+    );
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      { once: true }
+    );
   } else {
-    init();
+    boot();
   }
 
 })();

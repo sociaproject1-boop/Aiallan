@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>User Login</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top,#241044 0%,#0b0712 45%,#050408 100%);
+  color:#fff;
+  font-family:Arial,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.wrap{
+  width:min(430px,100%);
+}
+
+.brand{
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:6px;
+  letter-spacing:.3px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#999;
+  font-size:14px;
+  margin-bottom:22px;
+}
+
+.card{
+  background:linear-gradient(180deg,#17111f,#0e0b13);
+  border:1px solid #34273e;
+  border-radius:24px;
+  padding:24px 20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+h1{
+  margin:0 0 7px;
+  font-size:24px;
+}
+
+.desc{
+  color:#999;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:20px;
+}
+
+.field{
+  margin-top:15px;
+}
+
+label{
+  display:block;
+  color:#aaa;
+  font-size:13px;
+  margin-bottom:7px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:13px;
+  border:1px solid #3b3045;
+  background:#09070d;
+  color:#fff;
+  outline:none;
+  font-size:15px;
+}
+
+input:focus{
+  border-color:#9b4dff;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:14px;
+  margin-top:18px;
+  background:linear-gradient(135deg,#ff3d81,#8a43ff);
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.switch{
+  text-align:center;
+  margin-top:18px;
+  color:#999;
+  font-size:13px;
+}
+
+.switch button{
+  width:auto;
+  padding:0;
+  margin:0 0 0 4px;
+  background:none;
+  color:#c875ff;
+  font-size:13px;
+}
+
+.status{
+  min-height:20px;
+  margin-top:14px;
+  text-align:center;
+  color:#aaa;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:18px;
+  color:#888;
+  text-decoration:none;
+  font-size:13px;
+}
+
+.back:hover{
+  color:#fff;
+}
+
+.hidden{
+  display:none;
+}
+
+.note{
+  margin-top:18px;
+  padding:11px;
+  border-radius:12px;
+  background:#100d16;
+  border:1px solid #29202f;
+  color:#777;
+  font-size:11px;
+  line-height:1.4;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="brand">My Page</div>
+  <div class="subtitle">Your personal creator page</div>
+
+  <div class="card">
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+
+      <h1>Welcome back</h1>
+
+      <div class="desc">
+        Login to manage your personal page and links.
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input
+          id="loginEmail"
+          type="email"
+          autocomplete="email"
+          placeholder="Enter your email"
+        >
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          id="loginPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+        >
+      </div>
+
+      <button id="loginBtn">
+        Login
+      </button>
+
+      <div class="status" id="loginStatus"></div>
+
+      <div class="switch">
+        Don't have an account?
+        <button type="button" id="showSignup">
+          Create account
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- SIGN UP -->
+    <div id="signupBox" class="hidden">
+
+      <h1>Create your account</h1>
+
+      <div class="desc">
+        Create your own account to manage your personal page.
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input
+          id="signupEmail"
+          type="email"
+          autocomplete="email"
+          placeholder="Your email"
+        >
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          id="signupPassword"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Create a password"
+        >
+      </div>
+
+      <div class="field">
+        <label>Confirm password</label>
+        <input
+          id="signupConfirm"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Repeat your password"
+        >
+      </div>
+
+      <button id="signupBtn">
+        Create account
+      </button>
+
+      <div class="status" id="signupStatus"></div>
+
+      <div class="switch">
+        Already have an account?
+        <button type="button" id="showLogin">
+          Login
+        </button>
+      </div>
+
+    </div>
+
+
+    <div class="note">
+      Your account is separate from the website administrator.
+      You only manage your own page.
+    </div>
+
+  </div>
+
+  <a class="back" href="index.html">
+    ← Back to homepage
+  </a>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+  "https://tqtmssdjfptmbvjtxien.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_IeTtQyGxZ0THrBuqPmK9cQ_10JeusoA";
+
+const sb =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
+  );
+
+
+const $ = id => document.getElementById(id);
+
+
+// --------------------------------------------------
+// SWITCH LOGIN / SIGNUP
+// --------------------------------------------------
+
+$("showSignup").onclick = () => {
+
+  $("loginBox").classList.add("hidden");
+  $("signupBox").classList.remove("hidden");
+
+  $("loginStatus").textContent = "";
+  $("signupStatus").textContent = "";
+
+};
+
+
+$("showLogin").onclick = () => {
+
+  $("signupBox").classList.add("hidden");
+  $("loginBox").classList.remove("hidden");
+
+  $("loginStatus").textContent = "";
+  $("signupStatus").textContent = "";
+
+};
+
+
+// --------------------------------------------------
+// CHECK EXISTING SESSION
+// --------------------------------------------------
+
+async function checkSession(){
+
+  const {
+    data:{
+      session
+    }
+  } = await sb.auth.getSession();
+
+  if(session){
+
+    // User is already logged in.
+    // Send them directly to their own panel.
+
+    window.location.href =
+      "user-panel-simple.html";
+
+  }
+
+}
+
+checkSession();
+
+
+// --------------------------------------------------
+// LOGIN
+// --------------------------------------------------
+
+$("loginBtn").onclick = async () => {
+
+  const email =
+    $("loginEmail").value.trim();
+
+  const password =
+    $("loginPassword").value;
+
+
+  $("loginStatus").textContent = "";
+
+
+  if(!email){
+
+    $("loginStatus").textContent =
+      "Please enter your email.";
+
+    return;
+
+  }
+
+
+  if(!password){
+
+    $("loginStatus").textContent =
+      "Please enter your password.";
+
+    return;
+
+  }
+
+
+  $("loginBtn").disabled = true;
+
+  $("loginBtn").textContent =
+    "Logging in…";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await sb.auth.signInWithPassword({
+
+      email:email,
+
+      password:password
+
+    });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    if(!data.session){
+
+      throw new Error(
+        "Login failed. Please try again."
+      );
+
+    }
+
+
+    $("loginStatus").textContent =
+      "✓ Login successful. Opening your panel…";
+
+
+    setTimeout(() => {
+
+      window.location.href =
+        "user-panel-simple.html";
+
+    },500);
+
+
+  }catch(error){
+
+    $("loginStatus").textContent =
+      error.message ||
+      "Unable to login.";
+
+  }finally{
+
+    $("loginBtn").disabled = false;
+
+    $("loginBtn").textContent =
+      "Login";
+
+  }
+
+};
+
+
+// --------------------------------------------------
+// CREATE ACCOUNT
+// --------------------------------------------------
+
+$("signupBtn").onclick = async () => {
+
+  const email =
+    $("signupEmail").value.trim();
+
+  const password =
+    $("signupPassword").value;
+
+  const confirm =
+    $("signupConfirm").value;
+
+
+  $("signupStatus").textContent = "";
+
+
+  if(!email){
+
+    $("signupStatus").textContent =
+      "Please enter your email.";
+
+    return;
+
+  }
+
+
+  if(password.length < 6){
+
+    $("signupStatus").textContent =
+      "Password must be at least 6 characters.";
+
+    return;
+
+  }
+
+
+  if(password !== confirm){
+
+    $("signupStatus").textContent =
+      "Passwords do not match.";
+
+    return;
+
+  }
+
+
+  $("signupBtn").disabled = true;
+
+  $("signupBtn").textContent =
+    "Creating account…";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await sb.auth.signUp({
+
+      email:email,
+
+      password:password
+
+    });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    // If email confirmation is disabled,
+    // Supabase may return an active session.
+
+    if(data.session){
+
+      $("signupStatus").textContent =
+        "✓ Account created. Opening your panel…";
+
+
+      setTimeout(() => {
+
+        window.location.href =
+          "user-panel-simple.html";
+
+      },700);
+
+      return;
+
+    }
+
+
+    // If email confirmation is enabled.
+
+    $("signupStatus").textContent =
+      "✓ Account created. Check your email to confirm your account, then login.";
+
+    $("signupBtn").disabled = false;
+
+    $("signupBtn").textContent =
+      "Create account";
+
+
+  }catch(error){
+
+    $("signupStatus").textContent =
+      error.message ||
+      "Unable to create account.";
+
+  }finally{
+
+    $("signupBtn").disabled = false;
+
+    $("signupBtn").textContent =
+      "Create account";
+
+  }
+
+};
+
+
+// --------------------------------------------------
+// ENTER KEY SUPPORT
+// --------------------------------------------------
+
+$("loginPassword").addEventListener(
+  "keydown",
+  e => {
+
+    if(e.key === "Enter"){
+
+      $("loginBtn").click();
+
+    }
+
+  }
+);
+
+
+$("signupConfirm").addEventListener(
+  "keydown",
+  e => {
+
+    if(e.key === "Enter"){
+
+      $("signupBtn").click();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+  </html>

@@ -1,611 +1,506 @@
 /* =========================================================
-   AIALAN — PROFILE COVER PHOTO
-   Separate feature file
+   AIALAN PROFILE COVER
+   Facebook-style cover sizing / positioning
+   No face overlay
+   No unnecessary top space
+   Keeps cover text visible
    ========================================================= */
 
-(() => {
-  "use strict";
+(function () {
+  'use strict';
 
-  const DB_NAME = "aiallan-cover-db";
-  const DB_VERSION = 1;
-  const STORE = "settings";
-  const KEY = "profileCover";
+  const STORAGE_KEY = 'aiallan_profile_cover';
 
-  const css = `
-    .aiallan-cover-admin {
-      margin: 0 0 18px;
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      background: rgba(255,255,255,.035);
-    }
+  let coverDataUrl = null;
 
-    .aiallan-cover-admin h3 {
-      margin: 0 0 10px;
-      font-size: 16px;
-    }
+  /* ---------------------------------------------------------
+     Inject CSS
+     --------------------------------------------------------- */
+  function injectStyles() {
+    if (document.getElementById('aiallan-cover-style')) return;
 
-    .aiallan-cover-preview {
-      width: 100%;
-      aspect-ratio: 820 / 312;
-      min-height: 120px;
-      max-height: 260px;
-      border-radius: 14px;
-      overflow: hidden;
-      background: linear-gradient(135deg,#15101e,#09070d);
-      border: 1px solid rgba(255,255,255,.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
+    const style = document.createElement('style');
+    style.id = 'aiallan-cover-style';
 
-    .aiallan-cover-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    style.textContent = `
+      /* COVER CONTAINER */
 
-    .aiallan-cover-empty {
-      opacity: .6;
-      font-size: 14px;
-      text-align: center;
-      padding: 20px;
-    }
+      .profile-cover,
+      #profileCover,
+      #coverPhoto,
+      .cover-photo {
+        width: 100%;
+        aspect-ratio: 2.63 / 1;
+        min-height: 0 !important;
+        max-height: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative;
+        overflow: hidden;
+        background: #09070f;
+        box-sizing: border-box;
+      }
 
-    .aiallan-cover-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+      /* COVER IMAGE */
 
-    .aiallan-cover-actions label,
-    .aiallan-cover-actions button {
-      border: 0;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font: inherit;
-      cursor: pointer;
-    }
+      .profile-cover img,
+      #profileCover img,
+      #coverPhoto img,
+      .cover-photo img {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
 
-    .aiallan-cover-actions label {
-      background: linear-gradient(90deg,#ff2f87,#9c4dff);
-      color: #fff;
-    }
+        /*
+          Facebook-style behavior:
+          fill the complete cover area without
+          creating blank space above/below.
+        */
+        object-fit: cover !important;
+        object-position: center center !important;
 
-    .aiallan-cover-actions button {
-      background: #24202d;
-      color: #fff;
-    }
+        margin: 0 !important;
+        padding: 0 !important;
+      }
 
-    .aiallan-cover-file {
-      display: none;
-    }
+      /* Prevent accidental extra spacing */
 
-    .aiallan-cover-status {
-      margin-top: 8px;
-      font-size: 12px;
-      opacity: .7;
-    }
+      .profile-cover-wrapper,
+      .cover-wrapper,
+      .cover-container {
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 0;
+      }
 
-    .aiallan-public-cover {
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 100%;
-      min-height: 180px;
-      background-size: cover;
-      background-position: center;
-      pointer-events: none;
-    }
+      /* Mobile */
 
-    .aiallan-public-cover:after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(5,3,10,.08),
-        rgba(5,3,10,.78)
-      );
-    }
+      @media (max-width: 600px) {
+        .profile-cover,
+        #profileCover,
+        #coverPhoto,
+        .cover-photo {
+          aspect-ratio: 2.63 / 1;
+          width: 100%;
+        }
 
-    .aiallan-cover-host {
-      position: relative;
-      overflow: hidden;
-    }
+        .profile-cover img,
+        #profileCover img,
+        #coverPhoto img,
+        .cover-photo img {
+          object-fit: cover !important;
+          object-position: center center !important;
+        }
+      }
 
-    .aiallan-cover-host > *:not(.aiallan-public-cover) {
-      position: relative;
-      z-index: 1;
-    }
-  `;
+      /* Desktop */
 
-  function addCSS() {
-    if (document.getElementById("aiallan-cover-css")) return;
+      @media (min-width: 601px) {
+        .profile-cover,
+        #profileCover,
+        #coverPhoto,
+        .cover-photo {
+          aspect-ratio: 2.63 / 1;
+        }
+      }
 
-    const style = document.createElement("style");
-    style.id = "aiallan-cover-css";
-    style.textContent = css;
+      /* Hide cover completely when there is no image */
+
+      .aiallan-cover-empty {
+        display: none !important;
+      }
+
+      /*
+        IMPORTANT:
+        Don't let the avatar/profile information
+        push the cover upward/downward.
+      */
+
+      .profile-cover + .profile,
+      .profile-cover + .profile-header {
+        margin-top: 0;
+      }
+    `;
 
     document.head.appendChild(style);
   }
 
-  function openDB() {
+  /* ---------------------------------------------------------
+     Find existing cover container
+     --------------------------------------------------------- */
+  function getCoverContainer() {
+    return (
+      document.querySelector('.profile-cover') ||
+      document.getElementById('profileCover') ||
+      document.getElementById('coverPhoto') ||
+      document.querySelector('.cover-photo')
+    );
+  }
+
+  /* ---------------------------------------------------------
+     Create cover if none exists
+     --------------------------------------------------------- */
+  function ensureCoverContainer() {
+    let container = getCoverContainer();
+
+    if (container) return container;
+
+    /*
+      Find the main profile/home area.
+    */
+    const home =
+      document.querySelector('.home') ||
+      document.querySelector('.profile')?.parentElement ||
+      document.body;
+
+    container = document.createElement('div');
+
+    container.id = 'profileCover';
+    container.className = 'profile-cover';
+
+    /*
+      Put cover at the very beginning so it doesn't
+      create strange blank space.
+    */
+    home.insertBefore(container, home.firstChild);
+
+    return container;
+  }
+
+  /* ---------------------------------------------------------
+     Render cover
+     --------------------------------------------------------- */
+  function renderCover(url) {
+    const container = ensureCoverContainer();
+
+    if (!url) {
+      container.innerHTML = '';
+      container.classList.add('aiallan-cover-empty');
+      return;
+    }
+
+    container.classList.remove('aiallan-cover-empty');
+
+    container.innerHTML = '';
+
+    const img = document.createElement('img');
+
+    img.src = url;
+    img.alt = 'Profile Cover';
+    img.loading = 'eager';
+    img.decoding = 'async';
+
+    container.appendChild(img);
+  }
+
+  /* ---------------------------------------------------------
+     File -> Data URL
+     --------------------------------------------------------- */
+  function readFile(file) {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      if (!file) {
+        reject(new Error('No cover image selected.'));
+        return;
+      }
 
-      request.onupgradeneeded = () => {
-        if (!request.result.objectStoreNames.contains(STORE)) {
-          request.result.createObjectStore(STORE);
-        }
-      };
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async function saveCover(data) {
-    try {
-      const db = await openDB();
-
-      await new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE, "readwrite");
-        transaction.objectStore(STORE).put(data, KEY);
-
-        transaction.oncomplete = resolve;
-        transaction.onerror = () => reject(transaction.error);
-      });
-
-      db.close();
-    } catch (error) {
-      console.warn("[Cover] IndexedDB save failed:", error);
-
-      try {
-        if (data === null) {
-          localStorage.removeItem("AIALAN_PROFILE_COVER");
-        } else {
-          localStorage.setItem("AIALAN_PROFILE_COVER", data);
-        }
-      } catch (_) {}
-    }
-  }
-
-  async function loadCover() {
-    try {
-      const db = await openDB();
-
-      const value = await new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE, "readonly");
-        const request = transaction.objectStore(STORE).get(KEY);
-
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = () => reject(request.error);
-      });
-
-      db.close();
-
-      if (value) return value;
-    } catch (error) {
-      console.warn("[Cover] IndexedDB load failed:", error);
-    }
-
-    try {
-      return localStorage.getItem("AIALAN_PROFILE_COVER") || null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function imageToDataURL(file) {
-    return new Promise((resolve, reject) => {
-      if (!file || !file.type.startsWith("image/")) {
-        reject(new Error("Please choose an image."));
+      if (!file.type.startsWith('image/')) {
+        reject(new Error('Please select an image file.'));
         return;
       }
 
       const reader = new FileReader();
 
-      reader.onerror = () => {
-        reject(new Error("Could not read image."));
+      reader.onload = function (event) {
+        resolve(event.target.result);
       };
 
-      reader.onload = () => {
-        const image = new Image();
-
-        image.onload = () => {
-          const maxWidth = 1600;
-          const maxHeight = 650;
-
-          const scale = Math.min(
-            1,
-            maxWidth / image.naturalWidth,
-            maxHeight / image.naturalHeight
-          );
-
-          const width = Math.max(
-            1,
-            Math.round(image.naturalWidth * scale)
-          );
-
-          const height = Math.max(
-            1,
-            Math.round(image.naturalHeight * scale)
-          );
-
-          const canvas = document.createElement("canvas");
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const context = canvas.getContext("2d");
-
-          context.drawImage(
-            image,
-            0,
-            0,
-            width,
-            height
-          );
-
-          const result = canvas.toDataURL(
-            "image/jpeg",
-            0.86
-          );
-
-          resolve(result);
-        };
-
-        image.onerror = () => {
-          reject(new Error("Invalid image."));
-        };
-
-        image.src = reader.result;
+      reader.onerror = function () {
+        reject(new Error('Unable to read the cover image.'));
       };
 
       reader.readAsDataURL(file);
     });
   }
 
-  function findExistingImageInput() {
-    return document.querySelector(
-      '#avatarFile,' +
-      'input[type="file"][accept*="image"],' +
-      'input[type="file"]'
-    );
+  /* ---------------------------------------------------------
+     Upload / Preview
+     --------------------------------------------------------- */
+  async function handleCoverUpload(input) {
+    const file = input?.files?.[0];
+
+    if (!file) return;
+
+    try {
+      const url = await readFile(file);
+
+      coverDataUrl = url;
+
+      /*
+        Required by index.html:
+        state.profile.cover =
+          window.profileCoverDataUrl || null;
+      */
+      window.profileCoverDataUrl = url;
+
+      renderCover(url);
+
+      /*
+        Try to save immediately if the existing site
+        already exposes saveStateToDB().
+      */
+      if (typeof window.saveStateToDB === 'function') {
+        try {
+          await window.saveStateToDB();
+        } catch (err) {
+          console.warn(
+            '[AIALAN COVER] Auto-save failed:',
+            err
+          );
+        }
+      }
+
+      /*
+        Local fallback.
+      */
+      try {
+        localStorage.setItem(STORAGE_KEY, url);
+      } catch (err) {
+        console.warn(
+          '[AIALAN COVER] Local storage unavailable.',
+          err
+        );
+      }
+
+      updateUploadStatus('Cover photo updated ✓');
+
+    } catch (err) {
+      console.error('[AIALAN COVER]', err);
+      updateUploadStatus(
+        err.message || 'Cover upload failed.'
+      );
+    }
   }
 
-  function createAdminUI() {
-    if (document.getElementById("aiallanCoverAdmin")) {
+  /* ---------------------------------------------------------
+     Status text
+     --------------------------------------------------------- */
+  function updateUploadStatus(message) {
+    const status =
+      document.getElementById('coverUploadStatus');
+
+    if (status) {
+      status.textContent = message;
+    }
+  }
+
+  /* ---------------------------------------------------------
+     Add upload button to admin panel
+     --------------------------------------------------------- */
+  function createAdminUploader() {
+    /*
+      Don't create duplicate uploader.
+    */
+    if (document.getElementById('aiallanCoverUploader')) {
       return;
     }
 
-    const avatarInput = findExistingImageInput();
+    /*
+      Find Profile tab.
+    */
+    const profileTab =
+      document.getElementById('tab-profile') ||
+      document.querySelector('[data-tab="profile"]')?.parentElement;
 
-    if (!avatarInput) {
+    if (!profileTab) {
       return;
     }
 
-    const box = document.createElement("div");
+    const box = document.createElement('div');
 
-    box.id = "aiallanCoverAdmin";
-    box.className = "aiallan-cover-admin";
+    box.id = 'aiallanCoverUploader';
+
+    box.style.cssText = `
+      margin:14px 0;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      background:#151219;
+    `;
 
     box.innerHTML = `
-      <h3>🖼️ Profile Cover Photo</h3>
-
-      <div
-        class="aiallan-cover-preview"
-        id="aiallanCoverPreview"
-      >
-        <div class="aiallan-cover-empty">
-          No cover photo selected
-        </div>
+      <div style="
+        font-weight:700;
+        font-size:13px;
+        margin-bottom:8px;
+      ">
+        🖼️ Cover Photo
       </div>
 
-      <div class="aiallan-cover-actions">
-
-        <label for="aiallanCoverFile">
-          Choose Cover Photo
-        </label>
-
-        <input
-          id="aiallanCoverFile"
-          class="aiallan-cover-file"
-          type="file"
-          accept="image/*"
-        >
-
-        <button
-          type="button"
-          id="aiallanCoverRemove"
-        >
-          Remove Cover
-        </button>
-
+      <div style="
+        color:#aaa;
+        font-size:11px;
+        margin-bottom:10px;
+        line-height:1.4;
+      ">
+        Facebook-style cover. The image automatically fills
+        the cover area without creating extra space.
       </div>
 
-      <div
-        class="aiallan-cover-status"
-        id="aiallanCoverStatus"
+      <input
+        type="file"
+        id="aiallanCoverFile"
+        accept="image/*"
+        style="
+          display:block;
+          width:100%;
+          box-sizing:border-box;
+          padding:8px;
+          border-radius:8px;
+          background:#171717;
+          color:#ddd;
+          border:1px solid #333;
+        "
       >
-        Cover photo is saved separately from your existing profile data.
+
+      <div
+        id="coverUploadStatus"
+        style="
+          margin-top:7px;
+          font-size:11px;
+          color:#aaa;
+        "
+      >
+        Ready
       </div>
     `;
 
-    const parent =
-      avatarInput.parentElement &&
-      avatarInput.parentElement.parentElement
-        ? avatarInput.parentElement.parentElement
-        : avatarInput.parentElement;
-
-    if (!parent) return;
-
-    parent.insertAdjacentElement(
-      "afterend",
-      box
+    /*
+      Put uploader near the beginning of Profile panel.
+    */
+    profileTab.insertBefore(
+      box,
+      profileTab.firstChild
     );
 
     const input =
-      box.querySelector("#aiallanCoverFile");
+      document.getElementById('aiallanCoverFile');
 
-    const preview =
-      box.querySelector("#aiallanCoverPreview");
-
-    const status =
-      box.querySelector("#aiallanCoverStatus");
-
-    const removeButton =
-      box.querySelector("#aiallanCoverRemove");
-
-    input.addEventListener(
-      "change",
-      async () => {
-        const file =
-          input.files &&
-          input.files[0];
-
-        if (!file) return;
-
-        try {
-          status.textContent =
-            "Processing cover photo...";
-
-          const data =
-            await imageToDataURL(file);
-
-          await saveCover(data);
-
-          renderPreview(
-            preview,
-            data
-          );
-
-          applyPublicCover(data);
-
-          status.textContent =
-            "✓ Cover photo saved.";
-        } catch (error) {
-          console.error(
-            "[Cover] Upload failed:",
-            error
-          );
-
-          status.textContent =
-            "⚠️ " +
-            (
-              error.message ||
-              "Upload failed."
-            );
-        } finally {
-          input.value = "";
-        }
-      }
-    );
-
-    removeButton.addEventListener(
-      "click",
-      async () => {
-        await saveCover(null);
-
-        renderPreview(
-          preview,
-          null
-        );
-
-        removePublicCover();
-
-        status.textContent =
-          "Cover photo removed.";
-      }
-    );
-
-    loadCover().then(
-      (data) => {
-        renderPreview(
-          preview,
-          data
-        );
-
-        if (data) {
-          applyPublicCover(data);
-        }
-      }
-    );
-  }
-
-  function renderPreview(
-    element,
-    data
-  ) {
-    if (!element) return;
-
-    element.innerHTML = "";
-
-    if (data) {
-      const image =
-        document.createElement("img");
-
-      image.src = data;
-      image.alt =
-        "Cover Preview";
-
-      element.appendChild(image);
-    } else {
-      const empty =
-        document.createElement("div");
-
-      empty.className =
-        "aiallan-cover-empty";
-
-      empty.textContent =
-        "No cover photo selected";
-
-      element.appendChild(empty);
+    if (input) {
+      input.addEventListener('change', function () {
+        handleCoverUpload(this);
+      });
     }
   }
 
-  function findPublicHost() {
-    const avatar =
-      document.getElementById("dispAvatar");
+  /* ---------------------------------------------------------
+     Load saved cover
+     --------------------------------------------------------- */
+  function loadSavedCover() {
 
-    if (!avatar) {
-      return null;
-    }
-
-    let parent =
-      avatar.parentElement;
-
-    for (
-      let i = 0;
-      i < 5 && parent;
-      i++,
-      parent = parent.parentElement
-    ) {
-      const rect =
-        parent.getBoundingClientRect();
-
-      if (
-        rect.width > 280 &&
-        rect.height > 180
-      ) {
-        return parent;
-      }
-    }
-
-    return avatar.parentElement;
-  }
-
-  function applyPublicCover(data) {
-    const host =
-      findPublicHost();
-
-    if (!host) {
+    /*
+      First priority:
+      value loaded from Supabase/index.html.
+    */
+    if (window.profileCoverDataUrl) {
+      coverDataUrl = window.profileCoverDataUrl;
+      renderCover(coverDataUrl);
       return;
     }
 
-    host.classList.add(
-      "aiallan-cover-host"
-    );
+    /*
+      Local fallback.
+    */
+    try {
+      const saved =
+        localStorage.getItem(STORAGE_KEY);
 
-    let cover =
-      host.querySelector(
-        ".aiallan-public-cover"
-      );
+      if (saved) {
+        coverDataUrl = saved;
 
-    if (!cover) {
-      cover =
-        document.createElement("div");
+        window.profileCoverDataUrl = saved;
 
-      cover.className =
-        "aiallan-public-cover";
-
-      host.prepend(cover);
-    }
-
-    cover.style.backgroundImage =
-      data
-        ? `url("${data}")`
-        : "none";
-  }
-
-  function removePublicCover() {
-    document
-      .querySelectorAll(
-        ".aiallan-public-cover"
-      )
-      .forEach(
-        element => element.remove()
-      );
-  }
-
-  function boot() {
-    addCSS();
-
-    let tries = 0;
-
-    const timer =
-      setInterval(
-        async () => {
-          tries++;
-
-          createAdminUI();
-
-          const data =
-            await loadCover();
-
-          if (data) {
-            applyPublicCover(data);
-          }
-
-          if (
-            document.getElementById(
-              "aiallanCoverAdmin"
-            ) ||
-            tries > 30
-          ) {
-            clearInterval(timer);
-          }
-        },
-        500
-      );
-
-    const observer =
-      new MutationObserver(
-        () => {
-          createAdminUI();
-
-          loadCover().then(
-            data => {
-              if (data) {
-                applyPublicCover(data);
-              }
-            }
-          );
-        }
-      );
-
-    observer.observe(
-      document.body,
-      {
-        childList: true,
-        subtree: true
+        renderCover(saved);
       }
-    );
+    } catch (err) {
+      console.warn(
+        '[AIALAN COVER] Could not load local cover.',
+        err
+      );
+    }
   }
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
+  /* ---------------------------------------------------------
+     Public API
+     --------------------------------------------------------- */
+  window.ProfileCover = {
+
+    set: function (url) {
+      coverDataUrl = url || null;
+
+      window.profileCoverDataUrl =
+        coverDataUrl;
+
+      renderCover(coverDataUrl);
+
+      if (coverDataUrl) {
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            coverDataUrl
+          );
+        } catch (err) {}
+      }
+    },
+
+    get: function () {
+      return (
+        window.profileCoverDataUrl ||
+        coverDataUrl ||
+        null
+      );
+    },
+
+    upload: handleCoverUpload,
+
+    refresh: function () {
+      renderCover(
+        window.profileCoverDataUrl ||
+        coverDataUrl ||
+        null
+      );
+    }
+  };
+
+  /* ---------------------------------------------------------
+     Initialize
+     --------------------------------------------------------- */
+  function init() {
+    injectStyles();
+
+    /*
+      Wait a little because the existing index.js
+      may still be building the homepage/admin UI.
+    */
+    setTimeout(function () {
+      createAdminUploader();
+      loadSavedCover();
+    }, 300);
+
+    /*
+      Run again after DOMContentLoaded.
+    */
     document.addEventListener(
-      "DOMContentLoaded",
-      boot,
+      'DOMContentLoaded',
+      function () {
+        injectStyles();
+        createAdminUploader();
+        loadSavedCover();
+      },
       { once: true }
     );
-  } else {
-    boot();
   }
+
+  init();
 
 })();

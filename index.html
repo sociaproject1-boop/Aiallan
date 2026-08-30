@@ -21,6 +21,12 @@
     --yt: #ff0000;
     --tw: #1da1f2;
     --muted: #101010;
+    --amazon: #ff8c00;
+    --shein: #d63384;
+    --lazada: #ff3b30;
+    --ebay: #0064d2;
+    --ttshop: #000000;
+    --btn-gray: #2b2b2b;
   }
   body {
     background: var(--bg);
@@ -116,7 +122,7 @@
 
   .home { max-width:480px; margin: 0 auto; padding: 40px 16px 36px; }
   .profile { text-align:center; margin-bottom:14px; }
-  .avatar { width:82px; height:82px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
+  .avatar { width:82px; height:82px; border-radius:50%; background: linear-gradient(135deg,var(--accent),#ff9500); margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; overflow:hidden; }
   .avatar img { width:100%; height:100%; object-fit:cover; }
   .name { font-size:20px; font-weight:700; margin-bottom:6px; }
   .bio { color:var(--text2); font-size:13px; margin-bottom:12px; }
@@ -149,16 +155,20 @@
   /* Category modal custom */
   .category-modal .modal-box { max-width: 640px; width: 92%; border-radius: 12px; padding: 12px; }
   .category-modal .modal-box h2 { text-align:left; font-size:16px; margin-bottom:10px; }
-  .product-list { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
-  .product-card-modal { background: #121212; border: 1px solid var(--border); border-radius:10px; padding:8px; display:flex; gap:8px; align-items:center; height:76px; }
-  .product-card-modal .img { width:64px; height:64px; border-radius:8px; overflow:hidden; background:#111; flex:0 0 64px; }
+  .product-list { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+  .product-card-modal { background: #121212; border: 1px solid var(--border); border-radius:10px; padding:8px; display:flex; gap:8px; align-items:center; height:96px; }
+  .product-card-modal .img { width:80px; height:80px; border-radius:8px; overflow:hidden; background:var(--muted); flex:0 0 80px; display:flex; align-items:center; justify-content:center; color:var(--text2); font-weight:700; }
   .product-card-modal .img img { width:100%; height:100%; object-fit:cover; }
-  .product-card-modal .meta { flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px; }
-  .product-card-modal .meta .title { font-size:13px; font-weight:600; color:var(--text); }
-  .product-card-modal .meta .domain { font-size:12px; color:var(--text2); }
+  .product-card-modal .meta { flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; }
+  .product-card-modal .meta .title { font-size:14px; font-weight:700; color:var(--text); }
   .product-card-modal .cta { flex:0 0 auto; }
   .btn-shopee { background:var(--shopee); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
-  .btn-default { background:#2b2b2b; color:var(--text); border:1px solid #2f2f2f; padding:8px 12px; border-radius:8px; }
+  .btn-amazon { background:var(--amazon); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-shein { background:var(--shein); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-lazada { background:var(--lazada); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-ttshop { background:var(--ttshop); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-ebay { background:var(--ebay); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .btn-default { background:var(--btn-gray); color:var(--text); border:1px solid #2f2f2f; padding:8px 12px; border-radius:8px; }
 
   /* compact admin product row */
   .prod-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
@@ -587,7 +597,7 @@
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const r = new FileReader();
-      r.onload = e => { const avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; document.getElementById('dispAvatar').innerHTML = '<img src="' + avatarData + '" alt="avatar">'; };
+      r.onload = e => { const avatarData = e.target.result; const preview = document.getElementById('avatarPreview'); if (preview) preview.innerHTML = '<img src="' + avatarData + '" alt="avatar">'; const disp = document.getElementById('dispAvatar'); if(disp) disp.innerHTML = '<img src="'+avatarData+'" alt="avatar">'; };
       r.readAsDataURL(file);
     }
   }
@@ -615,7 +625,7 @@
   // Save categories (update tiles and keep products)
   function saveAllProducts() {
     for (let i = 1; i <= 8; i++) {
-      const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+      const nameEl = document.querySelector(`.cat-name[data-cat=\"${i}\"]`);
       if (nameEl && nameEl.value) { const nameTarget = document.getElementById('name' + i); if (nameTarget) nameTarget.innerText = nameEl.value; }
       // update thumb if category-level thumb was set (not used currently)
       const thumb = document.getElementById('thumb' + i);
@@ -645,10 +655,10 @@
       r.readAsDataURL(file);
     }
   }
-  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Play failed',err); updateMusicUI(); }); }
+  function playMusic() { const audio = document.getElementById('bgMusic'); if (!audio.src) return; audio.play().then(()=>{ isPlaying=true; updateMusicUI(); }).catch(err=>{ console.warn('Play failed',err); }); }
   function pauseMusic() { const audio = document.getElementById('bgMusic'); audio.pause(); isPlaying=false; updateMusicUI(); }
   function toggleMusic() { isPlaying ? pauseMusic() : playMusic(); }
-  function updateMusicUI(){ const btn=document.getElementById('musicBtn'); if(btn) btn.innerHTML = isPlaying ? '<i class="fa fa-pause icon"></i>' : '<i class="fa fa-play icon"></i>'; const player=document.getElementById('musicPlayer'); if(player) { if(document.getElementById('bgMusic').src) player.classList.remove('hidden'); else player.classList.add('hidden'); } }
+  function updateMusicUI(){ const btn=document.getElementById('musicBtn'); if(btn) btn.innerHTML = isPlaying ? '<i class="fa fa-pause icon"></i>' : '<i class="fa fa-play icon"></i>'; const player=document.getElementById('musicPlayer'); if(player){ if(isPlaying) player.classList.remove('hidden'); } }
 
   // Build and persist state to IndexedDB
   async function saveStateToDB() {
@@ -669,7 +679,7 @@
       };
 
       for (let i=1;i<=8;i++){
-        const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+        const nameEl = document.querySelector(`.cat-name[data-cat=\"${i}\"]`);
         const products = [];
         const rows = document.querySelectorAll(`#cat${i}Products .prod-row`);
         rows.forEach((r, idx) => {
@@ -696,7 +706,7 @@
       if (state.profile) {
         if (state.profile.name) { document.getElementById('dispName').innerText = state.profile.name; document.getElementById('adminName').value = state.profile.name; }
         if (state.profile.bio) { document.getElementById('dispBio').innerText = state.profile.bio; document.getElementById('adminBio').value = state.profile.bio; }
-        if (state.profile.avatar) { const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp)disp.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; }
+        if (state.profile.avatar) { const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp) disp.innerHTML = '<img src="'+state.profile.avatar+'" alt="avatar">'; }
       }
       if (state.social) {
         document.getElementById('socFb').value = state.social.fb || '';
@@ -715,7 +725,7 @@
       if (Array.isArray(state.categories)) {
         state.categories.forEach((cat, idx) => {
           const i = idx + 1;
-          const nameEl = document.querySelector(`.cat-name[data-cat="${i}"]`);
+          const nameEl = document.querySelector(`.cat-name[data-cat=\"${i}\"]`);
           if (nameEl) nameEl.value = cat.name || '';
           const nameTarget = document.getElementById('name' + i);
           if (nameTarget) nameTarget.innerText = cat.name || nameTarget.innerText;
@@ -756,13 +766,13 @@
 
   function triggerImport() { document.getElementById('importFile').click(); }
   async function importStateFromFile(e) {
-    const file = e.target.files && e.target.files[0]; if (!file) return; const text = await file.text(); try { const state = JSON.parse(text); await idbSet(STATE_KEY, state); await loadStateFromDB(); alert('✅ Imported'); } catch(err){ alert('Import failed'); }
+    const file = e.target.files && e.target.files[0]; if (!file) return; const text = await file.text(); try { const state = JSON.parse(text); await idbSet(STATE_KEY, state); await loadStateFromDB(); alert('✅ Imported state'); } catch (er) { console.warn('import failed', er); alert('Import failed'); }
   }
 
   // Clear all data (IDB)
   async function clearAllData() {
     if (!confirm('Clear all saved data? This cannot be undone.')) return;
-    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ location.reload(); }; } catch(e){ console.warn(e); }
+    try { const db = await openDB(); const tx = db.transaction([STORE_NAME, AUTH_STORE], 'readwrite'); tx.objectStore(STORE_NAME).clear(); tx.objectStore(AUTH_STORE).clear(); tx.oncomplete = ()=>{ location.reload(); }; } catch(e) { console.warn('clear failed', e); }
   }
 
   // Category modal handling: clicking a product tile shows ALL links for that category as neat cards
@@ -778,18 +788,42 @@
       const grid = document.createElement('div'); grid.className = 'product-list';
       products.forEach((p, idx) => {
         const card = document.createElement('div'); card.className = 'product-card-modal';
-        const imgWrap = document.createElement('div'); imgWrap.className = 'img'; imgWrap.innerHTML = p.thumb ? `<img src="${p.thumb}" alt="p${idx}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text2);">📦</div>`;
-        const meta = document.createElement('div'); meta.className = 'meta'; meta.innerHTML = `<div class="title">${p.name || ('Product ' + (idx+1))}</div><div class="domain">${(p.url||'').replace(/^https?:\/\//,'')}</div>`;
+        const imgWrap = document.createElement('div'); imgWrap.className = 'img';
+        if (p.thumb) {
+          imgWrap.innerHTML = `<img src="${p.thumb}" alt="p${idx}">`;
+        } else {
+          // neutral placeholder: show first letter of product name or icon
+          const initial = (p.name && p.name.trim()) ? p.name.trim().charAt(0).toUpperCase() : '';
+          imgWrap.textContent = initial || '📦';
+        }
+
+        const meta = document.createElement('div'); meta.className = 'meta';
+        meta.innerHTML = `<div class="title">${p.name || ('Product ' + (idx+1))}</div>`;
+
         const ctaWrap = document.createElement('div'); ctaWrap.className = 'cta';
         const btn = document.createElement('button');
-        const isShopee = p.url && /shopee\./i.test(p.url);
-        btn.className = isShopee ? 'btn-shopee' : 'btn-default';
-        btn.textContent = isShopee ? 'Open on Shopee' : 'Open';
-        btn.onclick = (ev)=>{ ev.stopPropagation(); if(p.url) window.open(p.url, '_blank', 'noopener'); };
+
+        // platform detection based on URL
+        const url = (p.url || '').toString();
+        let btnClass = 'btn-default';
+        let btnText = 'View Product';
+        if (/shopee\./i.test(url)) { btnClass = 'btn-shopee'; btnText = 'Open on Shopee'; }
+        else if (/\bamazon\.|\bamzn\./i.test(url)) { btnClass = 'btn-amazon'; btnText = 'Open on Amazon'; }
+        else if (/shein\./i.test(url)) { btnClass = 'btn-shein'; btnText = 'Open on Shein'; }
+        else if (/lazada\./i.test(url)) { btnClass = 'btn-lazada'; btnText = 'Open on Lazada'; }
+        else if (/ebay\./i.test(url)) { btnClass = 'btn-ebay'; btnText = 'Open on eBay'; }
+        else if (/tiktok(?:shop)?|tikTok|tiktokshop/i.test(url)) { btnClass = 'btn-ttshop'; btnText = 'Open on TikTok Shop'; }
+        else { btnClass = 'btn-default'; btnText = 'View Product'; }
+
+        btn.className = btnClass;
+        btn.textContent = btnText;
+        btn.onclick = (ev)=>{ ev.stopPropagation(); if (p.url) window.open(p.url, '_blank', 'noopener'); };
         ctaWrap.appendChild(btn);
+
         card.appendChild(imgWrap);
         card.appendChild(meta);
         card.appendChild(ctaWrap);
+
         // Clicking whole card should open link as well
         card.onclick = ()=>{ if(p.url) window.open(p.url, '_blank', 'noopener'); };
         grid.appendChild(card);
@@ -874,7 +908,7 @@
     } catch (e) { console.warn('bgMusic init failed', e); }
 
     // close modals by clicking outside
-    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','false'); } }); });
+    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (ev) => { if (ev.target === modal) { modal.classList.remove('on'); modal.setAttribute('aria-hidden','true'); } }); });
 
   });
 

@@ -1469,6 +1469,19 @@ Shopee, TikTok Shop, Amazon, Lazada, SHEIN, eBay and other https:// links are de
         if (state.profile.bio) { document.getElementById('dispBio').innerText = state.profile.bio; document.getElementById('adminBio').value = state.profile.bio; }
         if (state.profile.avatar) { const prev=document.getElementById('avatarPreview'); if(prev)prev.innerHTML='<img src="'+state.profile.avatar+'" alt="avatar">'; const disp=document.getElementById('dispAvatar'); if(disp) disp.innerHTML = '<img src="'+state.profile.avatar+'" alt="avatar">'; }
       }
+     if (state.profile.cover) {
+  const c = document.getElementById('dispCover');
+  if (c) {
+    c.style.backgroundImage = `url("${state.profile.cover}")`;
+    c.dataset.url = state.profile.cover;
+  }
+
+  const p = document.getElementById('coverPreview');
+  if (p) {
+    p.innerHTML = `<img src="${state.profile.cover}" alt="Cover photo"
+      style="width:100%;height:100%;object-fit:cover;">`;
+  }
+     }
       if (state.social) {
         document.getElementById('socFb').value = state.social.fb || '';
         document.getElementById('socIg').value = state.social.ig || '';

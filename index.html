@@ -546,6 +546,37 @@ body{background:radial-gradient(800px 420px at 50% -100px,rgba(155,92,255,.16),t
 .product-card,.category-block,.admin-section,.admin-stat{border-color:#302b3b!important;background:linear-gradient(180deg,#17131e,#100d15)!important;}
 .metadata-status.ok,.bulk-result.ok .result-state{color:#cdbbff!important;}
 </style>
+ .profile-cover{
+  width:100%;
+  height:180px;
+  margin-bottom:-42px;
+  border-radius:18px;
+  background:#17131f center/cover no-repeat;
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+
+.profile-cover + .avatar{
+  position:relative;
+  z-index:2;
+  border:3px solid var(--accent);
+}
+
+.profile-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+@media(max-width:520px){
+  .profile-cover{
+    height:150px;
+    margin-bottom:-38px;
+    border-radius:16px;
+  }
+}
+</style>
 </head>
 <body>
   <!-- Background audio element (closed properly) -->
@@ -584,6 +615,20 @@ body{background:radial-gradient(800px 420px at 50% -100px,rgba(155,92,255,.16),t
       </div>
 
       <div id="tab-profile" class="tab-content">
+       <div class="cover-upload" style="margin-bottom:10px;">
+  <div id="coverPreview"
+       style="width:100%;height:140px;border-radius:12px;overflow:hidden;
+       background:#17131f;border:1px solid var(--border);display:flex;
+       align-items:center;justify-content:center;color:var(--text2);">
+    Cover Photo
+  </div>
+
+  <input type="file"
+         accept="image/*"
+         id="coverUpload"
+         onchange="previewCover(this)"
+         style="margin-top:8px;width:100%;">
+       </div>
         <div class="avatar-upload" style="text-align:left;margin-bottom:10px;">
           <div class="preview" id="avatarPreview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--card);display:inline-block;vertical-align:middle;margin-right:8px;">👤</div>
           <input type="file" accept="image/*" id="avatarUpload" onchange="previewAvatar(this)" style="display:inline-block;vertical-align:middle;">
@@ -699,10 +744,13 @@ Shopee, TikTok Shop, Amazon, Lazada, SHEIN, eBay and other https:// links are de
   <!-- Main content / Home page -->
   <div class="home" id="homePage">
     <div class="profile">
-      <div class="avatar" id="dispAvatar">👤</div>
-      <h1 class="name" id="dispName">Allan</h1>
-      <p class="bio" id="dispBio">Affiliate & Creator</p>
-    </div>
+      <div class="profile">
+  <div class="profile-cover" id="dispCover"></div>
+
+  <div class="avatar" id="dispAvatar">👤</div>
+  <h1 class="name" id="dispName">Allan</h1>
+  <p class="bio" id="dispBio">Affiliate & Creator</p>
+      </div>
 
     <div class="music-player hidden" id="musicPlayer">
       <button onclick="toggleMusic()" id="musicBtn" aria-label="Play/Pause"><i class="fa fa-music icon"></i></button>
@@ -1848,7 +1896,19 @@ async function captureStateFromUI(){
   if(adminBio || dispBio) state.profile.bio=adminBio?.value || dispBio?.innerText || state.profile.bio || '';
   const av=document.querySelector('#dispAvatar img');
   if(av) state.profile.avatar=av.src;
+if(state.profile.cover){
+  const c=document.getElementById('dispCover');
+  if(c){
+    c.style.backgroundImage=`url("${state.profile.cover}")`;
+    c.dataset.url=state.profile.cover;
+  }
 
+  const p=document.getElementById('coverPreview');
+  if(p){
+    p.innerHTML=`<img src="${state.profile.cover}" alt="Cover photo"
+      style="width:100%;height:100%;object-fit:cover;">`;
+  }
+}
  const cover = window.profileCoverDataUrl || null;
 if (cover) state.profile.cover = cover;
 
@@ -2079,7 +2139,40 @@ window.previewAvatar=async function(input){
     await saveStateToDB();
   }catch(e){showAdminError(e.message||'Avatar upload failed');}
 };
+window.previewCover=async function(input){
+  const file=input.files?.[0];
+  if(!file)return;
 
+  if(!file.type.startsWith('image/')){
+    alert('Please select an image.');
+    input.value='';
+    return;
+  }
+
+  try{
+    setSyncStatus('Uploading cover…');
+
+    const url=await uploadAsset(file,'profile');
+
+    const preview=document.getElementById('coverPreview');
+    if(preview){
+      preview.innerHTML=`<img src="${url}" alt="Cover photo"
+        style="width:100%;height:100%;object-fit:cover;">`;
+    }
+
+    const cover=document.getElementById('dispCover');
+    if(cover){
+      cover.style.backgroundImage=`url("${url}")`;
+      cover.dataset.url=url;
+    }
+
+    setSyncStatus('Cover uploaded','ok');
+    await saveStateToDB();
+
+  }catch(e){
+    showAdminError(e.message||'Cover upload failed');
+  }
+};
 async function blobToWav(blob){
   const buffer=await blob.arrayBuffer();
   const AC=window.AudioContext||window.webkitAudioContext;

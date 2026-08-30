@@ -1,268 +1,438 @@
 /* =========================================================
-   AIALAN — PROFILE COVER PHOTO FEATURE
-   Independent feature file
+   AIALAN — PROFILE COVER PHOTO
+   Separate feature file
    ========================================================= */
 
-(function () {
+(() => {
   'use strict';
 
   const COVER_KEY = 'aiallan_profile_cover_v1';
 
-  /* ---------- STORAGE ---------- */
-
-  function saveCover(dataUrl) {
-    try {
-      localStorage.setItem(COVER_KEY, dataUrl);
-      return true;
-    } catch (e) {
-      console.warn('Cover photo save failed:', e);
-      return false;
-    }
-  }
-
-  function loadCover() {
+  // ---------- Storage ----------
+  function getCover() {
     try {
       return localStorage.getItem(COVER_KEY) || '';
     } catch (e) {
+      console.warn('[Cover] Cannot read cover:', e);
       return '';
     }
   }
 
-  /* ---------- STYLE ---------- */
+  function saveCover(data) {
+    try {
+      localStorage.setItem(COVER_KEY, data);
+      return true;
+    } catch (e) {
+      console.warn('[Cover] Cannot save cover:', e);
+      return false;
+    }
+  }
 
+  // ---------- Create public cover ----------
+  function createPublicCover() {
+    if (document.getElementById('aiallanProfileCover')) return;
+
+    const profile = document.querySelector('.profile');
+    if (!profile) return;
+
+    const cover = document.createElement('div');
+    cover.id = 'aiallanProfileCover';
+
+    cover.innerHTML = `
+      <div class="aiallan-cover-image"></div>
+    `;
+
+    // Put cover behind the profile content
+    profile.parentNode.insertBefore(cover, profile);
+
+    const image = cover.querySelector('.aiallan-cover-image');
+    const saved = getCover();
+
+    if (saved) {
+      image.style.backgroundImage = `url("${saved}")`;
+      cover.classList.add('has-cover');
+    }
+  }
+
+  // ---------- Create admin controls ----------
+  function createAdminCoverControl() {
+    if (document.getElementById('aiallanCoverAdmin')) return;
+
+    // Find the existing admin Profile tab content
+    const adminName = document.getElementById('adminName');
+    if (!adminName) return;
+
+    const nameInput = adminName;
+
+    // Existing avatar file input is normally before adminName
+    const avatarInput =
+      document.querySelector('input[type="file"]');
+
+    const box = document.createElement('div');
+    box.id = 'aiallanCoverAdmin';
+
+    box.innerHTML = `
+      <div class="cover-admin-title">
+        🖼️ Cover Photo
+      </div>
+
+      <div class="cover-admin-preview" id="aiallanCoverPreview">
+        <span>No cover photo selected</span>
+      </div>
+
+      <label class="cover-file-picker">
+        Choose Cover Photo
+        <input
+          type="file"
+          id="aiallanCoverInput"
+          accept="image/jpeg,image/png,image/webp"
+          hidden
+        >
+      </label>
+
+      <button
+        type="button"
+        id="aiallanRemoveCover"
+        class="btn btn-gray cover-remove-btn"
+      >
+        Remove Cover
+      </button>
+    `;
+
+    /*
+      Put the new section directly before the Name field.
+      This keeps the existing Profile UI untouched.
+    */
+    nameInput.parentNode.insertBefore(box, nameInput);
+
+    const input = document.getElementById('aiallanCoverInput');
+    const preview = document.getElementById('aiallanCoverPreview');
+    const removeBtn = document.getElementById('aiallanRemoveCover');
+
+    const saved = getCover();
+
+    if (saved) {
+      showAdminPreview(saved);
+    }
+
+    input.addEventListener('change', async () => {
+      const file = input.files && input.files[0];
+
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        input.value = '';
+        return;
+      }
+
+      try {
+        const data = await resizeCover(file);
+
+        if (!saveCover(data)) {
+          alert('Cover photo could not be saved.');
+          return;
+        }
+
+        showAdminPreview(data);
+        updatePublicCover(data);
+
+        alert('✅ Cover Photo Saved!');
+      } catch (e) {
+        console.error('[Cover] Upload failed:', e);
+        alert('⚠️ Cover photo upload failed.');
+      }
+    });
+
+    removeBtn.addEventListener('click', () => {
+      try {
+        localStorage.removeItem(COVER_KEY);
+      } catch (e) {}
+
+      preview.innerHTML = '<span>No cover photo selected</span>';
+
+      const cover = document.getElementById('aiallanProfileCover');
+      if (cover) {
+        cover.classList.remove('has-cover');
+
+        const image = cover.querySelector('.aiallan-cover-image');
+        if (image) image.style.backgroundImage = '';
+      }
+
+      input.value = '';
+
+      alert('Cover Photo removed.');
+    });
+  }
+
+  // ---------- Image resize ----------
+  function resizeCover(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const img = new Image();
+
+        img.onload = () => {
+          const MAX_WIDTH = 1640;
+          const MAX_HEIGHT = 720;
+
+          let width = img.width;
+          let height = img.height;
+
+          const scale = Math.min(
+            1,
+            MAX_WIDTH / width,
+            MAX_HEIGHT / height
+          );
+
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            width,
+            height
+          );
+
+          // JPEG keeps storage size much smaller
+          const result = canvas.toDataURL(
+            'image/jpeg',
+            0.82
+          );
+
+          resolve(result);
+        };
+
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- Admin preview ----------
+  function showAdminPreview(data) {
+    const preview =
+      document.getElementById('aiallanCoverPreview');
+
+    if (!preview) return;
+
+    preview.innerHTML = `
+      <img src="${data}" alt="Cover Preview">
+    `;
+  }
+
+  // ---------- Public cover ----------
+  function updatePublicCover(data) {
+    const cover =
+      document.getElementById('aiallanProfileCover');
+
+    if (!cover) return;
+
+    const image =
+      cover.querySelector('.aiallan-cover-image');
+
+    if (!image) return;
+
+    image.style.backgroundImage = `url("${data}")`;
+    cover.classList.add('has-cover');
+  }
+
+  // ---------- CSS ----------
   function addStyles() {
-    if (document.getElementById('coverFeatureStyles')) return;
+    if (document.getElementById('aiallanCoverStyles')) return;
 
     const style = document.createElement('style');
-    style.id = 'coverFeatureStyles';
+    style.id = 'aiallanCoverStyles';
 
     style.textContent = `
-      .aiallan-cover {
+      /* =========================
+         PUBLIC COVER
+         ========================= */
+
+      #aiallanProfileCover {
         width: 100%;
-        aspect-ratio: 820 / 312;
-        min-height: 150px;
-        max-height: 320px;
-        background: rgba(20,18,28,.75);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-radius: 18px;
-        margin: 0 auto 18px;
+        height: 0;
         overflow: hidden;
         position: relative;
-        border: 1px solid rgba(255,255,255,.12);
+        margin: 0 auto;
+        transition: height .3s ease;
       }
 
-      .aiallan-cover-empty {
+      #aiallanProfileCover.has-cover {
+        height: 260px;
+      }
+
+      #aiallanProfileCover .aiallan-cover-image {
+        position: absolute;
+        inset: 0;
+
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+
+        background-color: #17131d;
+      }
+
+      #aiallanProfileCover .aiallan-cover-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background:
+          linear-gradient(
+            to bottom,
+            rgba(0,0,0,.08),
+            rgba(0,0,0,.45)
+          );
+      }
+
+
+      /* =========================
+         ADMIN COVER
+         ========================= */
+
+      #aiallanCoverAdmin {
         width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(255,255,255,.35);
-        font-size: 13px;
-      }
-
-      .cover-admin-box {
-        margin: 12px 0;
+        margin: 0 0 16px;
         padding: 14px;
-        border-radius: 14px;
-        background: rgba(255,255,255,.05);
-        border: 1px solid rgba(255,255,255,.1);
+
+        box-sizing: border-box;
+
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: 16px;
+
+        background: rgba(255,255,255,.035);
       }
 
       .cover-admin-title {
+        font-size: 16px;
         font-weight: 700;
         margin-bottom: 10px;
       }
 
-      .cover-admin-row {
+      .cover-admin-preview {
+        width: 100%;
+        height: 125px;
+
+        overflow: hidden;
+        border-radius: 12px;
+
         display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 10px;
+
+        background: #18151d;
+        color: #888;
+        font-size: 13px;
       }
 
-      .cover-admin-row button,
-      .cover-admin-row label {
-        flex: 1;
-        min-width: 120px;
-        padding: 11px 14px;
-        border: 0;
-        border-radius: 10px;
-        cursor: pointer;
-        text-align: center;
+      .cover-admin-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
 
-      .cover-upload-label {
-        background: linear-gradient(90deg,#ff2d70,#9b5cff);
+      .cover-file-picker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        min-height: 48px;
+
+        box-sizing: border-box;
+
+        border-radius: 12px;
+
+        background: linear-gradient(
+          90deg,
+          #ff278b,
+          #a84cff
+        );
+
         color: white;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        margin-bottom: 8px;
       }
 
       .cover-remove-btn {
-        background: rgba(255,255,255,.1);
-        color: white;
+        width: 100%;
       }
 
-      #coverUploadInput {
-        display: none;
+
+      /* =========================
+         MOBILE
+         ========================= */
+
+      @media (max-width: 600px) {
+        #aiallanProfileCover.has-cover {
+          height: 190px;
+        }
+
+        .cover-admin-preview {
+          height: 105px;
+        }
       }
     `;
 
     document.head.appendChild(style);
   }
 
-  /* ---------- PUBLIC COVER ---------- */
+  // ---------- Initialize ----------
+  function init() {
+    addStyles();
 
-  function createCover() {
-    if (document.getElementById('aiallanCover')) return;
-
-    const home = document.getElementById('homePage');
-    if (!home) return;
-
-    const profile = home.querySelector('.profile');
-    if (!profile) return;
-
-    const cover = document.createElement('div');
-    cover.id = 'aiallanCover';
-    cover.className = 'aiallan-cover';
-
-    const saved = loadCover();
-
-    if (saved) {
-      cover.style.backgroundImage = `url("${saved}")`;
-      cover.innerHTML = '';
-    } else {
-      cover.innerHTML =
-        '<div class="aiallan-cover-empty">Profile Cover Photo</div>';
-    }
-
-    profile.parentNode.insertBefore(cover, profile);
-
-    window.updateAiallanCover = function (dataUrl) {
-      if (!dataUrl) {
-        cover.style.backgroundImage = '';
-        cover.innerHTML =
-          '<div class="aiallan-cover-empty">Profile Cover Photo</div>';
-        return;
-      }
-
-      cover.innerHTML = '';
-      cover.style.backgroundImage = `url("${dataUrl}")`;
-    };
-  }
-
-  /* ---------- ADMIN CONTROLS ---------- */
-
-  function createAdminControls() {
-    if (document.getElementById('coverAdminBox')) return;
+    createPublicCover();
 
     /*
-      We try to place this inside the existing admin panel.
-      It will look for common admin containers first.
+      Admin panel can be rendered dynamically,
+      so try several times.
     */
+    createAdminCoverControl();
 
-    const adminPanel =
-      document.querySelector('.admin-panel') ||
-      document.querySelector('.admin-content') ||
-      document.querySelector('.admin-modal') ||
-      document.querySelector('.modal-box');
+    setTimeout(createAdminCoverControl, 500);
+    setTimeout(createAdminCoverControl, 1200);
+    setTimeout(createAdminCoverControl, 2500);
 
-    if (!adminPanel) {
-      console.warn('Cover feature: admin panel not found yet.');
-      return;
-    }
+    const observer = new MutationObserver(() => {
+      createPublicCover();
+      createAdminCoverControl();
 
-    const box = document.createElement('div');
-    box.id = 'coverAdminBox';
-    box.className = 'cover-admin-box';
+      const saved = getCover();
 
-    box.innerHTML = `
-      <div class="cover-admin-title">
-        🖼️ Profile Cover Photo
-      </div>
-
-      <div class="cover-admin-row">
-
-        <label
-          class="cover-upload-label"
-          for="coverUploadInput">
-          Upload Cover Photo
-        </label>
-
-        <input
-          type="file"
-          id="coverUploadInput"
-          accept="image/*">
-
-        <button
-          type="button"
-          class="cover-remove-btn"
-          id="coverRemoveBtn">
-          Remove Cover
-        </button>
-
-      </div>
-    `;
-
-    adminPanel.appendChild(box);
-
-    const input = document.getElementById('coverUploadInput');
-    const removeBtn = document.getElementById('coverRemoveBtn');
-
-    input.addEventListener('change', function () {
-      const file = this.files && this.files[0];
-
-      if (!file) return;
-
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image.');
-        return;
+      if (saved) {
+        updatePublicCover(saved);
       }
-
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-        const dataUrl = event.target.result;
-
-        if (saveCover(dataUrl)) {
-          if (window.updateAiallanCover) {
-            window.updateAiallanCover(dataUrl);
-          }
-
-          alert('✅ Cover photo saved!');
-        } else {
-          alert('⚠️ Cover photo could not be saved.');
-        }
-      };
-
-      reader.readAsDataURL(file);
     });
 
-    removeBtn.addEventListener('click', function () {
-      try {
-        localStorage.removeItem(COVER_KEY);
-      } catch (e) {}
-
-      if (window.updateAiallanCover) {
-        window.updateAiallanCover('');
-      }
-
-      alert('Cover photo removed.');
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
-  }
-
-  /* ---------- START ---------- */
-
-  function initCoverFeature() {
-    addStyles();
-    createCover();
-    createAdminControls();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCoverFeature);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    initCoverFeature();
+    init();
   }
 
 })();

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Page</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07060b;color:#fff;font-family:Arial,sans-serif}.wrap{width:min(620px,100%);margin:auto;padding:18px 16px 50px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-size:23px;font-weight:800}.muted{color:#999;font-size:13px}button,.btn{border:1px solid #403548;background:#15111b;color:#fff;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}.card{background:linear-gradient(180deg,#15111c,#0f0c14);border:1px solid #30263a;border-radius:20px;padding:18px;margin:14px 0}.hero{text-align:center}.avatar{width:78px;height:78px;border-radius:50%;overflow:hidden;margin:0 auto 10px;border:2px solid #ff4d87;background:#21182a;display:grid;place-items:center;font-size:28px}.avatar img{width:100%;height:100%;object-fit:cover}.hero h1{margin:0 0 5px;font-size:25px}.hero p{margin:0;color:#aaa}.field{margin-top:13px}label{display:block;color:#aaa;font-size:13px;margin:0 0 7px}input,textarea{width:100%;background:#09080d;color:#fff;border:1px solid #3a3043;border-radius:12px;padding:13px;outline:none}textarea{min-height:72px;resize:vertical}.save{width:100%;margin-top:14px;border:0;background:linear-gradient(135deg,#ff3d81,#8a43ff);padding:14px}.linkbox{display:flex;gap:8px}.linkbox input{flex:1}.detect{white-space:nowrap}.status{min-height:20px;margin-top:10px;color:#aaa;font-size:13px}.product{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid #2b2432}.product:first-child{border-top:0}.thumb{width:58px;height:58px;border-radius:12px;overflow:hidden;background:#19131f;display:grid;place-items:center;flex:none}.thumb img{width:100%;height:100%;object-fit:cover}.product strong{display:block;font-size:14px}.product small{display:block;color:#999;margin-top:4px;word-break:break-all}.remove{margin-left:auto;padding:7px 10px}.cat{margin-top:15px}.cat h3{margin:0 0 8px;font-size:15px}.empty{color:#777;font-size:13px}.preview{display:block;text-align:center;text-decoration:none;margin-top:12px}.file{padding:5px 0}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:500px){.row2{grid-template-columns:1fr}.linkbox{flex-direction:column}.detect{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="brand">My Page</div><button id="logout">Logout</button></div>
+
+  <div class="card hero">
+    <div class="avatar" id="avatarPreview">A</div>
+    <h1 id="displayName">Loading…</h1>
+    <p id="displayUsername"></p>
+  </div>
+
+  <div class="card">
+    <div class="row2">
+      <div class="field"><label>Name</label><input id="name" placeholder="Your name"></div>
+      <div class="field"><label>Username</label><input id="username" disabled></div>
+    </div>
+    <div class="field"><label>Bio</label><textarea id="bio" placeholder="Short bio"></textarea></div>
+    <div class="row2">
+      <div class="file"><label>Profile photo</label><input id="avatar" type="file" accept="image/*"></div>
+      <div class="file"><label>Cover photo</label><input id="cover" type="file" accept="image/*"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 5px">Add your links</h3>
+    <div class="muted">Paste a product link. The system will detect the platform and try to read the product automatically.</div>
+    <div class="linkbox" style="margin-top:12px">
+      <input id="link" type="url" placeholder="Paste Shopee, TikTok Shop, Amazon, Lazada, or other link">
+      <button class="detect" id="detect">⚡ Detect</button>
+    </div>
+    <div class="status" id="detectStatus"></div>
+    <div id="products"></div>
+  </div>
+
+  <button class="save" id="save">Save changes</button>
+  <a class="btn preview" id="preview" href="#" target="_blank">Open my public page</a>
+  <div class="status" id="status"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://tqtmssdjfptmbvjtxien.supabase.co";
+const SUPABASE_KEY="sb_publishable_IeTtQyGxZ0THrBuqPmK9cQ_10JeusoA";
+const BUCKET="site-assets";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=id=>document.getElementById(id);
+let user=null,profile=null;
+const DEFAULT_CATS=["Health & Beauty","Clothes & Fashion","Gadgets & Accessories","Campaign Tools","Foods & Groceries","Heavy Duty Tools","Motor & Vehicle Parts","Books & Learning"];
+let categories=[];
+
+function setStatus(t){$('status').textContent=t||''}
+function setDetectStatus(t){$('detectStatus').textContent=t||''}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function platform(url){try{const h=new URL(url).hostname.toLowerCase();if(h.includes('shopee'))return'Shopee';if(h.includes('tiktok'))return'TikTok Shop';if(h.includes('amazon'))return'Amazon';if(h.includes('lazada'))return'Lazada';if(h.includes('shein'))return'SHEIN';if(h.includes('ebay'))return'eBay';return h.replace(/^www\./,'')}catch{return'Link'}}
+function ensureCats(){
+  if(!Array.isArray(profile?.categories)||!profile.categories.length){categories=DEFAULT_CATS.map(name=>({name,thumb:null,products:[]}));return}
+  categories=DEFAULT_CATS.map((name,i)=>{const c=profile.categories[i]||{};return{name:c.name||name,thumb:c.thumb||null,products:Array.isArray(c.products)?c.products:[]}});
+}
+function renderProducts(){
+  const root=$('products');root.innerHTML='';let count=0;
+  categories.forEach((c,ci)=>{
+    const valid=c.products.filter(p=>p&&p.url);
+    if(!valid.length)return;
+    count+=valid.length;
+    const sec=document.createElement('div');sec.className='cat';
+    sec.innerHTML='<h3>'+esc(c.name)+'</h3>';
+    valid.forEach((p)=>{
+      const row=document.createElement('div');row.className='product';
+      row.innerHTML='<div class="thumb">'+(p.thumb?'<img src="'+esc(p.thumb)+'" alt="">':'🔗')+'</div><div><strong>'+esc(p.name||platform(p.url))+'</strong><small>'+esc(platform(p.url))+'</small></div><button class="remove" type="button">✕</button>';
+      row.querySelector('.remove').onclick=()=>{c.products=c.products.filter(x=>x!==p);renderProducts()};
+      sec.appendChild(row);
+    });
+    root.appendChild(sec);
+  });
+  if(!count)root.innerHTML='<div class="empty" style="margin-top:14px">No links yet. Add one above.</div>';
+}
+async function requireUser(){
+  const {data}=await sb.auth.getUser();user=data.user;
+  if(!user){location.href='login.html';return false}
+  return true;
+}
+async function load(){
+  if(!await requireUser())return;
+  const {data,error}=await sb.from('creator_profiles').select('*').eq('user_id',user.id).maybeSingle();
+  if(error){setStatus(error.message);return}
+  if(!data){setStatus('Profile not found.');return}
+  profile=data;ensureCats();
+  $('username').value=data.username||'';$('name').value=data.name||'';$('bio').value=data.bio||'';
+  $('displayName').textContent=data.name||data.username||'Creator';$('displayUsername').textContent='@'+(data.username||'');
+  if(data.avatar)$('avatarPreview').innerHTML='<img src="'+esc(data.avatar)+'" alt="">';
+  renderProducts();$('preview').href='user.html?u='+encodeURIComponent(data.username||'');
+}
+async function upload(file,folder){
+  if(!file)return null;
+  const ext=(file.name.split('.').pop()||'bin').replace(/[^a-z0-9]/gi,'').toLowerCase()||'bin';
+  const path=folder+'/'+user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+  const {error}=await sb.storage.from(BUCKET).upload(path,file,{upsert:false,contentType:file.type||undefined,cacheControl:'31536000'});
+  if(error)throw error;
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+async function detectLink(){
+  const url=$('link').value.trim();
+  if(!/^https?:\/\//i.test(url)){setDetectStatus('Paste a valid http/https link.');return}
+  $('detect').disabled=true;setDetectStatus('Reading link…');
+  try{
+    const {data,error}=await sb.functions.invoke('resolve-product',{body:{url}});
+    if(error)throw error;
+    const item={url,name:data?.name||platform(url),price:data?.price||'',thumb:data?.thumbnail||null,category:Number(data?.categoryIndex)||3};
+    const ci=Math.max(1,Math.min(8,item.category))-1;
+    categories[ci].products.push(item);renderProducts();$('link').value='';
+    setDetectStatus('✓ '+(item.name||'Link added')+' · '+(data?.categoryName||categories[ci].name));
+  }catch(e){
+    // Manual fallback: never lose the link when metadata is blocked.
+    const item={url,name:platform(url),price:'',thumb:null,category:3};
+    categories[2].products.push(item);renderProducts();$('link').value='';
+    setDetectStatus('Link added. Automatic reading was unavailable, so you can keep it manually.');
+  }finally{$('detect').disabled=false}
+}
+$('detect').onclick=detectLink;
+$('link').addEventListener('paste',()=>setTimeout(()=>{if(/^https?:\/\//i.test($('link').value.trim()))detectLink()},120));
+$('save').onclick=async()=>{
+  if(!user)return;$('save').disabled=true;setStatus('Saving…');
+  try{
+    let avatar=profile.avatar||null,cover=profile.cover||null;
+    if($('avatar').files[0])avatar=await upload($('avatar').files[0],'avatars');
+    if($('cover').files[0])cover=await upload($('cover').files[0],'covers');
+    const patch={name:$('name').value.trim(),bio:$('bio').value.trim(),avatar,cover,categories,updated_at:new Date().toISOString()};
+    const {data,error}=await sb.from('creator_profiles').update(patch).eq('user_id',user.id).select().single();
+    if(error)throw error;profile=data;setStatus('✓ Saved successfully.');$('preview').href='user.html?u='+encodeURIComponent(data.username||'');
+  }catch(e){setStatus(e.message||'Save failed.')}finally{$('save').disabled=false}
+};
+$('logout').onclick=async()=>{await sb.auth.signOut();location.href='login.html'};
+load();
+</script>
+</body>
+</html>

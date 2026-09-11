@@ -7,4 +7,4 @@
  *
  * Empty = automatic fallback to the original Supabase Storage URL.
  */
-window.AIALLAN_CDN_BASE = '';
+window.AIALLAN_CDN_BASE = 'https://cdn.aiallan.shop';
